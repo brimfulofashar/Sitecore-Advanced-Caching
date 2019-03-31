@@ -44,7 +44,7 @@ namespace SitecoreAdvancedCaching.Search
 
                             if (rendering == null) return null;
 
-                            sb.Append(rendering.UniqueId + "|");
+                            sb.Append(rendering.ItemID + "|");
                         }
                     }
 
