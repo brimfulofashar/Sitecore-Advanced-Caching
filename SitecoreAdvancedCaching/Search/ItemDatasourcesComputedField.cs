@@ -19,7 +19,9 @@ namespace SitecoreAdvancedCaching.Search
 
         public string ReturnType { get; set; }
 
-        private Regex IDRegex = new Regex(@"(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}");
+        private Regex IDRegex =
+            new Regex(
+                @"(\{){0,1}[0-9a-fA-F]{8}\-{0,1}[0-9a-fA-F]{4}\-{0,1}[0-9a-fA-F]{4}\-{0,1}[0-9a-fA-F]{4}\-{0,1}[0-9a-fA-F]{12}(\}){0,1}");
 
         public object ComputeFieldValue(IIndexable indexable)
         {
@@ -33,8 +35,6 @@ namespace SitecoreAdvancedCaching.Search
 
                 if (layout != null)
                 {
-                    
-
                     // loop over devices in the rendering
                     for (int deviceIndex = layout.Devices.Count - 1; deviceIndex >= 0; deviceIndex--)
                     {
@@ -51,16 +51,21 @@ namespace SitecoreAdvancedCaching.Search
 
                             foreach (var match in IDRegex.Matches(rendering.Datasource))
                             {
-                                sb.Append("{" + match + "}" + "|");
+                                sb.Append(
+                                    "r:" + rendering.ItemID.Replace("{", string.Empty).Replace("}", string.Empty) +
+                                    "{" + match + "}" + "|");
                             }
                         }
                     }
 
                     foreach (Field field in item.Fields)
                     {
-                        foreach (var match in IDRegex.Matches(field.Value))
+                        if (!IsStandardField(field))
                         {
-                            sb.Append("{" + match + "}" + "|");
+                            foreach (var match in IDRegex.Matches(field.Value))
+                            {
+                                sb.Append("f:" + field.ID.Guid + "{" + Guid.Parse(match.ToString()) + "}" + "|");
+                            }
                         }
                     }
                 }
@@ -69,6 +74,15 @@ namespace SitecoreAdvancedCaching.Search
             }
 
             return null;
+        }
+
+        private bool IsStandardField(Field field)
+        {
+            Sitecore.Data.Templates.Template template = Sitecore.Data.Managers.TemplateManager.GetTemplate(
+                Sitecore.Configuration.Settings.DefaultBaseTemplate,
+                field.Database);
+            Sitecore.Diagnostics.Assert.IsNotNull(template, "template");
+            return template.ContainsField(field.ID);
         }
     }
 }

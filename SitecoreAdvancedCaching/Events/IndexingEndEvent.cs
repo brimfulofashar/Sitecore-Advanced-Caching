@@ -43,11 +43,7 @@ namespace SitecoreAdvancedCaching.Events
                                     var rules = RuleFactory.ParseRules<ExtendedRuleContext>(Database.GetDatabase("web"), xmlRules);
                                     foreach (var rule in rules.Rules)
                                     {
-                                        var result = rule.Evaluate(new ExtendedRuleContext { SearchResultItem = publishedItem });
-                                        if (result)
-                                        {
-                                            Sitecore.Events.Event.RaiseEvent("caching", publishedItem.ItemId.Guid);
-                                        }
+                                        rule.Evaluate(new ExtendedRuleContext { SearchResultItem = publishedItem, Item = renderingItem.GetItem(), IndexName = _indexName });
                                     }
                                 }
                             }

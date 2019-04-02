@@ -14,14 +14,19 @@ namespace SitecoreAdvancedCaching.Rules
             Assert.ArgumentNotNull(ruleContext, nameof(ruleContext));
             using (var context = ContentSearchManager.GetIndex(ruleContext.IndexName).CreateSearchContext())
             {
-                var renderingsQueryResults = context.GetQueryable<SearchResultItem>().Where(i => !string.IsNullOrEmpty(i["RenderingRules"])).ToList();
+                var publishedItem = ruleContext.SearchResultItem;
+                if (publishedItem == null)
+                    return false;
 
-                var renderingPublished = renderingsQueryResults.Any(x => x.ItemId == ruleContext.SearchResultItem.ItemId);
+                var renderingsQueryResults = context.GetQueryable<SearchResultItem>()
+                    .Where(i => !string.IsNullOrEmpty(i["RenderingRules"])).ToList();
 
-                if (renderingPublished) Event.RaiseEvent("caching", ruleContext.SearchResultItem.ItemId.Guid);
+                var renderingPublished = renderingsQueryResults.Any(x => x.ItemId == publishedItem.ItemId);
+
+                if (renderingPublished) Event.RaiseEvent("caching", publishedItem.ItemId.Guid);
 
                 return renderingPublished;
-            }            
+            }
         }
     }
 }
