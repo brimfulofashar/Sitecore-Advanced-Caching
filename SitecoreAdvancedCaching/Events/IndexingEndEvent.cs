@@ -23,56 +23,35 @@ namespace SitecoreAdvancedCaching.Events
             {
                 using (var context = ContentSearchManager.GetIndex(_indexName).CreateSearchContext())
                 {
-                    var renderingsQueryResults = context.GetQueryable<SearchResultItem>().Where(i => !string.IsNullOrEmpty(i["RenderingRules"])).ToList();
-
-                    var pagesQueryResults = context.GetQueryable<SearchResultItem>().Where(i => !string.IsNullOrEmpty(i["ItemRenderings"])).ToList();
-
                     var publishedItemsQueryResult = context.GetQueryable<SearchResultItem>().Where(i => i["PublishingTimestamp"] == PublishingStartEvent.PublishingStartTimestamp).ToList();
+                    var rendeingItemsWithCacheRulesQueryResult = context.GetQueryable<SearchResultItem>().Where(i => !string.IsNullOrEmpty(i["CachingRules"])).ToList();
 
                     foreach (var publishedItem in publishedItemsQueryResult)
                     {
-                        // if a page is published then we invalidate all caches for that page
-                        var pageRenderings = publishedItem.Fields["itemrenderings"].ToString();
-                        if (!string.IsNullOrEmpty(pageRenderings))
-                        {                            
-                            Sitecore.Events.Event.RaiseEvent("caching", "_#iid:" + publishedItem.ItemId.Guid);
-                        }
-                        // if a rendering is published then we invalidate all caches where the rendering is used
-                        else if (renderingsQueryResults.Any(x => x.ItemId == publishedItem.ItemId))
+                        // if a rendering is published then we simply invalidate all caches where the id is in cache
+                        if (publishedItem.Fields.ContainsKey("cachingrules"))
                         {
-                            Sitecore.Events.Event.RaiseEvent("caching", "_#ruid:" + publishedItem.ItemId.Guid);
+                            Sitecore.Events.Event.RaiseEvent("caching", publishedItem.ItemId.Guid);
                         }
-                        // else if must be a normal item and we must execute the rules engine.
                         else
                         {
-                            foreach (var rendering in renderingsQueryResults)
+                            foreach (var renderingItem in rendeingItemsWithCacheRulesQueryResult)
                             {
-                                var xmlRules = rendering.Fields["renderingrules"].ToString();
+                                var xmlRules = renderingItem.Fields["cachingrules"].ToString();
                                 if (!string.IsNullOrEmpty(xmlRules))
                                 {
-                                    var referencedPageItems = pagesQueryResults.Where(x =>
-                                            x.Fields["itemrenderings"].ToString()
-                                                .Contains(rendering.ItemId.ToString()))
-                                        .ToList();
-                                    foreach (var referencedPageItem in referencedPageItems)
+                                    var rules = RuleFactory.ParseRules<ExtendedRuleContext>(Database.GetDatabase("web"), xmlRules);
+                                    foreach (var rule in rules.Rules)
                                     {
-                                        Item pageItem = referencedPageItem.GetItem();
-                                        var rules = RuleFactory.ParseRules<RuleContext>(Database.GetDatabase("web"),
-                                            xmlRules);
-                                        foreach (var rule in rules.Rules)
+                                        var result = rule.Evaluate(new ExtendedRuleContext { SearchResultItem = publishedItem });
+                                        if (result)
                                         {
-
-                                            var result = rule.Evaluate(new ExtendedRuleContext {PageItem = pageItem, ItemToCompare = publishedItem.GetItem()});
-                                            if (result)
-                                            {
-                                                Sitecore.Events.Event.RaiseEvent("caching", "_#rid:" + rendering.ItemId.Guid);
-                                            }
+                                            Sitecore.Events.Event.RaiseEvent("caching", publishedItem.ItemId.Guid);
                                         }
                                     }
                                 }
                             }
                         }
-                        
                     }
                 }
             }

@@ -10,10 +10,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   </PropertyGroup>
   <ItemGroup>
     <File Include="App_Config/Include/Foundation/SitecoreAdvancedCaching.config">
-      <publishTime>03/29/2019 01:21:14</publishTime>
+      <publishTime>04/01/2019 14:00:34</publishTime>
     </File>
     <File Include="bin/App_Config/Include/Foundation/SitecoreAdvancedCaching.config">
-      <publishTime>03/29/2019 01:21:14</publishTime>
+      <publishTime>04/01/2019 14:00:34</publishTime>
     </File>
     <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
       <publishTime>05/24/2018 14:38:22</publishTime>
@@ -172,10 +172,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>03/28/2018 06:39:54</publishTime>
     </File>
     <File Include="bin/SitecoreAdvancedCaching.dll">
-      <publishTime>03/31/2019 15:38:16</publishTime>
+      <publishTime>04/02/2019 12:05:51</publishTime>
     </File>
     <File Include="bin/SitecoreAdvancedCaching.pdb">
-      <publishTime>03/31/2019 15:38:16</publishTime>
+      <publishTime>04/02/2019 12:05:51</publishTime>
     </File>
   </ItemGroup>
 </Project>

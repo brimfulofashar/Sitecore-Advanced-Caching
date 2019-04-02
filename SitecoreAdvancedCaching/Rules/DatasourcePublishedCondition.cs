@@ -3,7 +3,7 @@ using Sitecore.Rules.Conditions;
 
 namespace SitecoreAdvancedCaching.Rules
 {
-    public class ItemIdCondition<T> : StringOperatorCondition<T> where T : ExtendedRuleContext
+    public class DatasourcePublishedCondition<T> : WhenCondition<T> where T : ExtendedRuleContext
     {
         protected override bool Execute(T ruleContext)
         {
@@ -11,7 +11,7 @@ namespace SitecoreAdvancedCaching.Rules
             var obj = ruleContext.Item;
             if (obj == null)
                 return false;
-            return ruleContext.ItemToCompare != null && ruleContext.ItemToCompare == ruleContext.Item;
+            return ruleContext.SearchResultItem != null && ruleContext.SearchResultItem.GetItem() == ruleContext.Item;
         }
     }
 }

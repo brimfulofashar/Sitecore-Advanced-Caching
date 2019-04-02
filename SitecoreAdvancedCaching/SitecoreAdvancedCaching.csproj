@@ -87,11 +87,17 @@
     <Compile Include="Events\PublishingStartEvent.cs" />
     <Compile Include="Events\IndexingEndEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\RenderingPublishedCondition.cs" />
+    <Compile Include="Rules\PagePublishedCondition.cs" />
     <Compile Include="Rules\ExtendedRuleContext.cs" />
-    <Compile Include="Rules\ItemIdCondition.cs" />
+    <Compile Include="Rules\DatasourcePublishedCondition.cs" />
+    <Compile Include="Rules\ItemOrFamilyPublishedCondition.cs" />
+    <Compile Include="Rules\ItemPublishedCondition.cs" />
+    <Compile Include="Search\ItemDatasourcesComputedField.cs" />
+    <Compile Include="Search\ItemHasLayoutComputedField.cs" />
     <Compile Include="Search\ItemRenderingsComputedField.cs" />
     <Compile Include="Search\PublishingTimestampComputedField.cs" />
-    <Compile Include="Search\RenderingRulesComputedField.cs" />
+    <Compile Include="Search\ItemCachingRulesComputedField.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Config\Include\Foundation\SitecoreAdvancedCaching.config">
