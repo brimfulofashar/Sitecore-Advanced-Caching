@@ -1,20 +1,23 @@
-﻿using Sitecore.Mvc.Pipelines.Response.RenderRendering;
+﻿using System.Linq;
+using Sitecore.Diagnostics;
+using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 using Sitecore.Mvc.Presentation;
+using SitecoreAdvancedCaching.Providers;
 
 namespace SitecoreAdvancedCaching.Cache
 {
-    public class GenerateCacheKeyWithUID : GenerateCacheKey
+    public class GenerateCacheKeyWithUID : RenderRenderingProcessor
     {
-        protected override string GenerateKey(Rendering rendering, RenderRenderingArgs args)
+        public override void Process(RenderRenderingArgs args)
         {
-            var key = base.GenerateKey(rendering, args);
-            // stores the id of the item that refers to the rendering
-            key += "_#iid:" + args.PageContext.Item.ID.Guid;
-            // stores the unique id of the rendering on the page item
-            key += "_#ruid:" + args.Rendering.UniqueId;
-            // stores the item id of the rendering
-            key += "_#rid:" + args.Rendering.RenderingItem.ID.Guid;
-            return key;
+            Assert.ArgumentNotNull((object)args, nameof(args));
+            if (!args.Rendered)
+                return;
+            string cacheKey = args.CacheKey;
+            if (!args.Cacheable || string.IsNullOrEmpty(cacheKey))
+                return;
+            cacheKey += "_#aids:" + string.Join("|", ItemAccessTracker.Instance.ItemIdKey_RenderingIDsValue_Dic.Where(x => x.Value.Contains(args.Rendering.UniqueId.ToString())).Select(x => x.Key));
+            args.CacheKey = cacheKey;
         }
     }
 }

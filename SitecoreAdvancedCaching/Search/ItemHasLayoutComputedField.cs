@@ -9,6 +9,7 @@ using Sitecore.ContentSearch.ComputedFields;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Layouts;
+using SitecoreAdvancedCaching.Helpers;
 
 namespace SitecoreAdvancedCaching.Search
 {
@@ -23,15 +24,7 @@ namespace SitecoreAdvancedCaching.Search
             Item item = indexable as SitecoreIndexableItem;
             if (item != null)
             {
-                var layout = new LayoutField(item).Value;
-                if (!string.IsNullOrEmpty(layout))
-                {
-//                    var layoutField = new LayoutField(item.Fields[FieldIDs.FinalLayoutField]);
-//
-//                    LayoutDefinition layout = LayoutDefinition.Parse(layoutField.Value);
-
-                    return true;
-                }
+                return ItemLayoutHelper.ItemHasLayout(item);
             }
 
             return false;
