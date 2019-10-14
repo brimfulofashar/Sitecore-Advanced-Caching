@@ -92,19 +92,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\GenerateCacheKeyWithUID.cs" />
-    <Compile Include="Events\HtmlCacheClearingEvent.cs" />
-    <Compile Include="Events\PublishingStartEvent.cs" />
-    <Compile Include="Events\IndexingEndEvent.cs" />
-    <Compile Include="Helpers\ItemLayoutHelper.cs" />
-    <Compile Include="Models\CacheSearchResultItem.cs" />
+    <Compile Include="Events\ClearCacheRemote.cs" />
+    <Compile Include="Cache\GenerateCacheKeyWithUIDBefore.cs" />
+    <Compile Include="Cache\GenerateCacheKeyWithUIDAfter.cs" />
+    <Compile Include="Controls\MultiRootTreeList.cs" />
+    <Compile Include="Events\ItemPublishedEvent.cs" />
+    <Compile Include="Events\ItemPublishNotifier.cs" />
+    <Compile Include="Pipelines\ItemPublishingWatchProcesser.cs" />
     <Compile Include="Pipelines\RenderingContextProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ItemTrackingProvider.cs" />
-    <Compile Include="Search\ItemDatasourcesComputedField.cs" />
-    <Compile Include="Search\ItemHasLayoutComputedField.cs" />
-    <Compile Include="Search\ItemRenderingsComputedField.cs" />
-    <Compile Include="Search\PublishingTimestampComputedField.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Config\Include\zFoundation\zSitecoreAdvancedCaching.config">
@@ -115,13 +112,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
-    <Content Include="web.config" />
-    <None Include="web.Debug.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
-    <None Include="web.Release.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
+    <None Include="web.config" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
