@@ -15,11 +15,11 @@ namespace SitecoreAdvancedCaching.Cache
             var cacheKey = args.CacheKey;
             if (!args.Cacheable || string.IsNullOrEmpty(cacheKey))
                 return;
-            if (!ItemAccessTracker.Instance.ItemIdKey_RenderingIDsValue_Dic.ContainsKey(args.Rendering.UniqueId.ToString()))
+            if (!ItemAccessTracker.Instance.RenderingIdKey_ItemIDsValue_Dic.ContainsKey(args.Rendering.UniqueId.ToString()))
                 return;
             var usedItemIds = string.Join("|",
                 ItemAccessTracker.Instance
-                    .ItemIdKey_RenderingIDsValue_Dic[args.Rendering.UniqueId.ToString()]
+                    .RenderingIdKey_ItemIDsValue_Dic[args.Rendering.UniqueId.ToString()]
                     .Select(x => x.ToString()).OrderBy(x => x));
 
             if (!string.IsNullOrEmpty(usedItemIds))

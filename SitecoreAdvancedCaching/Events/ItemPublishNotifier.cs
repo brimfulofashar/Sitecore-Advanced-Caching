@@ -12,9 +12,14 @@ namespace SitecoreAdvancedCaching.Events
         {
             var argContext = ((ItemProcessedEventArgs) args).Context;
             var itemId = argContext.ItemId;
-            var remoteEvent = new ItemPublishedArgs("publish:itemProcessed:Remote", itemId.Guid,
-                argContext.Action == PublishAction.DeleteTargetItem);
-            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+            var operation = argContext.PublishContext.CustomData[itemId.ToString()];
+            if (operation != null)
+            {
+                var createUpdateOrDeleteOperation =(SitecoreAdvancedCaching.Models.PublishOperation.PublishOperationEnum)operation;
+                var remoteEvent = new ItemPublishedArgs("publish:itemProcessed:Remote", itemId.Guid,
+                    createUpdateOrDeleteOperation);
+                Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+            }
         }
     }
 }

@@ -97,7 +97,9 @@
     <Compile Include="Cache\GenerateCacheKeyWithUIDAfter.cs" />
     <Compile Include="Controls\MultiRootTreeList.cs" />
     <Compile Include="Events\ItemPublishedArgs.cs" />
+    <Compile Include="Events\ItemPrePublish.cs" />
     <Compile Include="Events\ItemPublishNotifier.cs" />
+    <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Pipelines\ItemPublishingWatchProcesser.cs" />
     <Compile Include="Pipelines\RenderingContextProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

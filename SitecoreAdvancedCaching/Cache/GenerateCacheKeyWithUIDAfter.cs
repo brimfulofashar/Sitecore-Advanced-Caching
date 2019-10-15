@@ -17,11 +17,11 @@ namespace SitecoreAdvancedCaching.Cache
                 return;
             if (cacheKey.Contains("_#aids:"))
                 return;
-            if (!ItemAccessTracker.Instance.ItemIdKey_RenderingIDsValue_Dic.ContainsKey(args.Rendering.UniqueId.ToString()))
+            if (!ItemAccessTracker.Instance.RenderingIdKey_ItemIDsValue_Dic.ContainsKey(args.Rendering.UniqueId.ToString()))
                 return;
             cacheKey += "_#aids:" + string.Join("|",
                             ItemAccessTracker.Instance
-                                .ItemIdKey_RenderingIDsValue_Dic[args.Rendering.UniqueId.ToString()]
+                                .RenderingIdKey_ItemIDsValue_Dic[args.Rendering.UniqueId.ToString()]
                                 .Select(x => x.ToString()).OrderBy(x => x));
             args.CacheKey = cacheKey;
         }

@@ -60,11 +60,11 @@ namespace SitecoreAdvancedCaching.Providers
                 new Lazy<ItemAccessTracker>
                     (() => new ItemAccessTracker());
 
-        public readonly Dictionary<string, List<ID>> ItemIdKey_RenderingIDsValue_Dic;
+        public readonly Dictionary<string, List<ID>> RenderingIdKey_ItemIDsValue_Dic;
 
         private ItemAccessTracker()
         {
-            ItemIdKey_RenderingIDsValue_Dic = new Dictionary<string, List<ID>>();
+            RenderingIdKey_ItemIDsValue_Dic = new Dictionary<string, List<ID>>();
             _globalCacheableTemplateIDs = Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|').Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
         }
 
@@ -81,22 +81,29 @@ namespace SitecoreAdvancedCaching.Providers
                 var cacheableTemplates = rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value;
                 if (!string.IsNullOrEmpty(renderingId) && (cacheableTemplates.Contains(item.TemplateID.ToString()) || _globalCacheableTemplateIDs.Any(x => x == item.TemplateID)))
                 {
-                    if (!ItemIdKey_RenderingIDsValue_Dic.ContainsKey(renderingId))
-                        ItemIdKey_RenderingIDsValue_Dic.Add(renderingId, new List<ID> {item.ID});
-                    else if (!ItemIdKey_RenderingIDsValue_Dic[renderingId].Contains(item.ID))
-                        ItemIdKey_RenderingIDsValue_Dic[renderingId].Add(item.ID);
+                    if (!RenderingIdKey_ItemIDsValue_Dic.ContainsKey(renderingId))
+                        RenderingIdKey_ItemIDsValue_Dic.Add(renderingId, new List<ID> {item.ID});
+                    else if (!RenderingIdKey_ItemIDsValue_Dic[renderingId].Contains(item.ID))
+                        RenderingIdKey_ItemIDsValue_Dic[renderingId].Add(item.ID);
                 }
             }
         }
 
         public void Remove(ID itemId)
         {
-            if (HttpContext.Current.Items["RenderingId"] != null)
+            List<string> keysToRemove = new List<string>();
+
+            foreach (var key in RenderingIdKey_ItemIDsValue_Dic.Keys)
             {
-                var renderingId = HttpContext.Current.Items["RenderingId"].ToString();
-                if (!string.IsNullOrEmpty(renderingId))
-                    if (!ItemIdKey_RenderingIDsValue_Dic.ContainsKey(renderingId))
-                        ItemIdKey_RenderingIDsValue_Dic.Remove(renderingId);
+                if (RenderingIdKey_ItemIDsValue_Dic[key].Contains(itemId))
+                {
+                    keysToRemove.Add(key);
+                }
+            }
+
+            foreach (var key in keysToRemove)
+            {
+                RenderingIdKey_ItemIDsValue_Dic.Remove(key);
             }
         }
     }
