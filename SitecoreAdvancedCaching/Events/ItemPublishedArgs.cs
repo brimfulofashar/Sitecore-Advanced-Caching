@@ -5,9 +5,9 @@ using Sitecore.Eventing;
 namespace SitecoreAdvancedCaching.Events
 {
     [DataContract]
-    public class ItemPublishedEvent : IHasEventName
+    public class ItemPublishedArgs : IHasEventName
     {
-        public ItemPublishedEvent(string instanceName, string eventName, Guid itemId, bool itemIsDeleted)
+        public ItemPublishedArgs(string instanceName, string eventName, Guid itemId, bool itemIsDeleted)
         {
             InstanceName = instanceName;
             EventName = eventName;

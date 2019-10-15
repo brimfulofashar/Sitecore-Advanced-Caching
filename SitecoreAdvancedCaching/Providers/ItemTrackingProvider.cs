@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using Sitecore;
 using Sitecore.Abstractions;
@@ -64,8 +65,11 @@ namespace SitecoreAdvancedCaching.Providers
         private ItemAccessTracker()
         {
             ItemIdKey_RenderingIDsValue_Dic = new Dictionary<string, List<ID>>();
+            _globalCacheableTemplateIDs = Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|').Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
         }
 
+        private readonly List<ID> _globalCacheableTemplateIDs;
+        
         public static ItemAccessTracker Instance => lazy.Value;
 
         public void Add(Item item)
@@ -73,9 +77,9 @@ namespace SitecoreAdvancedCaching.Providers
             var rendering = (Rendering) HttpContext.Current.Items["Rendering"];
             if (rendering.Caching.Cacheable)
             {
-                var cacheableTemplates = rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value;
                 var renderingId = rendering.UniqueId.ToString();
-                if (!string.IsNullOrEmpty(renderingId) && cacheableTemplates.Contains(item.TemplateID.ToString()))
+                var cacheableTemplates = rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value;
+                if (!string.IsNullOrEmpty(renderingId) && (cacheableTemplates.Contains(item.TemplateID.ToString()) || _globalCacheableTemplateIDs.Any(x => x == item.TemplateID)))
                 {
                     if (!ItemIdKey_RenderingIDsValue_Dic.ContainsKey(renderingId))
                         ItemIdKey_RenderingIDsValue_Dic.Add(renderingId, new List<ID> {item.ID});

@@ -1,4 +1,5 @@
 ﻿using System;
+using Sitecore.Data.Events;
 using Sitecore.Diagnostics;
 using Sitecore.Eventing;
 using Sitecore.Events;
@@ -12,13 +13,14 @@ namespace SitecoreAdvancedCaching.Pipelines
         public void Initialize(PipelineArgs args)
         {
             Log.Info("Initializing publish item watcher", this);
-            var action = new Action<ItemPublishedEvent>(RaiseRemoteEvent);
+            var action = new Action<ItemPublishedArgs>(RaiseRemoteEvent);
             EventManager.Subscribe(action);
         }
 
-        private void RaiseRemoteEvent(ItemPublishedEvent myEvent)
+        private static void RaiseRemoteEvent<TEvent>(TEvent @event) where TEvent : IHasEventName
         {
-            Event.RaiseEvent("publish:itemProcessed:Remote", myEvent);
+            RemoteEventArgs<TEvent> remoteEventArgs = new RemoteEventArgs<TEvent>(@event);
+            Event.RaiseEvent(@event.EventName, (IPassNativeEventArgs)remoteEventArgs);
         }
     }
 }

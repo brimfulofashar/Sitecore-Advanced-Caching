@@ -92,11 +92,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Events\ClearCacheRemote.cs" />
+    <Compile Include="Events\ItemPublished.cs" />
     <Compile Include="Cache\GenerateCacheKeyWithUIDBefore.cs" />
     <Compile Include="Cache\GenerateCacheKeyWithUIDAfter.cs" />
     <Compile Include="Controls\MultiRootTreeList.cs" />
-    <Compile Include="Events\ItemPublishedEvent.cs" />
+    <Compile Include="Events\ItemPublishedArgs.cs" />
     <Compile Include="Events\ItemPublishNotifier.cs" />
     <Compile Include="Pipelines\ItemPublishingWatchProcesser.cs" />
     <Compile Include="Pipelines\RenderingContextProcessor.cs" />

@@ -3,17 +3,15 @@ using System.Linq;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Events;
-using Sitecore.Eventing;
-using Sitecore.Pipelines;
 using SitecoreAdvancedCaching.Providers;
 
 namespace SitecoreAdvancedCaching.Events
 {
-    public class ClearCacheRemote
+    public class ItemPublished
     {
         public void Clear(object sender, EventArgs args)
         {
-            var itemPublishedEvent = args as RemoteEventArgs<ItemPublishedEvent>;
+            var itemPublishedEvent = args as RemoteEventArgs<ItemPublishedArgs>;
             if (itemPublishedEvent != null)
             {
                 var itemId = ID.Parse(itemPublishedEvent.Event.ItemId);
