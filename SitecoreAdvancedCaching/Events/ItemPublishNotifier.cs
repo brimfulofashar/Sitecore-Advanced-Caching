@@ -12,9 +12,9 @@ namespace SitecoreAdvancedCaching.Events
         {
             var argContext = ((ItemProcessedEventArgs) args).Context;
             var itemId = argContext.ItemId;
-            var remoteEvent = new ItemPublishedArgs(Settings.InstanceName, "publish:itemProcessed:Remote", itemId.Guid,
+            var remoteEvent = new ItemPublishedArgs("publish:itemProcessed:Remote", itemId.Guid,
                 argContext.Action == PublishAction.DeleteTargetItem);
-            EventManager.QueueEvent(remoteEvent);
+            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
         }
     }
 }

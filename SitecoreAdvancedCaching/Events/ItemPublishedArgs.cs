@@ -7,15 +7,12 @@ namespace SitecoreAdvancedCaching.Events
     [DataContract]
     public class ItemPublishedArgs : IHasEventName
     {
-        public ItemPublishedArgs(string instanceName, string eventName, Guid itemId, bool itemIsDeleted)
+        public ItemPublishedArgs(string eventName, Guid itemId, bool itemIsDeleted)
         {
-            InstanceName = instanceName;
             EventName = eventName;
             ItemId = itemId;
             ItemIsDeleted = itemIsDeleted;
         }
-
-        [DataMember] public string InstanceName { get; protected set; }
 
         [DataMember] public bool ItemIsDeleted { get; protected set; }
 

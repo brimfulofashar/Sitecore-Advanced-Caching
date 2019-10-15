@@ -24,7 +24,7 @@ namespace SitecoreAdvancedCaching.Events
                     }
                     else
                     {
-                        var publishedItem = Database.GetDatabase("web").GetItem(itemId);
+                        var publishedItem = Factory.GetDatabase("web").GetItem(itemId);
                         if (publishedItem != null)
                         {
                             var siblingItems = publishedItem.Parent.Children
