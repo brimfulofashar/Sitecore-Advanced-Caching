@@ -17,6 +17,8 @@ namespace SitecoreAdvancedCaching.Cache
                 return;
             if (!ItemAccessTracker.Instance.RenderingIdKey_ItemIDsValue_Dic.ContainsKey(args.Rendering.UniqueId.ToString()))
                 return;
+
+            // this inserts the page id so that if the page is rendered, all caches using the page are cleared.
             var usedItemIds = string.Join("|",
                 ItemAccessTracker.Instance
                     .RenderingIdKey_ItemIDsValue_Dic[args.Rendering.UniqueId.ToString()]
@@ -29,6 +31,8 @@ namespace SitecoreAdvancedCaching.Cache
                 args.CacheKey = cacheKey;
             }
 
+            cacheKey += "_#pid:" + args.PageContext.Item.ID;
+            args.CacheKey = cacheKey;
         }
     }
 }
