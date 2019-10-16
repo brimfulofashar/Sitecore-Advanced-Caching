@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 using SitecoreAdvancedCaching.Providers;
@@ -15,14 +16,23 @@ namespace SitecoreAdvancedCaching.Cache
             var cacheKey = args.CacheKey;
             if (!args.Cacheable || string.IsNullOrEmpty(cacheKey))
                 return;
-            if (cacheKey.Contains("_#aids:"))
-                return;
             if (!ItemAccessTracker.Instance.RenderingIdKey_ItemIDsValue_Dic.ContainsKey(args.Rendering.UniqueId.ToString()))
                 return;
-            cacheKey += "_#aids:" + string.Join("|",
-                            ItemAccessTracker.Instance
-                                .RenderingIdKey_ItemIDsValue_Dic[args.Rendering.UniqueId.ToString()]
-                                .Select(x => x.ToString()).OrderBy(x => x));
+            var newCacheKey = "_#aids:" + string.Join("|",
+                                  ItemAccessTracker.Instance
+                                      .RenderingIdKey_ItemIDsValue_Dic[args.Rendering.UniqueId.ToString()]
+                                      .Select(x => x.ToString()).OrderBy(x => x));
+
+            var match = new Regex("_#aids:(.*)").Match(cacheKey);
+            if (match.Success && match.Groups[0].Value != newCacheKey)
+            {
+                cacheKey = cacheKey.Replace(match.Groups[0].Value, newCacheKey);
+            }
+            else if (!match.Success)
+            {
+                cacheKey += newCacheKey;
+            }
+
             args.CacheKey = cacheKey;
         }
     }
