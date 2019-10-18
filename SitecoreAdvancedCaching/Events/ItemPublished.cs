@@ -26,12 +26,11 @@ namespace SitecoreAdvancedCaching.Events
                             siteInfo.HtmlCache.RemoveKeysContaining(itemId.ToString());
                             if (itemPublishedEvent.Event.PublishOperationEnum ==
                                 PublishOperation.PublishOperationEnum.Delete)
-                            {
                                 ItemAccessTracker.Instance.Remove(itemId);
-                            }
                         }
                     }
-                    else if (itemPublishedEvent.Event.PublishOperationEnum == PublishOperation.PublishOperationEnum.Create)
+                    else if (itemPublishedEvent.Event.PublishOperationEnum ==
+                             PublishOperation.PublishOperationEnum.Create)
                     {
                         var publishedItem = Factory.GetDatabase("web").GetItem(itemId);
                         if (publishedItem != null)

@@ -8,7 +8,8 @@ namespace SitecoreAdvancedCaching.Events
     [DataContract]
     public class ItemPublishedArgs : IHasEventName
     {
-        public ItemPublishedArgs(string eventName, Guid itemId, PublishOperation.PublishOperationEnum publishOperationEnum)
+        public ItemPublishedArgs(string eventName, Guid itemId,
+            PublishOperation.PublishOperationEnum publishOperationEnum)
         {
             EventName = eventName;
             ItemId = itemId;

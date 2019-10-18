@@ -92,15 +92,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\SiteClearCacheAllSitesCommand.cs" />
+    <Compile Include="Commands\SiteClearCacheAllLanguagesCommand.cs" />
+    <Compile Include="Commands\SiteClearCacheCommand.cs" />
+    <Compile Include="Events\ClearCacheSite.cs" />
+    <Compile Include="Events\ClearCacheAllSites.cs" />
+    <Compile Include="Events\ClearCacheSiteAllLanguages.cs" />
     <Compile Include="Events\ItemPublished.cs" />
     <Compile Include="Cache\GenerateCacheKeyWithUIDBefore.cs" />
     <Compile Include="Cache\GenerateCacheKeyWithUIDAfter.cs" />
     <Compile Include="Controls\MultiRootTreeList.cs" />
+    <Compile Include="Events\ClearCacheArgs.cs" />
     <Compile Include="Events\ItemPublishedArgs.cs" />
     <Compile Include="Events\ItemPrePublish.cs" />
     <Compile Include="Events\ItemPublishNotifier.cs" />
+    <Compile Include="Extensions\SiteInfoExtensions.cs" />
+    <Compile Include="Models\ClearCacheOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
-    <Compile Include="Pipelines\ItemPublishingWatchProcesser.cs" />
+    <Compile Include="Pipelines\RemoteEventSubscriber.cs" />
     <Compile Include="Pipelines\RenderingContextProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ItemTrackingProvider.cs" />

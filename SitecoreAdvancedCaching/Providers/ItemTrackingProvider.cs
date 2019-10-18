@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Sitecore;
 using Sitecore.Abstractions;
+using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
@@ -60,16 +61,19 @@ namespace SitecoreAdvancedCaching.Providers
                 new Lazy<ItemAccessTracker>
                     (() => new ItemAccessTracker());
 
+        private readonly HashSet<Guid> globalCacheableTemplateIDs;
+
         public readonly Dictionary<string, List<ID>> RenderingIdKey_ItemIDsValue_Dic;
 
         private ItemAccessTracker()
         {
             RenderingIdKey_ItemIDsValue_Dic = new Dictionary<string, List<ID>>();
-            _globalCacheableTemplateIDs = Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|').Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
+            var globalCacheableTemplateIDsTemp = Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|')
+                .Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
+            globalCacheableTemplateIDs = new HashSet<Guid>();
+            foreach (var g in globalCacheableTemplateIDsTemp) globalCacheableTemplateIDs.Add(g.Guid);
         }
 
-        private readonly List<ID> _globalCacheableTemplateIDs;
-        
         public static ItemAccessTracker Instance => lazy.Value;
 
         public void Add(Item item)
@@ -79,7 +83,11 @@ namespace SitecoreAdvancedCaching.Providers
             {
                 var renderingId = rendering.UniqueId.ToString();
                 var cacheableTemplates = rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value;
-                if (!string.IsNullOrEmpty(renderingId) && (cacheableTemplates.Contains(item.TemplateID.ToString()) || _globalCacheableTemplateIDs.Any(x => x == item.TemplateID)))
+
+                var globalTemplateContainsItem = globalCacheableTemplateIDs.Contains(item.TemplateID.Guid);
+
+                if (!string.IsNullOrEmpty(renderingId) &&
+                    (cacheableTemplates.Contains(item.TemplateID.ToString()) || globalTemplateContainsItem))
                 {
                     if (!RenderingIdKey_ItemIDsValue_Dic.ContainsKey(renderingId))
                         RenderingIdKey_ItemIDsValue_Dic.Add(renderingId, new List<ID> {item.ID});
@@ -91,20 +99,13 @@ namespace SitecoreAdvancedCaching.Providers
 
         public void Remove(ID itemId)
         {
-            List<string> keysToRemove = new List<string>();
+            var keysToRemove = new List<string>();
 
             foreach (var key in RenderingIdKey_ItemIDsValue_Dic.Keys)
-            {
                 if (RenderingIdKey_ItemIDsValue_Dic[key].Contains(itemId))
-                {
                     keysToRemove.Add(key);
-                }
-            }
 
-            foreach (var key in keysToRemove)
-            {
-                RenderingIdKey_ItemIDsValue_Dic.Remove(key);
-            }
+            foreach (var key in keysToRemove) RenderingIdKey_ItemIDsValue_Dic.Remove(key);
         }
     }
 }

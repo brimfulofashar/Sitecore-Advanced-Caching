@@ -1,8 +1,7 @@
 ﻿using System;
 using Sitecore.Configuration;
-using Sitecore.Eventing;
-using Sitecore.Publishing;
 using Sitecore.Publishing.Pipelines.PublishItem;
+using SitecoreAdvancedCaching.Models;
 
 namespace SitecoreAdvancedCaching.Events
 {
@@ -15,7 +14,7 @@ namespace SitecoreAdvancedCaching.Events
             var operation = argContext.PublishContext.CustomData[itemId.ToString()];
             if (operation != null)
             {
-                var createUpdateOrDeleteOperation =(SitecoreAdvancedCaching.Models.PublishOperation.PublishOperationEnum)operation;
+                var createUpdateOrDeleteOperation = (PublishOperation.PublishOperationEnum) operation;
                 var remoteEvent = new ItemPublishedArgs("publish:itemProcessed:Remote", itemId.Guid,
                     createUpdateOrDeleteOperation);
                 Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);

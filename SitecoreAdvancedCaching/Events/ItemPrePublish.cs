@@ -14,15 +14,12 @@ namespace SitecoreAdvancedCaching.Events
             var sourceItem = Factory.GetDatabase("master").GetItem(itemId);
             var destinationItem = Factory.GetDatabase("web").GetItem(itemId);
             var operation = destinationItem == null ? PublishOperation.PublishOperationEnum.Create :
-                sourceItem == null ? PublishOperation.PublishOperationEnum.Delete : PublishOperation.PublishOperationEnum.Update;
+                sourceItem == null ? PublishOperation.PublishOperationEnum.Delete :
+                PublishOperation.PublishOperationEnum.Update;
             if (argContext.PublishContext.CustomData[itemId.ToString()] == null)
-            {
                 argContext.PublishContext.CustomData.Add(itemId.ToString(), operation);
-            }
             else
-            {
                 argContext.PublishContext.CustomData[itemId.ToString()] = operation;
-            }
         }
     }
 }
