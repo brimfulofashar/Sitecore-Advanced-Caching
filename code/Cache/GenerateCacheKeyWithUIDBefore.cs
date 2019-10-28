@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Foundation.HtmlCache.Providers;
+using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
@@ -14,7 +15,7 @@ namespace Foundation.HtmlCache.Cache
                 return;
 
             string cacheKey = args.CacheKey;
-            string[] list = ItemAccessTracker.Instance.GetByKey(args.Rendering.UniqueId.ToString());
+            string[] list = ItemAccessTracker.Instance.GetByKey(Context.Site.SiteInfo, args.Rendering.UniqueId.ToString());
 
             if (list != null)
             {

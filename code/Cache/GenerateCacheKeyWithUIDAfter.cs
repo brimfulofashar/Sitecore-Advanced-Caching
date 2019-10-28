@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Foundation.HtmlCache.Providers;
+using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
@@ -18,7 +19,7 @@ namespace Foundation.HtmlCache.Cache
 
             string preGeneratedAidsPidKey = args.CustomData["preGeneratedAidsPidKey"]?.ToString();
 
-            string[] list = ItemAccessTracker.Instance.GetByKey(args.Rendering.UniqueId.ToString());
+            string[] list = ItemAccessTracker.Instance.GetByKey(Context.Site.SiteInfo, args.Rendering.UniqueId.ToString());
 
             string aidsKey = string.Empty;
 

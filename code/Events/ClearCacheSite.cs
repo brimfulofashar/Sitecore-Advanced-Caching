@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Models;
+using Foundation.HtmlCache.Providers;
 using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -30,6 +32,7 @@ namespace Foundation.HtmlCache.Events
                         SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
                         if (siteInfo != null)
                         {
+                            ItemAccessTracker.Instance.Enqueue(new DeleteSiteFromCache(siteInfo));
                             SiteContext siteContext = Factory.GetSite(siteInfo.Name);
                             CacheManager.GetHtmlCache(siteContext)?.Clear();
                         }

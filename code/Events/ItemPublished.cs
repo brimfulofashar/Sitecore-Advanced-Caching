@@ -5,6 +5,7 @@ using Sitecore.Data;
 using Sitecore.Data.Events;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
+using Sitecore;
 
 namespace Foundation.HtmlCache.Events
 {
@@ -25,7 +26,7 @@ namespace Foundation.HtmlCache.Events
                         if (itemPublishedEvent.Event.PublishOperationEnum ==
                             PublishOperation.PublishOperationEnum.Delete)
                         {
-                            ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(itemId));
+                            ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(Context.Site.SiteInfo, itemId));
                         }
                     }
                     else if (itemPublishedEvent.Event.PublishOperationEnum == PublishOperation.PublishOperationEnum.Create)

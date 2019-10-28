@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 using System.Web;
 using Foundation.HtmlCache.Models;
 using Sitecore;
@@ -15,6 +18,7 @@ using Sitecore.Data.Managers;
 using Sitecore.Globalization;
 using Sitecore.Mvc.Presentation;
 using Sitecore.SecurityModel;
+using Sitecore.Web;
 using Version = Sitecore.Data.Version;
 
 namespace Foundation.HtmlCache.Providers
@@ -38,7 +42,7 @@ namespace Foundation.HtmlCache.Providers
                 Context.Database.Name == "web")
             {
                 var rendering = (Rendering) HttpContext.Current.Items["Rendering"];
-                ItemAccessTracker.Instance.Enqueue(new AddToCache(rendering, item));
+                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item));
             }
             return item;
         }
@@ -51,7 +55,7 @@ namespace Foundation.HtmlCache.Providers
                 Context.Database.Name == "web")
             {
                 var rendering = (Rendering)HttpContext.Current.Items["Rendering"];
-                ItemAccessTracker.Instance.Enqueue(new AddToCache(rendering, item));
+                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item));
             }
             return item;
         }
@@ -63,7 +67,7 @@ namespace Foundation.HtmlCache.Providers
                 Context.Database.Name == "web")
             {
                 var rendering = (Rendering)HttpContext.Current.Items["Rendering"];
-                ItemAccessTracker.Instance.Enqueue(new AddToCache(rendering, item));
+                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item));
             }
 
             return item;
@@ -79,52 +83,62 @@ namespace Foundation.HtmlCache.Providers
 
         private readonly HashSet<Guid> globalCacheableTemplateIDs;
 
-        private readonly SafeDictionary<string, HashSet<string>> RenderingIdKey_ItemIDsValue_Dic;
+        private readonly SafeDictionary<string, SafeDictionary<string, HashSet<string>>> RenderingIdKey_ItemIDsValue_Dic;
+        
+        private ChannelWriter<ICacheJob> _writer;
 
-        private ConcurrentQueue<ICacheJob> _cacheQueue = new ConcurrentQueue<ICacheJob>();
+        private Thread thread;
 
         private ItemAccessTracker()
         {
-            RenderingIdKey_ItemIDsValue_Dic = new SafeDictionary<string, HashSet<string>>();
+            RenderingIdKey_ItemIDsValue_Dic = new SafeDictionary<string, SafeDictionary<string, HashSet<string>>>();
             List<ID> globalCacheableTemplateIDsTemp = Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|')
                 .Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
             globalCacheableTemplateIDs = new HashSet<Guid>();
             foreach (ID g in globalCacheableTemplateIDsTemp) globalCacheableTemplateIDs.Add(g.Guid);
 
-            var thread = new Thread(new ThreadStart(OnStart));
-            thread.IsBackground = true;
-            thread.Start();
+
+            var channel = Channel.CreateUnbounded<ICacheJob>();
+            var reader = channel.Reader;
+            _writer = channel.Writer;
+
+            Task.Factory.StartNew(async () =>
+            {
+                // Wait while channel is not empty and still not completed
+                while (await reader.WaitToReadAsync())
+                {
+                    var job = await reader.ReadAsync();
+                    ProcessJob(job);
+                }
+            }, TaskCreationOptions.LongRunning);
         }
 
         public void Enqueue(ICacheJob job)
         {
-            _cacheQueue.Enqueue(job);
+            _writer.TryWrite(job);
         }
 
-        private void OnStart()
+        private void ProcessJob(ICacheJob result)
         {
-            while (true)
+            if (result.GetType() == typeof(AddToCache))
             {
-                if (_cacheQueue.TryDequeue(out var result))
-                {
-                    if (result.GetType() == typeof(AddToCache))
-                    {
-                        var r = result as AddToCache;
-                        Add(r.Rendering,r.Item);
-                    }
-                    else if (result.GetType() == typeof(DeleteFromCache))
-                    {
-                        var r = result as DeleteFromCache;
-                        Delete(r.ItemId);
-                    }
-                }
+                var r = result as AddToCache;
+                Add(r.SiteInfo, r.Rendering, r.Item);
+            }
+            else if (result.GetType() == typeof(DeleteFromCache))
+            {
+                var r = result as DeleteFromCache;
+                Delete(r.SiteInfo, r.ItemId);
+            }
+            else if (result.GetType() == typeof(DeleteSiteFromCache))
+            {
+                var r = result as DeleteSiteFromCache;
+                DeleteSite(r.SiteInfo);
             }
         }
-
         public static ItemAccessTracker Instance => lazy.Value;
-
         
-        private void Add(Rendering rendering, Item item)
+        private void Add(SiteInfo siteInfo, Rendering rendering, Item item)
         {
             if (rendering.Caching.Cacheable)
             {
@@ -133,36 +147,76 @@ namespace Foundation.HtmlCache.Providers
 
                 bool globalTemplateContainsItem = globalCacheableTemplateIDs.Contains(item.TemplateID.Guid);
 
+                var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
+
                 if (!string.IsNullOrEmpty(renderingId) && (cacheableTemplates.Contains(item.TemplateID.ToString()) || globalTemplateContainsItem))
                 {
-                    if (!RenderingIdKey_ItemIDsValue_Dic.ContainsKey(renderingId))
+                    if (!RenderingIdKey_ItemIDsValue_Dic.ContainsKey(siteLangKey))
                     {
-                        RenderingIdKey_ItemIDsValue_Dic.Add(renderingId, new HashSet<string>());
+                        RenderingIdKey_ItemIDsValue_Dic.Add(siteLangKey, new SafeDictionary<string, HashSet<string>>());
                     }
-                    RenderingIdKey_ItemIDsValue_Dic[renderingId].Add(item.ID.ToString());
+
+                    if (!RenderingIdKey_ItemIDsValue_Dic[siteLangKey].ContainsKey(renderingId))
+                    {
+                        RenderingIdKey_ItemIDsValue_Dic[siteLangKey].Add(renderingId, new HashSet<string>());
+                    }
+
+                    RenderingIdKey_ItemIDsValue_Dic[siteLangKey][renderingId].Add(item.ID.ToString());
                 }
             }
         }
 
-        private void Delete(ID itemId)
+        private void Delete(SiteInfo siteInfo, ID itemId)
         {
-            var keysToRemove = new List<string>();
+            var renderingIdKeysToRemove = new List<string>();
 
-            string[] keys = RenderingIdKey_ItemIDsValue_Dic.Keys.ToArray();
+            var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
+
+            RenderingIdKey_ItemIDsValue_Dic.TryGetValue(siteLangKey, out var renderingItemsList);
+
+            string[] keys = renderingItemsList.ToKeyArray();
             foreach (string key in keys)
-                if (RenderingIdKey_ItemIDsValue_Dic.TryGetValue(key, out HashSet<string> list))
+                if (renderingItemsList.TryGetValue(key, out HashSet<string> list))
                     if (list.Contains(itemId.ToString()))
-                        keysToRemove.Add(key);
+                        renderingIdKeysToRemove.Add(key);
 
-            foreach (string key in keysToRemove)
-                RenderingIdKey_ItemIDsValue_Dic.Remove(key);
+
+
+            foreach (string renderingId in renderingIdKeysToRemove)
+            {
+                RenderingIdKey_ItemIDsValue_Dic[siteLangKey].Remove(renderingId);
+            }
+
         }
 
-        public string[] GetByKey(string key)
+        private void DeleteSite(SiteInfo siteInfo)
         {
-            RenderingIdKey_ItemIDsValue_Dic.TryGetValue(key, out var list);
+            var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
+            if (RenderingIdKey_ItemIDsValue_Dic.ContainsKey(siteLangKey))
+            {
+                var contains = RenderingIdKey_ItemIDsValue_Dic.ContainsKey(siteLangKey);
 
-            return list?.ToArray();
+                if (contains)
+                {
+                    RenderingIdKey_ItemIDsValue_Dic.Remove(siteLangKey);
+                }
+            }
+        }
+
+        public string[] GetByKey(SiteInfo siteInfo, string key)
+        {
+            var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
+
+            RenderingIdKey_ItemIDsValue_Dic.TryGetValue(siteLangKey, out var renderingItemsList);
+
+            if (renderingItemsList != null)
+            {
+                renderingItemsList.TryGetValue(key, out var itemList);
+
+                return itemList?.ToArray();
+            }
+
+            return null;
         }
     }
 }
