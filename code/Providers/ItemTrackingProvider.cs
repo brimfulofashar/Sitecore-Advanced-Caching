@@ -38,11 +38,12 @@ namespace Foundation.HtmlCache.Providers
             SecurityCheck securityCheck)
         {
             Item item = base.GetItem(itemId, language, version, database, securityCheck);
-            if (item != null && HttpContext.Current != null && HttpContext.Current.Items["Rendering"] != null &&
+            if (item != null && HttpContext.Current != null && HttpContext.Current.Items["Rendering"] != null && HttpContext.Current.Items["CacheKey"] != null &&
                 Context.Database.Name == "web")
             {
                 var rendering = (Rendering) HttpContext.Current.Items["Rendering"];
-                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item));
+                var cacheKey =  HttpContext.Current.Items["CacheKey"].ToString();
+                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item, cacheKey));
             }
             return item;
         }
@@ -51,11 +52,12 @@ namespace Foundation.HtmlCache.Providers
             SecurityCheck securityCheck)
         {
             Item item = base.GetItem(itemPath, language, version, database, securityCheck);
-            if (item != null && HttpContext.Current != null && HttpContext.Current.Items["Rendering"] != null &&
+            if (item != null && HttpContext.Current != null && HttpContext.Current.Items["Rendering"] != null && HttpContext.Current.Items["CacheKey"] != null &&
                 Context.Database.Name == "web")
             {
                 var rendering = (Rendering)HttpContext.Current.Items["Rendering"];
-                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item));
+                var cacheKey = HttpContext.Current.Items["CacheKey"].ToString();
+                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item, cacheKey));
             }
             return item;
         }
@@ -63,11 +65,12 @@ namespace Foundation.HtmlCache.Providers
         protected override Item GetItem(ID itemId, Language language, Version version, Database database)
         {
             Item item = base.GetItem(itemId, language, version, database);
-            if (item != null && HttpContext.Current != null && HttpContext.Current.Items["Rendering"] != null &&
+            if (item != null && HttpContext.Current != null && HttpContext.Current.Items["Rendering"] != null && HttpContext.Current.Items["CacheKey"] != null &&
                 Context.Database.Name == "web")
             {
                 var rendering = (Rendering)HttpContext.Current.Items["Rendering"];
-                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item));
+                var cacheKey = HttpContext.Current.Items["CacheKey"].ToString();
+                ItemAccessTracker.Instance.Enqueue(new AddToCache(Context.Site.SiteInfo, rendering, item, cacheKey));
             }
 
             return item;
@@ -83,15 +86,13 @@ namespace Foundation.HtmlCache.Providers
 
         private readonly HashSet<Guid> globalCacheableTemplateIDs;
 
-        private readonly SafeDictionary<string, SafeDictionary<string, HashSet<string>>> RenderingIdKey_ItemIDsValue_Dic;
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, HashSet<string>>> RenderingIdKey_ItemIDsValue_Dic;
         
         private ChannelWriter<ICacheJob> _writer;
 
-        private Thread thread;
-
         private ItemAccessTracker()
         {
-            RenderingIdKey_ItemIDsValue_Dic = new SafeDictionary<string, SafeDictionary<string, HashSet<string>>>();
+            RenderingIdKey_ItemIDsValue_Dic = new ConcurrentDictionary<string, ConcurrentDictionary<string, HashSet<string>>>();
             List<ID> globalCacheableTemplateIDsTemp = Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|')
                 .Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
             globalCacheableTemplateIDs = new HashSet<Guid>();
@@ -123,7 +124,7 @@ namespace Foundation.HtmlCache.Providers
             if (result.GetType() == typeof(AddToCache))
             {
                 var r = result as AddToCache;
-                Add(r.SiteInfo, r.Rendering, r.Item);
+                Add(r.SiteInfo, r.Rendering, r.Item, r.CacheKey);
             }
             else if (result.GetType() == typeof(DeleteFromCache))
             {
@@ -138,9 +139,9 @@ namespace Foundation.HtmlCache.Providers
         }
         public static ItemAccessTracker Instance => lazy.Value;
         
-        private void Add(SiteInfo siteInfo, Rendering rendering, Item item)
+        private void Add(SiteInfo siteInfo, Rendering rendering, Item item, string cacheKey)
         {
-            if (rendering.Caching.Cacheable)
+            if (rendering.Caching.Cacheable && !string.IsNullOrEmpty(cacheKey))
             {
                 string renderingId = rendering.UniqueId.ToString();
                 string cacheableTemplates = rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value;
@@ -153,38 +154,43 @@ namespace Foundation.HtmlCache.Providers
                 {
                     if (!RenderingIdKey_ItemIDsValue_Dic.ContainsKey(siteLangKey))
                     {
-                        RenderingIdKey_ItemIDsValue_Dic.Add(siteLangKey, new SafeDictionary<string, HashSet<string>>());
+                        RenderingIdKey_ItemIDsValue_Dic.TryAdd(siteLangKey,
+                            new ConcurrentDictionary<string, HashSet<string>>());
                     }
 
-                    if (!RenderingIdKey_ItemIDsValue_Dic[siteLangKey].ContainsKey(renderingId))
+                    if (!RenderingIdKey_ItemIDsValue_Dic[siteLangKey].ContainsKey(cacheKey))
                     {
-                        RenderingIdKey_ItemIDsValue_Dic[siteLangKey].Add(renderingId, new HashSet<string>());
+                        RenderingIdKey_ItemIDsValue_Dic[siteLangKey].TryAdd(cacheKey, new HashSet<string>());
                     }
 
-                    RenderingIdKey_ItemIDsValue_Dic[siteLangKey][renderingId].Add(item.ID.ToString());
+                    RenderingIdKey_ItemIDsValue_Dic[siteLangKey][cacheKey].Add(item.ID.ToString());
                 }
             }
         }
 
         private void Delete(SiteInfo siteInfo, ID itemId)
         {
-            var renderingIdKeysToRemove = new List<string>();
+            var cacheKeysToRemove = new HashSet<string>();
 
             var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
 
             RenderingIdKey_ItemIDsValue_Dic.TryGetValue(siteLangKey, out var renderingItemsList);
 
-            string[] keys = renderingItemsList.ToKeyArray();
+            string[] keys = renderingItemsList?.Keys.ToArray();
+            if (keys != null)
+            {
             foreach (string key in keys)
                 if (renderingItemsList.TryGetValue(key, out HashSet<string> list))
                     if (list.Contains(itemId.ToString()))
-                        renderingIdKeysToRemove.Add(key);
+                            cacheKeysToRemove.Add(key);
+            }
 
 
 
-            foreach (string renderingId in renderingIdKeysToRemove)
+            foreach (string cacheKey in cacheKeysToRemove)
             {
-                RenderingIdKey_ItemIDsValue_Dic[siteLangKey].Remove(renderingId);
+                RenderingIdKey_ItemIDsValue_Dic[siteLangKey].TryRemove(cacheKey, out var list);
+                siteInfo.HtmlCache.RemoveKeysContaining(cacheKey);
             }
 
         }
@@ -194,29 +200,8 @@ namespace Foundation.HtmlCache.Providers
             var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
             if (RenderingIdKey_ItemIDsValue_Dic.ContainsKey(siteLangKey))
             {
-                var contains = RenderingIdKey_ItemIDsValue_Dic.ContainsKey(siteLangKey);
-
-                if (contains)
-                {
-                    RenderingIdKey_ItemIDsValue_Dic.Remove(siteLangKey);
-                }
+                RenderingIdKey_ItemIDsValue_Dic.TryRemove(siteLangKey, out var dic);
             }
-        }
-
-        public string[] GetByKey(SiteInfo siteInfo, string key)
-        {
-            var siteLangKey = "_#site:" + siteInfo.Name + "#lang:" + siteInfo.Language;
-
-            RenderingIdKey_ItemIDsValue_Dic.TryGetValue(siteLangKey, out var renderingItemsList);
-
-            if (renderingItemsList != null)
-            {
-                renderingItemsList.TryGetValue(key, out var itemList);
-
-                return itemList?.ToArray();
-            }
-
-            return null;
         }
     }
 }

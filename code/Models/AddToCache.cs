@@ -10,14 +10,17 @@ namespace Foundation.HtmlCache.Models
 {
     public class AddToCache : CacheJobBase, ICacheJob
     {
-        public AddToCache(SiteInfo siteInfo, Rendering rendering, Item item) : base(siteInfo)
+        public AddToCache(SiteInfo siteInfo, Rendering rendering, Item item, string cacheKey) : base(siteInfo)
         {
             Rendering = rendering;
             Item = item;
+            CacheKey = cacheKey;
         }
 
         public Rendering Rendering { get; set; }
         public Item Item { get; set; }
+
+        public string CacheKey { get; set; }
     }
 
     public class CacheJobBase

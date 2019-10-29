@@ -26,7 +26,7 @@ namespace Foundation.HtmlCache.Events
                         if (itemPublishedEvent.Event.PublishOperationEnum ==
                             PublishOperation.PublishOperationEnum.Delete)
                         {
-                            ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(Context.Site.SiteInfo, itemId));
+                            ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(siteInfo, itemId));
                         }
                     }
                     else if (itemPublishedEvent.Event.PublishOperationEnum == PublishOperation.PublishOperationEnum.Create)
@@ -34,10 +34,9 @@ namespace Foundation.HtmlCache.Events
                         var publishedItem = Factory.GetDatabase("web").GetItem(itemId);
                         if (publishedItem != null)
                         {
-                            var siblingItems = publishedItem.Parent.Children
-                                .Where(x => x.ID != itemId);
+                            var siblingItems = publishedItem.Parent.Children.Where(x => x.ID != itemId);
                             foreach (var sibling in siblingItems)
-                                siteInfo.HtmlCache.RemoveKeysContaining(sibling.ID.ToString());
+                                ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(siteInfo, sibling.ID));
                         }
                     }
             }
