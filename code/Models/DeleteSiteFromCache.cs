@@ -1,6 +1,6 @@
 ﻿using Sitecore.Web;
 
-namespace ProDirect.Foundation.HtmlCache.Models
+namespace Foundation.HtmlCache.Models
 {
     public class DeleteSiteFromCache : CacheJobBase, ICacheJob
     {
