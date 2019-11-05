@@ -11,7 +11,8 @@ namespace Foundation.HtmlCache.Models
         {
             Create,
             Update,
-            Delete
+            Delete,
+            Ignore // this is used to prevent the queuing operation
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Sitecore.Data.Items;
+﻿using Sitecore.Data.Items;
 using Sitecore.Mvc.Presentation;
 using Sitecore.Web;
 
@@ -10,14 +6,13 @@ namespace Foundation.HtmlCache.Models
 {
     public class AddToCache : CacheJobBase, ICacheJob
     {
-        public AddToCache(SiteInfo siteInfo, Rendering rendering, Item item, string cacheKey) : base(siteInfo)
+        public AddToCache(SiteInfo siteInfo, Item item, RenderingProcessorArgs renderingProcessorArgs) : base(siteInfo)
         {
-            Rendering = rendering;
+            RenderingProcessorArgs = renderingProcessorArgs;
             Item = item;
-            CacheKey = cacheKey;
         }
 
-        public Rendering Rendering { get; set; }
+        public RenderingProcessorArgs RenderingProcessorArgs { get; set; }
         public Item Item { get; set; }
 
         public string CacheKey { get; set; }

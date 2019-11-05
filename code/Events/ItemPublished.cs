@@ -14,7 +14,7 @@ namespace Foundation.HtmlCache.Events
         public void Clear(object sender, EventArgs args)
         {
             var itemPublishedEvent = args as RemoteEventArgs<ItemPublishedArgs>;
-            if (itemPublishedEvent != null)
+            if (itemPublishedEvent != null && itemPublishedEvent.Event.PublishOperationEnum != PublishOperation.PublishOperationEnum.Ignore)
             {
                 var itemId = ID.Parse(itemPublishedEvent.Event.ItemId);
                 var siteInfoList = Factory.GetSiteInfoList();
@@ -22,12 +22,7 @@ namespace Foundation.HtmlCache.Events
                     if (itemPublishedEvent.Event.PublishOperationEnum == PublishOperation.PublishOperationEnum.Delete ||
                         itemPublishedEvent.Event.PublishOperationEnum == PublishOperation.PublishOperationEnum.Update)
                     {
-                        siteInfo.HtmlCache.RemoveKeysContaining(itemId.ToString());
-                        if (itemPublishedEvent.Event.PublishOperationEnum ==
-                            PublishOperation.PublishOperationEnum.Delete)
-                        {
-                            ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(siteInfo, itemId));
-                        }
+                        ItemAccessTracker.Instance.Enqueue(new DeleteFromCache(siteInfo, itemId));
                     }
                     else if (itemPublishedEvent.Event.PublishOperationEnum == PublishOperation.PublishOperationEnum.Create)
                     {

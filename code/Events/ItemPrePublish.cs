@@ -2,6 +2,7 @@
 using Sitecore.Configuration;
 using Sitecore.Publishing.Pipelines.PublishItem;
 using Foundation.HtmlCache.Models;
+using Foundation.HtmlCache.Settings;
 
 namespace Foundation.HtmlCache.Events
 {
@@ -15,13 +16,28 @@ namespace Foundation.HtmlCache.Events
             var destinationItem = Factory.GetDatabase("web").GetItem(itemId);
             var operation = destinationItem == null ? PublishOperation.PublishOperationEnum.Create :
                 sourceItem == null ? PublishOperation.PublishOperationEnum.Delete : PublishOperation.PublishOperationEnum.Update;
-            if (argContext.PublishContext.CustomData[itemId.ToString()] == null)
+            if ((sourceItem != null && GlobalCacheTemplateSettings.Instance.GlobalCacheableTemplateIDs.Contains(sourceItem.TemplateID.Guid)) ||
+                (destinationItem != null && GlobalCacheTemplateSettings.Instance.GlobalCacheableTemplateIDs.Contains(destinationItem.TemplateID.Guid)))
             {
-                argContext.PublishContext.CustomData.Add(itemId.ToString(), operation);
+                if (argContext.PublishContext.CustomData[itemId.ToString()] == null)
+                {
+                    argContext.PublishContext.CustomData.Add(itemId.ToString(), operation);
+                }
+                else
+                {
+                    argContext.PublishContext.CustomData[itemId.ToString()] = operation;
+                }
             }
             else
             {
-                argContext.PublishContext.CustomData[itemId.ToString()] = operation;
+                if (argContext.PublishContext.CustomData[itemId.ToString()] == null)
+                {
+                    argContext.PublishContext.CustomData.Add(itemId.ToString(), PublishOperation.PublishOperationEnum.Ignore);
+                }
+                else
+                {
+                    argContext.PublishContext.CustomData[itemId.ToString()] = PublishOperation.PublishOperationEnum.Ignore;
+                }
             }
         }
     }

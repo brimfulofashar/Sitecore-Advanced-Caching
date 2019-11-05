@@ -1,22 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Web;
+using Foundation.HtmlCache.Models;
+using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
-namespace ProDirect.Foundation.HtmlCache.Pipelines
+namespace Foundation.HtmlCache.Pipelines
 {
     public class BeginRenderingContextProcessor : RenderRenderingProcessor
     {
         public override void Process(RenderRenderingArgs args)
         {
-            if (HttpContext.Current.Items["Rendering"] == null)
+            if (!args.UsedCache && args.Cacheable)
             {
-                HttpContext.Current.Items.Add("Rendering", args.Rendering);
+                var dic = new RenderingProcessorArgs(args.CacheKey, args.Rendering, args.PageContext.Item);
+                if (!HttpContext.Current.Items.Contains("RenderingArgs"))
+                    HttpContext.Current.Items.Add("RenderingArgs", dic);
+                else
+                    HttpContext.Current.Items["RenderingArgs"] = dic;
             }
             else
             {
-                HttpContext.Current.Items["Rendering"] = args.Rendering;
+                if (HttpContext.Current.Items.Contains("RenderingArgs"))
+                    HttpContext.Current.Items.Remove("RenderingArgs");
             }
         }
     }
