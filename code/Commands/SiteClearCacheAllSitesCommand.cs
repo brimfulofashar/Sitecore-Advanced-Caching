@@ -21,7 +21,7 @@ namespace Foundation.HtmlCache.Commands
 
         protected void Run(ClientPipelineArgs args)
         {
-            var remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", Guid.Empty, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", Guid.Empty, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
 
             SheerResponse.Alert("Cache for the Site has been cleared", true);

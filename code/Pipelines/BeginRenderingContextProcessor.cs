@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.Web;
+﻿using System.Web;
 using Foundation.HtmlCache.Models;
-using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
 namespace Foundation.HtmlCache.Pipelines
@@ -10,19 +8,16 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public override void Process(RenderRenderingArgs args)
         {
-            if (!args.UsedCache && args.Cacheable)
+            RenderingProcessorArgs dic;
+            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey))
             {
-                var dic = new RenderingProcessorArgs(args.CacheKey, args.Rendering, args.PageContext.Item);
-                if (!HttpContext.Current.Items.Contains("RenderingArgs"))
-                    HttpContext.Current.Items.Add("RenderingArgs", dic);
-                else
-                    HttpContext.Current.Items["RenderingArgs"] = dic;
+                dic = new RenderingProcessorArgs(args.CacheKey, args.Rendering, args.PageContext.Item, TrackOperation.TrackOperationEnum.Track);
             }
             else
             {
-                if (HttpContext.Current.Items.Contains("RenderingArgs"))
-                    HttpContext.Current.Items.Remove("RenderingArgs");
+                dic = new RenderingProcessorArgs(TrackOperation.TrackOperationEnum.DoNotTrack);
             }
+            HttpContext.Current.Items["RenderingArgs"] = dic;
         }
     }
 }

@@ -14,13 +14,13 @@ namespace Foundation.HtmlCache.Events
     {
         public void Clear(object sender, EventArgs args)
         {
-            var clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
+            RemoteEventArgs<ClearCacheArgs> clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
             if (clearCacheArgs != null)
             {
                 List<SiteInfo> siteInfos = Factory.GetSiteInfoList();
                 foreach (SiteInfo siteInfo in siteInfos)
                 {
-                    ItemAccessTracker.Instance.Enqueue(new DeleteSiteFromCache(siteInfo));
+                    ItemTrackingStore.Instance.Enqueue(new DeleteSiteFromCache(siteInfo));
                     SiteContext siteContext = Factory.GetSite(siteInfo.Name);
                     CacheManager.GetHtmlCache(siteContext)?.Clear();
                 }

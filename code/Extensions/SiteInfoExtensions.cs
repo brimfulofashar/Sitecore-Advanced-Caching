@@ -11,7 +11,7 @@ namespace Foundation.HtmlCache.Extensions
     {
         public static List<Sitecore.Web.SiteInfo> GetSites(Sitecore.Data.Items.Item item, Language language = null)
         {
-            var siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();
+            List<SiteInfo> siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();
 
             List<Sitecore.Web.SiteInfo> siteInfos = new List<SiteInfo>();
 

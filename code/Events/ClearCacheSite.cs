@@ -18,7 +18,7 @@ namespace Foundation.HtmlCache.Events
     {
         public void Clear(object sender, EventArgs args)
         {
-            var clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
+            RemoteEventArgs<ClearCacheArgs> clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
             if (clearCacheArgs != null)
             {
                 Guid? itemId = clearCacheArgs.Event.ItemId;
@@ -32,7 +32,7 @@ namespace Foundation.HtmlCache.Events
                         SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
                         if (siteInfo != null)
                         {
-                            ItemAccessTracker.Instance.Enqueue(new DeleteSiteFromCache(siteInfo));
+                            ItemTrackingStore.Instance.Enqueue(new DeleteSiteFromCache(siteInfo));
                             SiteContext siteContext = Factory.GetSite(siteInfo.Name);
                             CacheManager.GetHtmlCache(siteContext)?.Clear();
                         }

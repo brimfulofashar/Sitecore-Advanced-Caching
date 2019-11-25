@@ -24,7 +24,7 @@ namespace Foundation.HtmlCache.Commands
 
         protected void Run(ClientPipelineArgs args)
         {
-            var remoteEvent = new ClearCacheArgs("cache:clearCacheSiteAllLanguages:Remote", this.Item?.ID.Guid, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.SiteAllLanguages);
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSiteAllLanguages:Remote", this.Item?.ID.Guid, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.SiteAllLanguages);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
 
             SheerResponse.Alert("Caches for the Site in all languages have been cleared", true);

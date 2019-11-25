@@ -20,7 +20,10 @@ namespace Foundation.HtmlCache.Settings
             List<ID> globalCacheableTemplateIDsTemp = Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs").Split('|')
                 .Where(x => !string.IsNullOrEmpty(x)).Select(x => ID.Parse(x)).ToList();
             GlobalCacheableTemplateIDs = new HashSet<Guid>();
-            foreach (ID g in globalCacheableTemplateIDsTemp) GlobalCacheableTemplateIDs.Add(g.Guid);
+            foreach (ID g in globalCacheableTemplateIDsTemp)
+            {
+                GlobalCacheableTemplateIDs.Add(g.Guid);
+            }
         }
 
         public static GlobalCacheTemplateSettings Instance => lazy.Value;

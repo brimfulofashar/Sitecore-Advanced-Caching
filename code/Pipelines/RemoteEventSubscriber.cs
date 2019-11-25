@@ -13,9 +13,9 @@ namespace Foundation.HtmlCache.Pipelines
         public void Initialize(PipelineArgs args)
         {
             Log.Info("HtmlCache: Initializing remote event subscribers", this);
-            var itemPublishedAction = new Action<ItemPublishedArgs>(RaiseRemoteEvent);
+            Action<ItemPublishedArgs> itemPublishedAction = new Action<ItemPublishedArgs>(RaiseRemoteEvent);
             EventManager.Subscribe(itemPublishedAction);
-            var clearCacheAction = new Action<ClearCacheArgs>(RaiseRemoteEvent);
+            Action<ClearCacheArgs> clearCacheAction = new Action<ClearCacheArgs>(RaiseRemoteEvent);
             EventManager.Subscribe(clearCacheAction);
         }
 
