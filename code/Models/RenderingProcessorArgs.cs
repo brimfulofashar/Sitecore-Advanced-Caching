@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Sitecore;
-using Sitecore.Collections;
 using Sitecore.Data.Items;
 using Sitecore.Mvc.Presentation;
 
@@ -30,7 +28,5 @@ namespace Foundation.HtmlCache.Models
         public string CacheableTemplates { get; set; }
         public TrackOperation.TrackOperationEnum? TrackOperationEnum { get; set; }
         public HashSet<ItemMetaData> ItemAccessList { get; set; }
-
-        public readonly string SiteLang;
     }
 }

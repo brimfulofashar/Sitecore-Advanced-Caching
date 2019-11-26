@@ -6,7 +6,6 @@ using Sitecore.Data;
 using Sitecore.Data.Events;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
-using Sitecore;
 using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Events

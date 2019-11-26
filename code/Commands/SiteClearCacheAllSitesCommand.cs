@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
 using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Configuration;
-using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web.UI.Sheer;

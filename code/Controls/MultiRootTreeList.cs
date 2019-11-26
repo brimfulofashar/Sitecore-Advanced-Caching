@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Sitecore;
-using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
 using Sitecore.Shell.Applications.ContentEditor;
 using Sitecore.Text;
 using Sitecore.Web;
 using Sitecore.Web.UI.HtmlControls;
-using Sitecore.Web.UI.HtmlControls.Data;
 using Sitecore.Web.UI.WebControls;
 using Control = System.Web.UI.Control;
 

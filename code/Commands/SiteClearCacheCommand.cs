@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Models;
 using Sitecore;
-using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;

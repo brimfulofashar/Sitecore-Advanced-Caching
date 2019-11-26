@@ -1,8 +1,6 @@
 ﻿using System;
 using Sitecore.Configuration;
 using Sitecore.Data;
-using Sitecore.Eventing;
-using Sitecore.Publishing;
 using Sitecore.Publishing.Pipelines.PublishItem;
 
 namespace Foundation.HtmlCache.Events
