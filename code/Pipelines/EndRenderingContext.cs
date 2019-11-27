@@ -8,7 +8,7 @@ using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
 namespace Foundation.HtmlCache.Pipelines
 {
-    public class EndRenderingContextProcessor : RenderRenderingProcessor
+    public class EndRenderingContext : RenderRenderingProcessor
     {
         public override void Process(RenderRenderingArgs args)
         {

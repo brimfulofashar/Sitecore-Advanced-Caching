@@ -266,8 +266,10 @@
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Models\RenderingProcessorArgs.cs" />
-    <Compile Include="Pipelines\EndRenderingContextProcessor.cs" />
-    <Compile Include="Pipelines\BeginRenderingContextProcessor.cs" />
+    <Compile Include="Pipelines\SaveToPersistantCache.cs" />
+    <Compile Include="Pipelines\RenderFromPersistantCache.cs" />
+    <Compile Include="Pipelines\EndRenderingContext.cs" />
+    <Compile Include="Pipelines\BeginRenderingContext.cs" />
     <Compile Include="Pipelines\InitializeMessageBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ItemTrackingStore.cs" />
