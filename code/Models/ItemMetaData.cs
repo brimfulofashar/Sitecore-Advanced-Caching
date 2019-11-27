@@ -1,7 +1,9 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Foundation.HtmlCache.Models
 {
+    [Serializable]
     public class ItemMetaData
     {
         public ItemMetaData(Guid id, Guid templateId)
@@ -10,7 +12,9 @@ namespace Foundation.HtmlCache.Models
             TempalteId = templateId;
         }
 
+        [JsonProperty("Id")]
         public readonly Guid Id;
+        [JsonProperty("TempalteId")]
         public readonly Guid TempalteId;
 
         public override bool Equals(object obj)

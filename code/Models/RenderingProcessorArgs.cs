@@ -1,21 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Sitecore.Data.Items;
 using Sitecore.Mvc.Presentation;
+using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Models
 {
+    [Serializable]
     public class RenderingProcessorArgs
     {
-        public RenderingProcessorArgs(string cacheKey, Rendering rendering, Item pageItem, TrackOperation.TrackOperationEnum trackOperationEnum)
+        [JsonConstructor]
+        public RenderingProcessorArgs(string cacheKey, string cacheableTemplates, bool cacheable, TrackOperation.TrackOperationEnum trackOperationEnum)
         {
             CacheKey = cacheKey;
-            CacheableTemplates = rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value;
-            Cacheable = rendering.Caching.Cacheable;
+            CacheableTemplates = cacheableTemplates;
+            Cacheable = cacheable;
+
             TrackOperationEnum = trackOperationEnum;
-            ItemAccessList = new HashSet<ItemMetaData>
-            {
-                new ItemMetaData(pageItem.ID.Guid, pageItem.TemplateID.Guid)
-            };
+            ItemAccessList = new HashSet<ItemMetaData>();
         }
 
         public RenderingProcessorArgs(TrackOperation.TrackOperationEnum trackOperationEnum)
@@ -23,10 +27,16 @@ namespace Foundation.HtmlCache.Models
             TrackOperationEnum = trackOperationEnum;
         }
 
+        [JsonProperty("CacheKey")]
         public string CacheKey { get; set; }
+        [JsonProperty("Cacheable")]
         public bool Cacheable { get; set; }
+        [JsonProperty("CacheableTemplates")]
         public string CacheableTemplates { get; set; }
+        [JsonProperty("TrackOperationEnum")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public TrackOperation.TrackOperationEnum? TrackOperationEnum { get; set; }
+        [JsonProperty("ItemAccessList")]
         public HashSet<ItemMetaData> ItemAccessList { get; set; }
     }
 }

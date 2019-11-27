@@ -1,11 +1,22 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Events;
+using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Models;
+using Foundation.HtmlCache.Providers;
 using Sitecore;
+using Sitecore.Caching;
 using Sitecore.Configuration;
+using Sitecore.Data;
 using Sitecore.Data.Items;
+using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
+using Sitecore.Framework.Messaging;
 using Sitecore.Shell.Framework.Commands;
+using Sitecore.Sites;
+using Sitecore.Web;
 using Sitecore.Web.UI.Sheer;
 
 namespace Foundation.HtmlCache.Commands
@@ -17,16 +28,21 @@ namespace Foundation.HtmlCache.Commands
         {
             Assert.ArgumentNotNull(context, nameof(context));
             this.Item = context.Items.FirstOrDefault();
-            Context.ClientPage.Start(this, "Run");
-        }
 
-        protected void Run(ClientPipelineArgs args)
-        {
-            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSiteAllLanguages:Remote", this.Item?.ID.Guid, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.SiteAllLanguages);
-            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+            Guid? itemId = this.Item?.ID.Guid;
+            if (itemId != null)
+            {
+                Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId));
+                if (item != null)
+                {
+                    List<SiteInfo> siteInfos = SiteInfoExtensions.GetSites(item);
+                    foreach (SiteInfo siteInfo in siteInfos)
+                    {
+                        ((IMessageBus<HtmlCacheMessageBus>) ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                    }
+                }
+            }
 
-            SheerResponse.Alert("Caches for the Site in all languages have been cleared", true);
-            args.WaitForPostBack(false);
         }
     }
 }

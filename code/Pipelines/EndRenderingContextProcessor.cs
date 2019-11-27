@@ -1,7 +1,9 @@
 ﻿using System.Web;
+using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
 using Sitecore;
+using Sitecore.DependencyInjection;
+using Sitecore.Framework.Messaging;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
 namespace Foundation.HtmlCache.Pipelines
@@ -13,8 +15,8 @@ namespace Foundation.HtmlCache.Pipelines
             var renderingProcessorArgs = (RenderingProcessorArgs)HttpContext.Current.Items["RenderingArgs"];
             if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track)
             {
-                var addToCache = new AddToCache(Context.Site.SiteInfo, renderingProcessorArgs);
-                ItemTrackingStore.Instance.Enqueue(addToCache);
+                var addToCache = new AddToCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, renderingProcessorArgs);
+                ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(addToCache);
             }
 
             renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;
