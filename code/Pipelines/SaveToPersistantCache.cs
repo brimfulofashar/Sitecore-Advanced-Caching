@@ -14,8 +14,7 @@ namespace Foundation.HtmlCache.Pipelines
         {
             if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey))
             {
-                Item renderingItem = args.Rendering.RenderingItem.InnerItem;
-                bool.TryParse(renderingItem.Fields["PersistRecordedHtml"].Value, out var persistRecordedHtml);
+                bool.TryParse(Sitecore.Configuration.Settings.GetSetting("PersistRecordedHtml"), out var persistRecordedHtml);
                 if (persistRecordedHtml)
                 {
                     var appDataFolder = Sitecore.Configuration.Settings.GetSetting("PersistentCacheFolder");

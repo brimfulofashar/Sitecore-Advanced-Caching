@@ -8,16 +8,24 @@ namespace Foundation.HtmlCache.Extensions
     {
         public static List<SiteInfo> GetSites(Sitecore.Data.Items.Item item, Language language = null)
         {
-            List<SiteInfo> siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();
-
             List<SiteInfo> siteInfos = new List<SiteInfo>();
-
-            foreach (SiteInfo siteInfo in siteInfoList)
+            if (item != null)
             {
-                if (item.Paths.FullPath.ToLower().Trim().StartsWith(siteInfo.RootPath.ToLower().Trim()) && siteInfo.Domain != "sitecore" && siteInfo.Domain != "extranet" && (language == null || siteInfo.Language == language.Name))
+                List<SiteInfo> siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();
+
+                
+
+                foreach (SiteInfo siteInfo in siteInfoList)
                 {
-                    siteInfos.Add(siteInfo);
+                    if (item.Paths.FullPath.ToLower().Trim().StartsWith(siteInfo.RootPath.ToLower().Trim()) &&
+                        siteInfo.Domain != "sitecore" && siteInfo.Domain != "extranet" &&
+                        (language == null || siteInfo.Language == language.Name))
+                    {
+                        siteInfos.Add(siteInfo);
+                    }
                 }
+
+                
             }
 
             return siteInfos;
