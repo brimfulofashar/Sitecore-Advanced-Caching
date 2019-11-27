@@ -11,7 +11,7 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public override void Process(RenderRenderingArgs args)
         {
-            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey))
+            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey) && !args.Rendering.Caching.VaryByUser)
             {
                 bool.TryParse(Sitecore.Configuration.Settings.GetSetting("PersistRecordedHtml"), out var persistRecordedHtml);
                 if (persistRecordedHtml)

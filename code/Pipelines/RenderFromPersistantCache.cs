@@ -18,8 +18,7 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public override void Process(RenderRenderingArgs args)
         {
-            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable &&
-                !string.IsNullOrEmpty(args.CacheKey))
+            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey) && !args.Rendering.Caching.VaryByUser)
             {
                 
                 var matchCollection = new Regex("[a-zA-Z0-9]+").Matches(args.CacheKey);
