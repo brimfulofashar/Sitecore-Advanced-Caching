@@ -1,9 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using Sitecore.Configuration;
+using Sitecore.Data;
+using Sitecore.Data.Items;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
+using Sitecore.SecurityModel;
 
 namespace Foundation.HtmlCache.Pipelines
 {
@@ -50,7 +55,22 @@ namespace Foundation.HtmlCache.Pipelines
                     {
                         string recording = writer.GetRecording();
 
-                        File.WriteAllText(fileName, recording);
+                        using (new SecurityDisabler())
+                        {
+                            string cacheKey = string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
+                            Item cachedItem = Factory.GetDatabase("web")
+                                .GetItem("/sitecore/system/Modules/HtmlCache/" + cacheKey);
+                            if (cachedItem == null)
+                            {
+                                cachedItem = Factory.GetDatabase("web").GetItem("/sitecore/system/Modules/HtmlCache").Add(cacheKey, new TemplateID(new ID("{987E6DC4-F4E6-4BE8-8349-A4513244A112}")));
+                            }
+
+                            cachedItem.Editing.BeginEdit();
+                            cachedItem.Fields["CacheKey"].Value = args.CacheKey;
+                            cachedItem.Fields["RenderingId"].Value = args.Rendering.Item.ID.ToString();
+                            cachedItem.Fields["CachedHtml"].Value = recording;
+                            cachedItem.Editing.EndEdit();
+                        }
                     }
                 }
             }

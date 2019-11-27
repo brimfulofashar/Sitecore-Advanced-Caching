@@ -20,18 +20,15 @@ namespace Foundation.HtmlCache.Pipelines
         {
             if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey) && !args.Rendering.Caching.VaryByUser)
             {
-                
-                var matchCollection = new Regex("[a-zA-Z0-9]+").Matches(args.CacheKey);
-                var cacheKey = string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
+                ItemTrackingStore.Instance.PersistedHtmlCache.TryGetValue(args.CacheKey, out var renderingItemHtmlValuePair);
 
-                ItemTrackingStore.Instance.PersistedHtmlCache.TryGetValue(cacheKey, out var html);
-                if (!string.IsNullOrEmpty(html))
+                if (!string.IsNullOrEmpty(renderingItemHtmlValuePair.Value))
                 {
-                    args.Writer.Write(html);
+                    args.Writer.Write(renderingItemHtmlValuePair.Value);
                     args.Rendered = true;
                     args.UsedCache = true;
                     args.Cacheable = false;
-                    AddHtmlToCache(args.CacheKey, html, args);
+                    AddHtmlToCache(args.CacheKey, renderingItemHtmlValuePair.Value, args);
                 }
             }
         }
