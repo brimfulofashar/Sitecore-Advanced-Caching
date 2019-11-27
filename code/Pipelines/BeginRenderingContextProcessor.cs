@@ -11,7 +11,12 @@ namespace Foundation.HtmlCache.Pipelines
             RenderingProcessorArgs dic;
             if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey))
             {
-                dic = new RenderingProcessorArgs(args.CacheKey, args.Rendering, args.PageContext.Item, TrackOperation.TrackOperationEnum.Track);
+                dic = new RenderingProcessorArgs(args.CacheKey, 
+                    args.Rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value, 
+                    args.Rendering.Caching.Cacheable, 
+                    TrackOperation.TrackOperationEnum.Track);
+                dic.ItemAccessList.Add(new ItemMetaData(args.PageContext.Item.ID.Guid,
+                    args.PageContext.Item.TemplateID.Guid));
             }
             else
             {

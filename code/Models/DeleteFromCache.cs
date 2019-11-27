@@ -3,9 +3,9 @@ using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Models
 {
-    public class DeleteFromCache : CacheJobBase, ICacheJob
+    public class DeleteFromCache : SiteMetaData, ICacheJob
     {
-        public DeleteFromCache(SiteInfo siteInfo, ID itemId) : base(siteInfo)
+        public DeleteFromCache(string siteInfoName, string siteInfoLanguage, ID itemId) : base(siteInfoName, siteInfoLanguage)
         {
             ItemId = itemId;
         }

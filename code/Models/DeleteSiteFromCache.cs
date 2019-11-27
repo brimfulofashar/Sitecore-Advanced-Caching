@@ -2,9 +2,9 @@
 
 namespace Foundation.HtmlCache.Models
 {
-    public class DeleteSiteFromCache : CacheJobBase, ICacheJob
+    public class DeleteSiteFromCache : SiteMetaData, ICacheJob
     {
-        public DeleteSiteFromCache(SiteInfo siteInfo) : base(siteInfo)
+        public DeleteSiteFromCache(string siteInfoName, string siteInfoLanguage) : base(siteInfoName, siteInfoLanguage)
         {
         }
     }

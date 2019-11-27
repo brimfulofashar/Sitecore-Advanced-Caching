@@ -1,11 +1,14 @@
-﻿using System;
-using Foundation.HtmlCache.Events;
+﻿using System.Collections.Generic;
+using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Models;
-using Sitecore;
+using Sitecore.Caching;
 using Sitecore.Configuration;
+using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
+using Sitecore.Framework.Messaging;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Web.UI.Sheer;
+using Sitecore.Sites;
+using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Commands
 {
@@ -14,16 +17,12 @@ namespace Foundation.HtmlCache.Commands
         public override void Execute(CommandContext context)
         {
             Assert.ArgumentNotNull(context, nameof(context));
-            Context.ClientPage.Start(this, "Run");
-        }
-
-        protected void Run(ClientPipelineArgs args)
-        {
-            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", Guid.Empty, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
-            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
-
-            SheerResponse.Alert("Cache for the Site has been cleared", true);
-            args.WaitForPostBack(false);
+            List<SiteInfo> siteInfos = Factory.GetSiteInfoList();
+            foreach (SiteInfo siteInfo in siteInfos)
+            {
+                ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(
+                    typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+            }
         }
     }
 }

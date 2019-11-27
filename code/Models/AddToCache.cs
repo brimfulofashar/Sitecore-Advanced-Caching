@@ -1,24 +1,18 @@
-﻿using Sitecore.Web;
+﻿using System;
+using Newtonsoft.Json;
+using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Models
 {
-    public class AddToCache : CacheJobBase, ICacheJob
+    [Serializable]
+    public class AddToCache : SiteMetaData, ICacheJob
     {
-        public AddToCache(SiteInfo siteInfo, RenderingProcessorArgs renderingProcessorArgs) : base(siteInfo)
+        public AddToCache(string siteInfoName, string siteInfoLanguage, RenderingProcessorArgs renderingProcessorArgs) : base(siteInfoName, siteInfoLanguage)
         {
             RenderingProcessorArgs = renderingProcessorArgs;
         }
 
+        [JsonProperty("RenderingProcessorArgs")]
         public RenderingProcessorArgs RenderingProcessorArgs { get; set; }
-    }
-
-    public class CacheJobBase
-    {
-        public CacheJobBase(SiteInfo siteInfo)
-        {
-            SiteInfo = siteInfo;
-        }
-
-        public SiteInfo SiteInfo { get; set; }
     }
 }
