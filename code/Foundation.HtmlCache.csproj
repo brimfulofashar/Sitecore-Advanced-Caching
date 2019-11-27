@@ -127,6 +127,7 @@
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Models\RenderingProcessorArgs.cs" />
+    <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />
     <Compile Include="Pipelines\RenderFromPersistantCache.cs" />
     <Compile Include="Pipelines\EndRenderingContext.cs" />

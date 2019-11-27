@@ -1,8 +1,16 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using Foundation.HtmlCache.Providers;
+using Sitecore;
+using Sitecore.Caching;
+using Sitecore.Diagnostics;
+using Sitecore.Mvc.Common;
+using Sitecore.Mvc.Extensions;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
+using Sitecore.Sites;
 
 namespace Foundation.HtmlCache.Pipelines
 {
@@ -13,26 +21,18 @@ namespace Foundation.HtmlCache.Pipelines
             if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable &&
                 !string.IsNullOrEmpty(args.CacheKey))
             {
-                var appDataFolder = Sitecore.Configuration.Settings.GetSetting("PersistentCacheFolder");
-
-                var htmlCacheFolder = HttpContext.Current.Server.MapPath(appDataFolder);
-
-                var site = Sitecore.Context.Site;
-
+                
                 var matchCollection = new Regex("[a-zA-Z0-9]+").Matches(args.CacheKey);
-                var fileName = htmlCacheFolder + "/" + site.Name + "/" + site.Language + "/" + string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
+                var cacheKey = string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
 
-                if (File.Exists(fileName))
+                ItemTrackingStore.Instance.PersistedHtmlCache.TryGetValue(cacheKey, out var html);
+                if (!string.IsNullOrEmpty(html))
                 {
-                    var html = File.ReadAllText(fileName);
-
                     args.Writer.Write(html);
-
-                    base.Process(args);
-
+                    args.Rendered = true;
                     args.UsedCache = true;
                     args.Cacheable = false;
-                    args.Rendered = true;
+                    AddHtmlToCache(args.CacheKey, html, args);
                 }
             }
         }

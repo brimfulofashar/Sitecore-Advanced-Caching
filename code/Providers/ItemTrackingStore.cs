@@ -15,11 +15,14 @@ namespace Foundation.HtmlCache.Providers
                 new Lazy<ItemTrackingStore>
                     (() => new ItemTrackingStore());
 
+        public Dictionary<string, string> PersistedHtmlCache;
+
         private readonly Dictionary<string, Dictionary<string, HashSet<string>>> RenderingIdKey_ItemIDsValue_Dic;
 
         private ItemTrackingStore()
         {
             RenderingIdKey_ItemIDsValue_Dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+            PersistedHtmlCache = new Dictionary<string, string>();
         }
 
         public static ItemTrackingStore Instance => lazy.Value;

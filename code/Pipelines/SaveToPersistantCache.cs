@@ -26,7 +26,7 @@ namespace Foundation.HtmlCache.Pipelines
 
                     if (!string.IsNullOrEmpty(siteName))
                     {
-                        var siteNameFolder = htmlCacheFolder + siteName;
+                        var siteNameFolder = htmlCacheFolder + "/" + siteName;
                         if (!Directory.Exists(siteNameFolder))
                         {
                             Directory.CreateDirectory(siteNameFolder);
