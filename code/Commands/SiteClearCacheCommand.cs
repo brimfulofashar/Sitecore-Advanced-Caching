@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Foundation.HtmlCache.Bus;
-using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
-using Sitecore;
-using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;

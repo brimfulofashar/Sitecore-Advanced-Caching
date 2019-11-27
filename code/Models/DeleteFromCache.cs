@@ -1,5 +1,4 @@
 ﻿using Sitecore.Data;
-using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Models
 {

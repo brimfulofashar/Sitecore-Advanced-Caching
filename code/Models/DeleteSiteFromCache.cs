@@ -1,6 +1,4 @@
-﻿using Sitecore.Web;
-
-namespace Foundation.HtmlCache.Models
+﻿namespace Foundation.HtmlCache.Models
 {
     public class DeleteSiteFromCache : SiteMetaData, ICacheJob
     {

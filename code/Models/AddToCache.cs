@@ -1,6 +1,5 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Models
 {

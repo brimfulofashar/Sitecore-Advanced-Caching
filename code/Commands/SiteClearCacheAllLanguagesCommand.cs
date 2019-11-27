@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Foundation.HtmlCache.Bus;
-using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
-using Sitecore;
-using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
@@ -15,9 +11,7 @@ using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
 using Sitecore.Framework.Messaging;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Sites;
 using Sitecore.Web;
-using Sitecore.Web.UI.Sheer;
 
 namespace Foundation.HtmlCache.Commands
 {

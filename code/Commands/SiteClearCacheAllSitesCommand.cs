@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Models;
-using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
 using Sitecore.Framework.Messaging;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Sites;
 using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Commands
