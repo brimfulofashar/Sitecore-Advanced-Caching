@@ -123,6 +123,7 @@
     <Compile Include="Controls\MultiRootTreeList.cs" />
     <Compile Include="Events\ItemPublishMessenger.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
+    <Compile Include="Models\CacheStoreSearchResult.cs" />
     <Compile Include="Models\SiteMetaData.cs" />
     <Compile Include="Models\DeleteSiteFromCache.cs" />
     <Compile Include="Models\DeleteFromCache.cs" />

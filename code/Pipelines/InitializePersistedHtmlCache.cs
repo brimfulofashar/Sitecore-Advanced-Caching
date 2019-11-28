@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Web;
+using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
 using Sitecore.ContentSearch.Linq;
-using Sitecore.Data.Items;
 using Sitecore.Pipelines;
 
 namespace Foundation.HtmlCache.Pipelines
@@ -15,18 +13,18 @@ namespace Foundation.HtmlCache.Pipelines
         {
             using (var context = Sitecore.ContentSearch.ContentSearchManager.GetIndex("sitecore_cache_index").CreateSearchContext())
             {
-                var searchResult = context.GetQueryable<Item>()
-                    .Where(item => item["_path"].Contains("/sitecore/system/Modules/HtmlCache"))
-                    .Where(item => item["_templatename"] == "CacheStore")
+                var searchResult = context.GetQueryable<CacheStoreSearchResult>()
+                    .Where(item => item.Path.Contains("/sitecore/system/Modules/HtmlCache"))
+                    .Where(item => item.TemplateName == "CacheStore")
                     .GetResults();
 
                 foreach (var result in searchResult)
                 {
-                    Item item = result.Document;
-                    ItemTrackingStore.Instance.PersistedHtmlCache.Add(item.Fields["CacheKey"].Value,
+                    CacheStoreSearchResult item = result.Document;
+                    ItemTrackingStore.Instance.PersistedHtmlCache.Add(item.CacheKey,
                         new KeyValuePair<string, string>(
-                            item.Fields["RenderingId"].Value,
-                            item.Fields["CachedHtml"].Value));
+                            item.RenderingId,
+                            item.CachedHtml));
                 }
             }
         }
