@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Foundation.HtmlCache.Bus;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
 using Sitecore.ContentSearch.Linq;
+using Sitecore.DependencyInjection;
+using Sitecore.Framework.Messaging;
 using Sitecore.Pipelines;
 
 namespace Foundation.HtmlCache.Pipelines
@@ -26,6 +30,7 @@ namespace Foundation.HtmlCache.Pipelines
                             item.RenderingId,
                             item.CachedHtml));
                 }
+                ((IMessageBus<HtmlCacheMessageBusSend>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusSend>))).Send(new RecomputePersistedHtmlCache());
             }
         }
     }

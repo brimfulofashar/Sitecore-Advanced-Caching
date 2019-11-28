@@ -1,6 +1,5 @@
 ﻿using Foundation.HtmlCache.Handlers;
 using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Models;
 using Sitecore.Framework.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Sitecore.DependencyInjection;

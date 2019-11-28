@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Messages;
 using Sitecore;
+using Sitecore.DependencyInjection;
+using Sitecore.Framework.Messaging;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 using Sitecore.SecurityModel;
@@ -28,8 +30,8 @@ namespace Foundation.HtmlCache.Pipelines
                             var matchCollection = new Regex("[a-zA-Z0-9]+").Matches(args.CacheKey);
                             string cacheKey = string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
 
-                            var addToCacheStore = new AddToCacheStore(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, args.CacheKey, args.Rendering.Item.ID.ToString(), recording, cacheKey);
-                            HtmlCacheMessageBus.Send(addToCacheStore);
+                            var addToCacheStore = new AddToCacheStore(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, args.CacheKey, args.Rendering.Id.ToString(), recording, cacheKey);
+                            ((IMessageBus<HtmlCacheMessageBusSend>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusSend>))).Send(addToCacheStore);
                         }
                     }
                 }

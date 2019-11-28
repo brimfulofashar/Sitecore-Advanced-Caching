@@ -9,7 +9,8 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public void Initialize(PipelineArgs args)
         {
-            ServiceLocator.ServiceProvider.StartMessageBus<HtmlCacheMessageBus>();
+            ServiceLocator.ServiceProvider.StartMessageBus<HtmlCacheMessageBusSend>();
+//            ServiceLocator.ServiceProvider.StartMessageBus<HtmlCacheMessageBusPublisher>();
         }
     }
 }

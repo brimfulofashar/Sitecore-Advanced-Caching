@@ -6,7 +6,9 @@ using Foundation.HtmlCache.Messages;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
+using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
+using Sitecore.Framework.Messaging;
 using Sitecore.Globalization;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web;
@@ -34,7 +36,7 @@ namespace Foundation.HtmlCache.Commands
                     SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
                     if (siteInfo != null)
                     {
-                        HtmlCacheMessageBus.Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        ((IMessageBus<HtmlCacheMessageBusSend>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusSend>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
                     }
                 }
             }

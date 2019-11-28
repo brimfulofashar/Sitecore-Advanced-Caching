@@ -8,6 +8,8 @@ using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
+using Sitecore.DependencyInjection;
+using Sitecore.Framework.Messaging;
 using Sitecore.Publishing.Pipelines.PublishItem;
 
 namespace Foundation.HtmlCache.Events
@@ -34,14 +36,14 @@ namespace Foundation.HtmlCache.Events
                         {
                             var deleteFromCache =
                                 new DeleteFromCache(site.First().Name, site.First().Language, child.ID);
-                            HtmlCacheMessageBus.Publish(deleteFromCache);
+                            ((IMessageBus<HtmlCacheMessageBusPublisher>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusPublisher>))).Publish(deleteFromCache);
                         }
                     }
                 }
                 else
                 {
                     var deleteFromCache = new DeleteFromCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, itemId);
-                    HtmlCacheMessageBus.Publish(deleteFromCache);
+                    ((IMessageBus<HtmlCacheMessageBusPublisher>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusPublisher>))).Publish(deleteFromCache);
                 }
             }
         }

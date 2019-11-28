@@ -3,6 +3,8 @@ using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore;
+using Sitecore.DependencyInjection;
+using Sitecore.Framework.Messaging;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
 namespace Foundation.HtmlCache.Pipelines
@@ -15,7 +17,7 @@ namespace Foundation.HtmlCache.Pipelines
             if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track)
             {
                 var addToCache = new AddToCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, renderingProcessorArgs);
-                HtmlCacheMessageBus.Publish(addToCache);
+                ((IMessageBus<HtmlCacheMessageBusSend>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusSend>))).Send(addToCache);
             }
 
             renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;

@@ -1,5 +1,4 @@
 ﻿using System;
-using Foundation.HtmlCache.Models;
 using Newtonsoft.Json;
 
 namespace Foundation.HtmlCache.Messages

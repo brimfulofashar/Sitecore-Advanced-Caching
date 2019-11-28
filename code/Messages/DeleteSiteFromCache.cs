@@ -1,6 +1,4 @@
-﻿using Foundation.HtmlCache.Models;
-
-namespace Foundation.HtmlCache.Messages
+﻿namespace Foundation.HtmlCache.Messages
 {
     public class DeleteSiteFromCache : SiteMetaData, ICacheMessage
     {
