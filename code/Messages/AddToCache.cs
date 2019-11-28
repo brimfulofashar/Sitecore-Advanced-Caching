@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace Foundation.HtmlCache.Messages
 {
     [Serializable]
-    public class AddToCache : SiteMetaData, ICacheJob
+    public class AddToCache : SiteMetaData, ICacheMessage
     {
         public AddToCache(string siteInfoName, string siteInfoLanguage, RenderingProcessorArgs renderingProcessorArgs) : base(siteInfoName, siteInfoLanguage)
         {

@@ -1,16 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web;
-using Foundation.HtmlCache.Providers;
-using Sitecore;
-using Sitecore.Caching;
-using Sitecore.Diagnostics;
-using Sitecore.Mvc.Common;
-using Sitecore.Mvc.Extensions;
+﻿using Foundation.HtmlCache.Providers;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
-using Sitecore.Sites;
 
 namespace Foundation.HtmlCache.Pipelines
 {

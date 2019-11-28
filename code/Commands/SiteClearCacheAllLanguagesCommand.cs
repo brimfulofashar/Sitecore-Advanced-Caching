@@ -33,7 +33,7 @@ namespace Foundation.HtmlCache.Commands
                     List<SiteInfo> siteInfos = SiteInfoExtensions.GetSites(item);
                     foreach (SiteInfo siteInfo in siteInfos)
                     {
-                        ((IMessageBus<HtmlCacheMessageBus>) ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        HtmlCacheMessageBus.Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
                     }
                 }
             }

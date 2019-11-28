@@ -3,7 +3,7 @@ using Sitecore.Data;
 
 namespace Foundation.HtmlCache.Messages
 {
-    public class DeleteFromCache : SiteMetaData, ICacheJob
+    public class DeleteFromCache : SiteMetaData, ICacheMessage
     {
         public DeleteFromCache(string siteInfoName, string siteInfoLanguage, ID itemId) : base(siteInfoName, siteInfoLanguage)
         {

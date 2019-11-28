@@ -132,7 +132,7 @@
     <Compile Include="Messages\DeleteFromCache.cs" />
     <Compile Include="Messages\AddToCache.cs" />
     <Compile Include="Messages\ClearCacheOperation.cs" />
-    <Compile Include="Messages\ICacheJob.cs" />
+    <Compile Include="Messages\ICacheMessage.cs" />
     <Compile Include="Messages\ItemMetaData.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />

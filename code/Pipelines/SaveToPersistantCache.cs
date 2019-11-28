@@ -2,13 +2,7 @@
 using System.Text.RegularExpressions;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Models;
 using Sitecore;
-using Sitecore.Configuration;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-using Sitecore.DependencyInjection;
-using Sitecore.Framework.Messaging;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 using Sitecore.SecurityModel;
@@ -35,7 +29,7 @@ namespace Foundation.HtmlCache.Pipelines
                             string cacheKey = string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
 
                             var addToCacheStore = new AddToCacheStore(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, args.CacheKey, args.Rendering.Item.ID.ToString(), recording, cacheKey);
-                            ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(addToCacheStore);
+                            HtmlCacheMessageBus.Send(addToCacheStore);
                         }
                     }
                 }

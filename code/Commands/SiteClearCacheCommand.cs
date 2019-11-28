@@ -3,13 +3,10 @@ using System.Linq;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Models;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
-using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
-using Sitecore.Framework.Messaging;
 using Sitecore.Globalization;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web;
@@ -37,8 +34,7 @@ namespace Foundation.HtmlCache.Commands
                     SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
                     if (siteInfo != null)
                     {
-                        ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(
-                            typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        HtmlCacheMessageBus.Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
                     }
                 }
             }

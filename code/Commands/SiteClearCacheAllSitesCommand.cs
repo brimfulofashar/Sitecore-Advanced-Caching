@@ -19,8 +19,7 @@ namespace Foundation.HtmlCache.Commands
             List<SiteInfo> siteInfos = Factory.GetSiteInfoList();
             foreach (SiteInfo siteInfo in siteInfos)
             {
-                ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(
-                    typeof(IMessageBus<HtmlCacheMessageBus>))).Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                HtmlCacheMessageBus.Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
             }
         }
     }
