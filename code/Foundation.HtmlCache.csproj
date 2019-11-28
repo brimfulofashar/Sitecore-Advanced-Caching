@@ -114,6 +114,7 @@
     <Compile Include="Configuration\ServicesConfiguratorCm.cs" />
     <Compile Include="Configuration\ServicesConfigurator.cs" />
     <Compile Include="Events\ItemPrePublish.cs" />
+    <Compile Include="Handlers\BroadcastCacheBusMessageHandler.cs" />
     <Compile Include="Handlers\AddToCacheStoreBusMessageHandler.cs" />
     <Compile Include="Handlers\DeleteSiteFromCacheBusMessageHandler.cs" />
     <Compile Include="Handlers\DeleteFromCacheBusMessageHandler.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Events\ItemPublishMessenger.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
     <Compile Include="Messages\AddToCacheStore.cs" />
+    <Compile Include="Messages\BroadcastCache.cs" />
     <Compile Include="Models\CacheStoreSearchResult.cs" />
     <Compile Include="Messages\SiteMetaData.cs" />
     <Compile Include="Messages\DeleteSiteFromCache.cs" />

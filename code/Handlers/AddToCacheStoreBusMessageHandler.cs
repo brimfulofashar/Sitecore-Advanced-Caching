@@ -1,6 +1,5 @@
-﻿using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
+﻿using Foundation.HtmlCache.Bus;
+using Foundation.HtmlCache.Messages;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
@@ -26,6 +25,9 @@ namespace Foundation.HtmlCache.Handlers
             cachedItem.Fields["SiteName"].Value = message.SiteInfoName;
             cachedItem.Fields["SiteLanguage"].Value = message.SiteInfoLanguage;
             cachedItem.Editing.EndEdit();
+
+            HtmlCacheMessageBus.Publish(new BroadcastCache(message.SiteInfoName, message.SiteInfoLanguage, message.CacheKey, message.CachedHtml));
+
             return Task.CompletedTask;
         }
     }

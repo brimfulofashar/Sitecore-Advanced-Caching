@@ -14,6 +14,7 @@ namespace Foundation.HtmlCache.Configuration
             serviceCollection.AddTransient<IMessageHandler<AddToCache>, AddToCacheBusMessageHandler>();
             serviceCollection.AddTransient<IMessageHandler<DeleteFromCache>, DeleteFromCacheBusMessageHandler>();
             serviceCollection.AddTransient<IMessageHandler<DeleteSiteFromCache>, DeleteSiteFromCacheBusMessageHandler>();
+            serviceCollection.AddTransient<IMessageHandler<BroadcastCache>, BroadcastCacheBusMessageHandler>();
         }
     }
 }

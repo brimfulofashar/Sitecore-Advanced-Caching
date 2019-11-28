@@ -5,18 +5,14 @@ using Newtonsoft.Json;
 namespace Foundation.HtmlCache.Messages
 {
     [Serializable]
-    public class AddToCacheStore : SiteMetaData, ICacheMessage
+    public class AddToCacheStore : BroadcastCache
     {
         [JsonProperty("Name")]
         public string Name { get; set; }
-        [JsonProperty("CacheKey")]
-        public string CacheKey { get; set; }
         [JsonProperty("RenderingId")]
         public string RenderingId { get; set; }
-        [JsonProperty("CachedHtml")]
-        public string CachedHtml { get; set; }
 
-        public AddToCacheStore(string siteInfoName, string siteInfoLanguage, string cacheKey, string renderingId, string cachedHtml, string name) : base(siteInfoName, siteInfoLanguage)
+        public AddToCacheStore(string siteInfoName, string siteInfoLanguage, string cacheKey, string renderingId, string cachedHtml, string name) : base(siteInfoName, siteInfoLanguage, cacheKey, cachedHtml)
         {
             CacheKey = cacheKey;
             RenderingId = renderingId;
