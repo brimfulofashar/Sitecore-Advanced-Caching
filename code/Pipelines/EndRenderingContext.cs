@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Foundation.HtmlCache.Bus;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.DependencyInjection;
@@ -16,7 +17,7 @@ namespace Foundation.HtmlCache.Pipelines
             if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track)
             {
                 var addToCache = new AddToCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, renderingProcessorArgs);
-                ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(addToCache);
+                ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Publish(addToCache);
             }
 
             renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;

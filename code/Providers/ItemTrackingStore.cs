@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Settings;
 using Sitecore.Data;

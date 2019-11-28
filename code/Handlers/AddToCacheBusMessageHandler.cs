@@ -1,4 +1,5 @@
-﻿using Foundation.HtmlCache.Models;
+﻿using Foundation.HtmlCache.Messages;
+using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
 using Sitecore.Framework.Messaging;
 using Task = System.Threading.Tasks.Task;

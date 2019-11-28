@@ -1,4 +1,4 @@
-﻿namespace Foundation.HtmlCache.Models
+﻿namespace Foundation.HtmlCache.Messages
 {
     public interface ICacheJob
     {

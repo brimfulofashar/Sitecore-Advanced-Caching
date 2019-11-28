@@ -2,6 +2,7 @@
 using System.Linq;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Configuration;
@@ -43,7 +44,7 @@ namespace Foundation.HtmlCache.Events
                 else
                 {
                     var deleteFromCache = new DeleteFromCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, itemId);
-                    ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(deleteFromCache);
+                    ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Publish(deleteFromCache);
                 }
             }
         }

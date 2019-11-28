@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Foundation.HtmlCache.Bus;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore.Configuration;
 using Sitecore.DependencyInjection;
@@ -19,7 +20,7 @@ namespace Foundation.HtmlCache.Commands
             foreach (SiteInfo siteInfo in siteInfos)
             {
                 ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(
-                    typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                    typeof(IMessageBus<HtmlCacheMessageBus>))).Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
             }
         }
     }

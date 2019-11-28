@@ -2,6 +2,7 @@
 using System.Linq;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore.Configuration;
 using Sitecore.Data;

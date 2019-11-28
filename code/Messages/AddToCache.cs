@@ -1,7 +1,8 @@
 ﻿using System;
+using Foundation.HtmlCache.Models;
 using Newtonsoft.Json;
 
-namespace Foundation.HtmlCache.Models
+namespace Foundation.HtmlCache.Messages
 {
     [Serializable]
     public class AddToCache : SiteMetaData, ICacheJob

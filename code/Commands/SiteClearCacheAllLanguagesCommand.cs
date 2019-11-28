@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Foundation.HtmlCache.Bus;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -32,7 +33,7 @@ namespace Foundation.HtmlCache.Commands
                     List<SiteInfo> siteInfos = SiteInfoExtensions.GetSites(item);
                     foreach (SiteInfo siteInfo in siteInfos)
                     {
-                        ((IMessageBus<HtmlCacheMessageBus>) ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        ((IMessageBus<HtmlCacheMessageBus>) ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
                     }
                 }
             }

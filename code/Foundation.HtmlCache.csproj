@@ -111,8 +111,10 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ServicesConfiguratorCm.cs" />
     <Compile Include="Configuration\ServicesConfigurator.cs" />
     <Compile Include="Events\ItemPrePublish.cs" />
+    <Compile Include="Handlers\AddToCacheStoreBusMessageHandler.cs" />
     <Compile Include="Handlers\DeleteSiteFromCacheBusMessageHandler.cs" />
     <Compile Include="Handlers\DeleteFromCacheBusMessageHandler.cs" />
     <Compile Include="Handlers\AddToCacheBusMessageHandler.cs" />
@@ -123,17 +125,18 @@
     <Compile Include="Controls\MultiRootTreeList.cs" />
     <Compile Include="Events\ItemPublishMessenger.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
+    <Compile Include="Messages\AddToCacheStore.cs" />
     <Compile Include="Models\CacheStoreSearchResult.cs" />
-    <Compile Include="Models\SiteMetaData.cs" />
-    <Compile Include="Models\DeleteSiteFromCache.cs" />
-    <Compile Include="Models\DeleteFromCache.cs" />
-    <Compile Include="Models\AddToCache.cs" />
-    <Compile Include="Models\ClearCacheOperation.cs" />
-    <Compile Include="Models\ICacheJob.cs" />
-    <Compile Include="Models\ItemMetaData.cs" />
+    <Compile Include="Messages\SiteMetaData.cs" />
+    <Compile Include="Messages\DeleteSiteFromCache.cs" />
+    <Compile Include="Messages\DeleteFromCache.cs" />
+    <Compile Include="Messages\AddToCache.cs" />
+    <Compile Include="Messages\ClearCacheOperation.cs" />
+    <Compile Include="Messages\ICacheJob.cs" />
+    <Compile Include="Messages\ItemMetaData.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
-    <Compile Include="Models\RenderingProcessorArgs.cs" />
+    <Compile Include="Messages\RenderingProcessorArgs.cs" />
     <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />
     <Compile Include="Pipelines\RenderFromPersistantCache.cs" />

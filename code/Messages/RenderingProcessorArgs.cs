@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Foundation.HtmlCache.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Foundation.HtmlCache.Models
+namespace Foundation.HtmlCache.Messages
 {
     [Serializable]
     public class RenderingProcessorArgs

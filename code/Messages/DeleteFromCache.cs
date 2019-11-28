@@ -1,6 +1,7 @@
-﻿using Sitecore.Data;
+﻿using Foundation.HtmlCache.Models;
+using Sitecore.Data;
 
-namespace Foundation.HtmlCache.Models
+namespace Foundation.HtmlCache.Messages
 {
     public class DeleteFromCache : SiteMetaData, ICacheJob
     {
