@@ -132,10 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bus\HtmlCacheMessageBusSubscriber.cs" />
     <Compile Include="Bus\HtmlCacheMessageBusPublisher.cs" />
-    <Compile Include="Configuration\ServicesConfigurator.cs" />
-    <Compile Include="Configuration\ServicesConfiguratorCm.cs" />
     <Compile Include="Events\ItemPrePublish.cs" />
     <Compile Include="Handlers\RecomputePersistedHtmlCacheBusMessageHandler.cs" />
     <Compile Include="Handlers\BroadcastCacheBusMessageHandler.cs" />
