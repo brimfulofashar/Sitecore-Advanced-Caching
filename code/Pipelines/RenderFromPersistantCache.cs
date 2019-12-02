@@ -3,7 +3,7 @@ using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
 namespace Foundation.HtmlCache.Pipelines
 {
-    public class RenderFromPersistantCache : AddRecordedHtmlToCache
+    public class RenderFromPersistantCache : RenderRenderingProcessor
     {
         public override void Process(RenderRenderingArgs args)
         {
@@ -17,7 +17,7 @@ namespace Foundation.HtmlCache.Pipelines
                     args.Rendered = true;
                     args.UsedCache = true;
                     args.Cacheable = false;
-                    AddHtmlToCache(args.CacheKey, renderingItemHtmlValuePair.Value, args);
+                    args.CustomData.Add("UsedPersistedCache", true);
                 }
             }
         }

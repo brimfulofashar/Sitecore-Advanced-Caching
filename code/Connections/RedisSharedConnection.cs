@@ -7,7 +7,9 @@ namespace Foundation.HtmlCache.Connections
     {
         public RedisSharedConnection()
         {
-            this.ConnectionMultiplexer = ConnectionMultiplexer.Connect(ConfigurationManager.ConnectionStrings["cache"].ConnectionString);
+            var cacheConnectionString = Sitecore.Configuration.Settings.GetSetting("redisConnectionString");
+            ConfigurationManager.ConnectionStrings.Add(new ConnectionStringSettings("redisConnectionString", cacheConnectionString));
+            this.ConnectionMultiplexer = ConnectionMultiplexer.Connect(ConfigurationManager.ConnectionStrings["redisConnectionString"].ConnectionString);
         }
 
         public ConnectionMultiplexer ConnectionMultiplexer { get; }

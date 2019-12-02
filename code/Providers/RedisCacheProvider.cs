@@ -11,17 +11,19 @@ namespace Foundation.HtmlCache.Providers
     public class RedisCacheProvider : IRedisCacheProvider
     {
         private readonly IRedisSharedConnection redisSharedConnection;
+        public int Database { get; }
 
         public RedisCacheProvider(IRedisSharedConnection redisSharedConnection)
         {
             this.redisSharedConnection = redisSharedConnection;
+            Database = int.Parse(Sitecore.Configuration.Settings.GetSetting("redisDatabase"));
         }
 
         public ICacheMessage Get<ICacheMessage>(string key) where ICacheMessage : Messages.ICacheMessage
         {
             try
             {
-                RedisValue redisValue = this.redisSharedConnection.ConnectionMultiplexer.GetDatabase().StringGet(key);
+                RedisValue redisValue = this.redisSharedConnection.ConnectionMultiplexer.GetDatabase(Database).StringGet(key);
                 return JsonConvert.DeserializeObject<ICacheMessage>(redisValue);
             }
             catch (Exception e)
@@ -37,11 +39,11 @@ namespace Foundation.HtmlCache.Providers
             {
                 if (duration > 0)
                 {
-                    this.redisSharedConnection.ConnectionMultiplexer.GetDatabase().StringSet(key,JsonConvert.SerializeObject(value),TimeSpan.FromSeconds(duration));
+                    this.redisSharedConnection.ConnectionMultiplexer.GetDatabase(Database).StringSet(key,JsonConvert.SerializeObject(value),TimeSpan.FromSeconds(duration));
                 }
                 else
                 {
-                    this.redisSharedConnection.ConnectionMultiplexer.GetDatabase().StringSet(key, JsonConvert.SerializeObject(value));
+                    this.redisSharedConnection.ConnectionMultiplexer.GetDatabase(Database).StringSet(key, JsonConvert.SerializeObject(value));
                 }
             }
             catch (Exception e)
