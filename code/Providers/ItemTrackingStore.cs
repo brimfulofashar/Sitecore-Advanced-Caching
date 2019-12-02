@@ -56,7 +56,7 @@ namespace Foundation.HtmlCache.Providers
             }
         }
 
-        public void Delete(string siteInfoName, string siteInfoLanguage, ID itemId)
+        public void Delete(string siteInfoName, string siteInfoLanguage, Guid itemId)
         {
             var cacheKeysToRemove = new HashSet<string>();
 
@@ -69,7 +69,7 @@ namespace Foundation.HtmlCache.Providers
             if (keys != null)
                 foreach (string key in keys)
                     if (renderingItemsList.TryGetValue(key, out HashSet<string> list))
-                        if (list.Contains(itemId.Guid.ToString()))
+                        if (list.Contains(itemId.ToString()))
                             cacheKeysToRemove.Add(key);
 
             List<SiteInfo> siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();

@@ -13,5 +13,10 @@ namespace Foundation.HtmlCache.Messages
             CacheKey = cacheKey;
             CachedHtml = cachedHtml;
         }
+
+        public void Handle()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

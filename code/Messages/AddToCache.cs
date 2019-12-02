@@ -1,4 +1,5 @@
 ﻿using System;
+using Foundation.HtmlCache.Providers;
 using Newtonsoft.Json;
 
 namespace Foundation.HtmlCache.Messages
@@ -13,5 +14,10 @@ namespace Foundation.HtmlCache.Messages
 
         [JsonProperty("RenderingProcessorArgs")]
         public RenderingProcessorArgs RenderingProcessorArgs { get; set; }
+
+        public void Handle()
+        {
+            ItemTrackingStore.Instance.Add(this.SiteInfoName, this.SiteInfoLanguage, this.RenderingProcessorArgs);
+        }
     }
 }

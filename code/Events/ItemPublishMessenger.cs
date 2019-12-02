@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
-using Foundation.HtmlCache.Bus;
+using System.Web.Mvc;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
+using Foundation.HtmlCache.Providers;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
-using Sitecore.DependencyInjection;
-using Sitecore.Framework.Messaging;
+
 using Sitecore.Publishing.Pipelines.PublishItem;
 
 namespace Foundation.HtmlCache.Events
@@ -25,25 +25,33 @@ namespace Foundation.HtmlCache.Events
             {
                 var createUpdateOrDeleteOperation = (PublishOperation.PublishOperationEnum)operation;
                 Item item = Factory.GetDatabase("web").GetItem(itemId);
-                var site = SiteInfoExtensions.GetSites(item);
+                var siteInfos = SiteInfoExtensions.GetSites(item);
 
-                if (createUpdateOrDeleteOperation == PublishOperation.PublishOperationEnum.Create)
+                foreach (var siteInfo in siteInfos)
                 {
-                    Item parent = item?.Parent;
-                    if (parent != null)
+                    IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>()
+                        .FirstOrDefault();
+                    if (createUpdateOrDeleteOperation == PublishOperation.PublishOperationEnum.Create)
                     {
-                        foreach (Item child in parent.Children)
+                        Item parent = item?.Parent;
+                        if (parent != null)
                         {
-                            var deleteFromCache =
-                                new DeleteFromCache(site.First().Name, site.First().Language, child.ID);
-                            ((IMessageBus<HtmlCacheMessageBusPublisher>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusPublisher>))).Publish(deleteFromCache);
+                            foreach (Item child in parent.Children)
+                            {
+                                var deleteFromCache =
+                                    new DeleteFromCache(siteInfo.Name, siteInfo.Language, child.ID.Guid);
+                                redis?.Set(child.ID.ToString(), deleteFromCache, 0);
+                                redis?.Publish(siteInfo.Name + "_" + siteInfo.Language, "DeleteFromCache");
+                            }
                         }
                     }
-                }
-                else
-                {
-                    var deleteFromCache = new DeleteFromCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, itemId);
-                    ((IMessageBus<HtmlCacheMessageBusPublisher>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusPublisher>))).Publish(deleteFromCache);
+                    else
+                    {
+                        var deleteFromCache = new DeleteFromCache(Context.Site.SiteInfo.Name,
+                            Context.Site.SiteInfo.Language, itemId.Guid);
+                        redis?.Set(itemId.ToString(), deleteFromCache, 0);
+                        redis?.Publish(siteInfo.Name + "_" + siteInfo.Language, "DeleteFromCache");
+                    }
                 }
             }
         }

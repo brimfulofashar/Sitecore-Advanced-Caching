@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Foundation.HtmlCache.Bus;
+using System.Linq;
+using System.Web.Mvc;
 using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Models;
+using Foundation.HtmlCache.Providers;
 using Sitecore.Configuration;
-using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
-using Sitecore.Framework.Messaging;
+
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web;
 
@@ -19,7 +19,9 @@ namespace Foundation.HtmlCache.Commands
             List<SiteInfo> siteInfos = Factory.GetSiteInfoList();
             foreach (SiteInfo siteInfo in siteInfos)
             {
-                ((IMessageBus<HtmlCacheMessageBusPublisher>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusPublisher>))).Publish(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>().FirstOrDefault();
+                redis?.Set("SiteClearCache", new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language), 0);
+                redis?.Publish(siteInfo.Name + "_" + siteInfo.Language, "SiteClearCache");
             }
         }
     }

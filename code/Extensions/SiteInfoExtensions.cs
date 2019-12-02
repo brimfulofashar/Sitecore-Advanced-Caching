@@ -13,8 +13,6 @@ namespace Foundation.HtmlCache.Extensions
             {
                 List<SiteInfo> siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();
 
-                
-
                 foreach (SiteInfo siteInfo in siteInfoList)
                 {
                     if (item.Paths.FullPath.ToLower().Trim().StartsWith(siteInfo.RootPath.ToLower().Trim()) &&

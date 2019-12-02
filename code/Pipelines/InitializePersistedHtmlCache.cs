@@ -1,12 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Foundation.HtmlCache.Bus;
-using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
-using Sitecore.ContentSearch.Linq;
-using Sitecore.DependencyInjection;
-using Sitecore.Framework.Messaging;
+﻿using System.Linq;
+using System.Web.Mvc;
+using Foundation.HtmlCache.Connections;
 using Sitecore.Pipelines;
 
 namespace Foundation.HtmlCache.Pipelines
@@ -15,23 +9,21 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public void Initialize(PipelineArgs args)
         {
-            using (var context = Sitecore.ContentSearch.ContentSearchManager.GetIndex("sitecore_cache_index").CreateSearchContext())
+            IRedisSharedConnection redis = DependencyResolver.Current.GetServices<IRedisSharedConnection>().FirstOrDefault();
+            System.Net.EndPoint[] endpoints = redis?.ConnectionMultiplexer.GetEndPoints();
+            if (endpoints != null)
             {
-                var searchResult = context.GetQueryable<CacheStoreSearchResult>()
-                    .Where(item => item.Path.Contains("/sitecore/system/Modules/HtmlCache"))
-                    .Where(item => item.TemplateName == "CacheStore")
-                    .GetResults();
-
-                foreach (var result in searchResult)
+                foreach (var endpoint in endpoints)
                 {
-                    CacheStoreSearchResult item = result.Document;
-                    ItemTrackingStore.Instance.PersistedHtmlCache.Add(item.CacheKey,
-                        new KeyValuePair<string, string>(
-                            item.RenderingId,
-                            item.CachedHtml));
+                    var server = redis.ConnectionMultiplexer.GetServer(endpoint);
+                    if (server.IsSlave)
+                    {
+                        var db = redis.ConnectionMultiplexer.GetDatabase();
+                        var values = db.StringGet(server.Keys().ToArray());
+                    }
                 }
-                ((IMessageBus<HtmlCacheMessageBusSend>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusSend>))).Send(new RecomputePersistedHtmlCache());
             }
+
         }
     }
 }

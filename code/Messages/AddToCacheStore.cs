@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Foundation.HtmlCache.Messages
 {
     [Serializable]
-    public class AddToCacheStore : BroadcastCache
+    public class AddToCacheStore : BroadcastCache, ICacheMessage
     {
         [JsonProperty("Name")]
         public string Name { get; set; }

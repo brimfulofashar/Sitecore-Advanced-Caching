@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
-using Foundation.HtmlCache.Bus;
+using System.Web.Mvc;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Messages;
+using Foundation.HtmlCache.Providers;
+using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
-using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
-using Sitecore.Framework.Messaging;
+
 using Sitecore.Globalization;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web;
@@ -23,24 +24,29 @@ namespace Foundation.HtmlCache.Commands
         {
             Assert.ArgumentNotNull(context, nameof(context));
             this.item = context.Items.FirstOrDefault();
-            this.language = this.item.Language;
-
-            Guid? itemId = this.item?.ID.Guid;
-            string languageStr = language.Name;
-            if (itemId != null && !string.IsNullOrEmpty(languageStr))
+            if (item != null)
             {
-                Language language = Language.Parse(languageStr);
-                Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId), language);
-                if (item != null)
+                this.language = this.item.Language;
+
+                Guid? itemId = this.item?.ID.Guid;
+                string languageStr = language.Name;
+                if (!string.IsNullOrEmpty(languageStr))
                 {
-                    SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
-                    if (siteInfo != null)
+                    Language language = Language.Parse(languageStr);
+                    Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId), language);
+                    if (item != null)
                     {
-                        ((IMessageBus<HtmlCacheMessageBusSend>)ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBusSend>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
+                        if (siteInfo != null)
+                        {
+                            IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>()
+                                .FirstOrDefault();
+                            redis?.Set("SiteClearCache", new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language), 0);
+                            redis?.Publish(Context.Site.Name + "_" + Context.Site.Language, "SiteClearCache");
+                        }
                     }
                 }
             }
-
         }
     }
 }
