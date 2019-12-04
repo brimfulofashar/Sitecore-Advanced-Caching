@@ -4,9 +4,11 @@ using System.Web.Mvc;
 using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
+using Newtonsoft.Json;
 using Sitecore;
 
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
+using StackExchange.Redis;
 
 namespace Foundation.HtmlCache.Pipelines
 {
@@ -19,12 +21,12 @@ namespace Foundation.HtmlCache.Pipelines
             {
                 var addToCache = new AddToCache(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, renderingProcessorArgs);
                 IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>().FirstOrDefault();
-                if (redis != null)
-                {
-                    redis.Set(args.CacheKey, addToCache,
-                        args.Rendering.Caching.Timeout.TotalMilliseconds);
-                    redis.Publish(Context.Site.Name + "_" + Context.Site.Language, "AddToCache");
-                }
+
+                var json = JsonConvert.SerializeObject(addToCache, Formatting.Indented,
+                    new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
+
+                redis?.Database.ListLeftPush("AddToCache", json);
+                redis?.Publish(addToCache.SiteInfoName + "_" + addToCache.SiteInfoLanguage, "AddToCache");
             }
 
             renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;

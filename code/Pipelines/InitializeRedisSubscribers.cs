@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web.Mvc;
-using Foundation.HtmlCache.Connections;
+using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Providers;
+using Newtonsoft.Json;
 using Sitecore.Configuration;
 using Sitecore.Diagnostics;
 using Sitecore.Jobs;
 using Sitecore.Pipelines;
-using Sitecore.Sites;
 using Sitecore.Web;
 
 using StackExchange.Redis;
@@ -16,14 +17,14 @@ namespace Foundation.HtmlCache.Pipelines
 {
     public class InitializeRedisSubscribers
     {
-        private readonly IRedisRenderingCacheManager _redisRenderingCacheManager;
+        private readonly IRedisCacheProvider _redisCacheProvider;
 
-        private readonly IRedisSharedConnection _redisSharedConnection;
+        private string _role;
 
         public InitializeRedisSubscribers()
         {
-            this._redisRenderingCacheManager = DependencyResolver.Current.GetServices<IRedisRenderingCacheManager>().FirstOrDefault();
-            this._redisSharedConnection = DependencyResolver.Current.GetServices<IRedisSharedConnection>().FirstOrDefault();
+            this._redisCacheProvider = DependencyResolver.Current.GetServices<IRedisCacheProvider>().FirstOrDefault();
+            _role = ConfigurationManager.AppSettings["role:define"];
         }
 
         public void Initialize(PipelineArgs args)
@@ -33,11 +34,26 @@ namespace Foundation.HtmlCache.Pipelines
             this.StartJob();
         }
 
-        public void Start(SiteInfo site)
+        public void Start(string siteNameLang)
         {
-            this._redisSharedConnection.ConnectionMultiplexer.GetSubscriber().Subscribe(
-                site.Name + "_" + site.Language,
-                (channel, message) => this.FireReceiveEvent(message));
+            var setting = Sitecore.Configuration.Settings.GetSetting("redisCompetingConsumerMessageTypes");
+            if (!string.IsNullOrEmpty(setting))
+            {
+                var redisCompetingConsumerMessageTypes = setting.Split('|').Where(x => !string.IsNullOrEmpty(x)).ToList();
+
+                foreach (var redisCompetingConsumerMessageType in redisCompetingConsumerMessageTypes)
+                {
+                    this._redisCacheProvider.ConnectionMultiplexer.GetSubscriber().Subscribe(siteNameLang, delegate
+                    {
+                        var message = this._redisCacheProvider.Database.ListRightPop(redisCompetingConsumerMessageType);
+                        this.ConsumeAndProcess(message);
+                    });
+                }
+            }
+
+            this._redisCacheProvider.ConnectionMultiplexer.GetSubscriber().Subscribe(
+                siteNameLang,
+                (channel, message) => this.Process(message));
         }
 
         public void StartJob()
@@ -45,22 +61,34 @@ namespace Foundation.HtmlCache.Pipelines
             List<SiteInfo> sites = Factory.GetSiteInfoList();
             foreach (SiteInfo site in sites)
             {
-                var jobOptions = new JobOptions(
+                var jobOptions = new DefaultJobOptions(
                     "RedisSubscriber",
                     "RedisSubscriber",
                     site.Name,
                     this,
                     "Start",
-                    new object[] { site });
+                    new object[] { site.Name + "_" + site.Language });
 
                 Log.Info($"Redis subscriber job starting for {site.Name}", this);
                 JobManager.Start(jobOptions);
             }
         }
 
-        private void FireReceiveEvent(RedisValue key)
+        private void Process(RedisValue redisValue)
         {
-            var cacheValue = this._redisRenderingCacheManager.GetRenderingCacheValue(key);
+            var stringVal = redisValue.ToString();
+            ICacheMessage cacheValue = JsonConvert.DeserializeObject<ICacheMessage>(stringVal);
+            cacheValue?.Handle();
+        }
+
+        private void ConsumeAndProcess(RedisValue redisValue)
+        {
+            var stringVal = redisValue.ToString();
+            ICacheMessage cacheValue = JsonConvert.DeserializeObject<ICacheMessage>(stringVal, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                NullValueHandling = NullValueHandling.Ignore,
+            });
             cacheValue?.Handle();
         }
     }

@@ -1,7 +1,4 @@
 ﻿using System;
-using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
-using Sitecore.Data;
 
 namespace Foundation.HtmlCache.Messages
 {
@@ -15,7 +12,7 @@ namespace Foundation.HtmlCache.Messages
         public Guid ItemId { get; set; }
         public void Handle()
         {
-            ItemTrackingStore.Instance.Delete(this.SiteInfoName, this.SiteInfoLanguage, this.ItemId);
+            
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Foundation.HtmlCache.Connections;
+using System.Configuration;
 using Foundation.HtmlCache.Messages;
 using Newtonsoft.Json;
 using Sitecore.Diagnostics;
@@ -10,20 +10,22 @@ namespace Foundation.HtmlCache.Providers
 {
     public class RedisCacheProvider : IRedisCacheProvider
     {
-        private readonly IRedisSharedConnection redisSharedConnection;
-        public int Database { get; }
+        public IDatabase Database { get; }
 
-        public RedisCacheProvider(IRedisSharedConnection redisSharedConnection)
+        public RedisCacheProvider()
         {
-            this.redisSharedConnection = redisSharedConnection;
-            Database = int.Parse(Sitecore.Configuration.Settings.GetSetting("redisDatabase"));
+            var redisConnectionString = ConfigurationManager.ConnectionStrings["redis"].ConnectionString;
+            this.ConnectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+            Database = this.ConnectionMultiplexer.GetDatabase(int.Parse(Sitecore.Configuration.Settings.GetSetting("redisDatabase")));
         }
+
+        public ConnectionMultiplexer ConnectionMultiplexer { get; }
 
         public ICacheMessage Get<ICacheMessage>(string key) where ICacheMessage : Messages.ICacheMessage
         {
             try
             {
-                RedisValue redisValue = this.redisSharedConnection.ConnectionMultiplexer.GetDatabase(Database).StringGet(key);
+                RedisValue redisValue = this.Database.StringGet(key);
                 return JsonConvert.DeserializeObject<ICacheMessage>(redisValue);
             }
             catch (Exception e)
@@ -39,11 +41,11 @@ namespace Foundation.HtmlCache.Providers
             {
                 if (duration > 0)
                 {
-                    this.redisSharedConnection.ConnectionMultiplexer.GetDatabase(Database).StringSet(key,JsonConvert.SerializeObject(value),TimeSpan.FromSeconds(duration));
+                    this.Database.StringSet(key,JsonConvert.SerializeObject(value),TimeSpan.FromSeconds(duration));
                 }
                 else
                 {
-                    this.redisSharedConnection.ConnectionMultiplexer.GetDatabase(Database).StringSet(key, JsonConvert.SerializeObject(value));
+                    this.Database.StringSet(key, JsonConvert.SerializeObject(value));
                 }
             }
             catch (Exception e)
@@ -56,7 +58,7 @@ namespace Foundation.HtmlCache.Providers
         {
             try
             {
-                this.redisSharedConnection.ConnectionMultiplexer.GetSubscriber().Publish(channel, message);
+                this.ConnectionMultiplexer.GetSubscriber().Publish(channel, message);
             }
             catch (Exception e)
             {
