@@ -43,15 +43,15 @@ namespace Foundation.HtmlCache.Providers
             DbModelBuilder builder = new DbModelBuilder(DbModelBuilderVersion.Latest);
 
             builder.Configurations.Add(new EntityTypeConfiguration<CacheItem>());
-            string tableName = "CacheItem" + suffix;
+            string tableName = "CacheItems" + suffix;
             builder.Entity<CacheItem>().ToTable(tableName);
 
             builder.Configurations.Add(new EntityTypeConfiguration<CacheKey>());
-            tableName = "CacheKey" + suffix;
+            tableName = "CacheKeys" + suffix;
             builder.Entity<CacheKey>().ToTable(tableName);
             
             builder.Configurations.Add(new EntityTypeConfiguration<CacheKeyItem>());
-            tableName = "CacheKeyItem" + suffix;
+            tableName = "CacheKeysItems" + suffix;
             builder.Entity<CacheKeyItem>().ToTable(tableName);
 
             // Compile ORM object, hard link connection
@@ -60,6 +60,10 @@ namespace Foundation.HtmlCache.Providers
 
             // Finally make our database context
             dummyContext = new ItemTrackingProvider(compiledModel, dummyContext.Database.Connection.ConnectionString);
+
+            var tempSql = CreateTempTables(suffix);
+
+            dummyContext.Database.ExecuteSqlCommand(tempSql);
 
             return dummyContext;
         }
@@ -95,6 +99,58 @@ namespace Foundation.HtmlCache.Providers
             modelBuilder.Entity<CacheItem>().HasIndex(x => new { x.ItemId });
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        private static string CreateTempTables(string suffix)
+        {
+            var createScript = string.Format(@"
+            CREATE TABLE [dbo].[CacheItems{0}] (
+              [Id] [uniqueidentifier] NOT NULL,
+              [ItemId] [uniqueidentifier] NOT NULL,
+              CONSTRAINT [PK_CacheItems{0}] PRIMARY KEY CLUSTERED
+              (
+              [Id] ASC
+              ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+            CREATE TABLE [dbo].[CacheKeys{0}] (
+              [Id] [uniqueidentifier] NOT NULL,
+              [SiteName] [varchar](250) NOT NULL,
+              [SiteLang] [varchar](250) NOT NULL,
+              [HtmlCacheKey] [varchar](500) NOT NULL,
+              [HtmlCacheResult] [varchar](MAX) NOT NULL,
+              CONSTRAINT [PK_CacheKeys{0}] PRIMARY KEY CLUSTERED
+              (
+              [Id] ASC
+              ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+            CREATE TABLE [dbo].[CacheKeysItems{0}] (
+              [Id] [uniqueidentifier] NOT NULL,
+              [CacheKey_Id] [uniqueidentifier] NOT NULL,
+              [CacheItem_Id] [uniqueidentifier] NOT NULL,
+              CONSTRAINT [PK_CacheKeysItems{0}] PRIMARY KEY CLUSTERED
+              (
+              [Id] ASC
+              ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+            CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheItems{0}] ON [dbo].[CacheItems{0}]
+            (
+            [ItemId] ASC
+            ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheKeys{0}] ON [dbo].[CacheKeys{0}]
+            (
+            [HtmlCacheKey] ASC
+            ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheKeysItems{0}] ON [dbo].[CacheKeysItems{0}]
+            (
+            [CacheKey_Id] ASC,
+            [CacheItem_Id] ASC
+            ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ALTER TABLE [dbo].[CacheKeysItems{0}] WITH CHECK ADD CONSTRAINT [FK_CacheKeysItems_CacheItems{0}] FOREIGN KEY ([CacheItem_Id]) REFERENCES [dbo].[CacheItems{0}] ([Id])
+            ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheItems{0}]
+            ALTER TABLE [dbo].[CacheKeysItems{0}] WITH CHECK ADD CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}] FOREIGN KEY ([CacheKey_Id]) REFERENCES [dbo].[CacheKeys{0}] ([Id])
+            ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}]", suffix);
+
+            return createScript;
         }
     }
 }

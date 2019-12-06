@@ -7,6 +7,7 @@ using System.Web;
 
 namespace Foundation.HtmlCache.Models
 {
+    [Table("CacheItems")]
     public class CacheItem
     {
         public CacheItem()

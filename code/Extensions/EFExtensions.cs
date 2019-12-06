@@ -59,11 +59,11 @@ namespace Foundation.HtmlCache.Extensions
             TableName = tableAttr.Name;
         }
 
-        public abstract TRet Execute();
-        public void Run()
-        {
-            Execute();
-        }
+        public abstract TRet Execute(string suffix);
+//        public void Run()
+//        {
+//            Execute();
+//        }
 
         public EntityOp<TEntity, TRet> Key<TKey>(Expression<Func<TEntity, TKey>> selectKey)
         {
@@ -90,20 +90,20 @@ namespace Foundation.HtmlCache.Extensions
     {
         public EntityOp(DbContext context, TEntity entity) : base(context, entity) { }
 
-        public sealed override int Execute()
+        public sealed override int Execute(string suffix)
         {
-            ExecuteNoRet();
+            ExecuteNoRet(suffix);
             return 0;
         }
 
-        protected abstract void ExecuteNoRet();
+        protected abstract void ExecuteNoRet(string suffix);
     }
 
     public class UpsertOp<TEntity> : EntityOp<TEntity>
     {
         public UpsertOp(DbContext context, TEntity entity) : base(context, entity) { }
 
-        protected override void ExecuteNoRet()
+        protected override void ExecuteNoRet(string suffix)
         {
             StringBuilder sql = new StringBuilder();
 
@@ -131,11 +131,9 @@ namespace Foundation.HtmlCache.Extensions
             sql.Append(TableName);
             sql.Append(" as T ");
 
-            sql.Append("using (values (");
-            sql.Append(string.Join(",", valueKeyList.ToArray()));
-            sql.Append(")) as S (");
-            sql.Append(string.Join(",", columns));
-            sql.Append(") ");
+            sql.Append("using");
+            sql.Append(TableName + "_" + suffix);
+            sql.Append(" as S ");
 
             sql.Append("on (");
             var mergeCond = string.Join(" and ", KeyNames.Select(kn => "T." + kn + "=S." + kn));
@@ -152,6 +150,17 @@ namespace Foundation.HtmlCache.Extensions
             sql.Append(");");
 
             Context.Database.ExecuteSqlCommand(sql.ToString(), valueList.ToArray());
+
+            /*
+                merge into CacheItems as T 
+                using CacheItems_395eb099a7a54363b464e19389df848f as S 
+                on (T.ItemId = S.ItemId) 
+                when matched 
+                then update set T.ItemId=S.ItemId
+                when not matched 
+                then insert (Id,ItemId) values (S.Id,S.ItemId)
+                OUTPUT $action,inserted.*;
+             */
         }
     }
 }

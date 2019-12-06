@@ -23,7 +23,8 @@ namespace Foundation.HtmlCache.Messages
 
         public void Handle()
         {
-            using (var ctx = ItemTrackingProvider.CreateDummyContext(Guid.NewGuid().ToString().Replace("-", string.Empty)))
+            var suffix = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            using (var ctx = ItemTrackingProvider.CreateDummyContext(suffix))
             {
                 var cacheKey = new CacheKey
                 {
@@ -35,13 +36,15 @@ namespace Foundation.HtmlCache.Messages
                 };
 
                 ctx.CacheKeys.AddOrUpdate(cacheKey);
-                ctx.Upsert(cacheKey).Execute();
+                ctx.Upsert(cacheKey).Execute(suffix);
                 
                 var cacheItems = this.RenderingProcessorArgs.ItemAccessList.Select(x => new CacheItem() {Id = Guid.NewGuid(), ItemId = x.Id}).ToArray();
                 ctx.CacheItems.AddOrUpdate(cacheItems);
+                ctx.Upsert(cacheKey).Execute(suffix);
 
                 var cacheKeyItems = cacheItems.Select(x => new CacheKeyItem(){Id = Guid.NewGuid(), CacheKey_Id = cacheKey.Id, CacheItem_Id = x.Id}).ToArray();
                 ctx.CacheKeyItems.AddOrUpdate(cacheKeyItems);
+                ctx.Upsert(cacheKey).Execute(suffix);
 
                 ctx.SaveChanges();
             }
