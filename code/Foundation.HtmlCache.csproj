@@ -112,6 +112,7 @@
     <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Configuration.ConfigurationManager.4.6.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
     <Reference Include="System.DirectoryServices" />
@@ -156,6 +157,7 @@
     <Compile Include="Commands\SiteClearCacheCommand.cs" />
     <Compile Include="Controls\MultiRootTreeList.cs" />
     <Compile Include="Events\ItemPublishMessenger.cs" />
+    <Compile Include="Extensions\EFExtensions.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
     <Compile Include="Messages\AddToCacheStore.cs" />
     <Compile Include="Messages\BroadcastCache.cs" />
@@ -167,7 +169,7 @@
     <Compile Include="Messages\ICacheMessage.cs" />
     <Compile Include="Messages\ItemMetaData.cs" />
     <Compile Include="Models\CacheItem.cs" />
-    <Compile Include="Models\CacheKeysItem.cs" />
+    <Compile Include="Models\CacheKeyItem.cs" />
     <Compile Include="Models\CacheKey.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />

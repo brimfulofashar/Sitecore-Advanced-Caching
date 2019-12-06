@@ -76,20 +76,27 @@ namespace Foundation.HtmlCache.Pipelines
 
         private void Process(RedisValue redisValue)
         {
-            var stringVal = redisValue.ToString();
-            ICacheMessage cacheValue = JsonConvert.DeserializeObject<ICacheMessage>(stringVal);
-            cacheValue?.Handle();
+            if (!string.IsNullOrEmpty(redisValue))
+            {
+                var stringVal = redisValue.ToString();
+                ICacheMessage cacheValue = JsonConvert.DeserializeObject<ICacheMessage>(stringVal);
+                cacheValue?.Handle();
+            }
         }
 
         private void ConsumeAndProcess(RedisValue redisValue)
         {
-            var stringVal = redisValue.ToString();
-            ICacheMessage cacheValue = JsonConvert.DeserializeObject<ICacheMessage>(stringVal, new JsonSerializerSettings
+            if (!string.IsNullOrEmpty(redisValue))
             {
-                TypeNameHandling = TypeNameHandling.Auto,
-                NullValueHandling = NullValueHandling.Ignore,
-            });
-            cacheValue?.Handle();
+                var stringVal = redisValue.ToString();
+                ICacheMessage cacheValue = JsonConvert.DeserializeObject<ICacheMessage>(stringVal,
+                    new JsonSerializerSettings
+                    {
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        NullValueHandling = NullValueHandling.Ignore,
+                    });
+                cacheValue?.Handle();
+            }
         }
     }
 }

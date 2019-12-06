@@ -27,6 +27,9 @@ namespace Foundation.HtmlCache.Messages
 
         [JsonProperty("CacheKey")]
         public string CacheKey { get; set; }
+
+        [JsonProperty("CacheResult")]
+        public string CacheResult { get; set; }
         [JsonProperty("Cacheable")]
         public bool Cacheable { get; set; }
         [JsonProperty("CacheableTemplates")]

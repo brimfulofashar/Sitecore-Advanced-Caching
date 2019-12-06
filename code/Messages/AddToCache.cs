@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
+using System.Text;
+using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
 using Newtonsoft.Json;
@@ -20,17 +23,26 @@ namespace Foundation.HtmlCache.Messages
 
         public void Handle()
         {
-            using (var ctx = new ItemTrackingProvider())
+            using (var ctx = ItemTrackingProvider.CreateDummyContext(Guid.NewGuid().ToString().Replace("-", string.Empty)))
             {
-                var existing = ctx.CacheKeys.FirstOrDefault(x =>
-                    x.HtmlCacheKey == this.RenderingProcessorArgs.CacheKey && x.SiteName == SiteInfoName &&
-                    x.SiteLang == SiteInfoLanguage);
-                if (existing != null)
+                var cacheKey = new CacheKey
                 {
-                    ctx.CacheKeys.Remove(existing);
-                }
-                var cacheKey = new CacheKey { ID = Guid.NewGuid(), HtmlCacheKey = this.RenderingProcessorArgs.CacheKey, SiteName = this.SiteInfoName, SiteLang = this.SiteInfoLanguage, CacheItems = this.RenderingProcessorArgs.ItemAccessList.Select(x => new CacheItem(){ID = Guid.NewGuid(), ItemId = x.Id}).ToList()};
-                ctx.CacheKeys.Add(cacheKey);
+                    Id = Guid.NewGuid(),
+                    HtmlCacheKey = this.RenderingProcessorArgs.CacheKey,
+                    HtmlCacheResult = this.RenderingProcessorArgs.CacheResult,
+                    SiteName = this.SiteInfoName,
+                    SiteLang = this.SiteInfoLanguage
+                };
+
+                ctx.CacheKeys.AddOrUpdate(cacheKey);
+                ctx.Upsert(cacheKey).Execute();
+                
+                var cacheItems = this.RenderingProcessorArgs.ItemAccessList.Select(x => new CacheItem() {Id = Guid.NewGuid(), ItemId = x.Id}).ToArray();
+                ctx.CacheItems.AddOrUpdate(cacheItems);
+
+                var cacheKeyItems = cacheItems.Select(x => new CacheKeyItem(){Id = Guid.NewGuid(), CacheKey_Id = cacheKey.Id, CacheItem_Id = x.Id}).ToArray();
+                ctx.CacheKeyItems.AddOrUpdate(cacheKeyItems);
+
                 ctx.SaveChanges();
             }
         }
