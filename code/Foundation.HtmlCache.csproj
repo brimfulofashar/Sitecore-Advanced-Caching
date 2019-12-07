@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Config\Include\Foundation\Foundation.HtmlCache.Serialization.config" />
+    <Content Include="Scripts\SQL\schema.sql" />
     <Content Include="sitecore\admin\HtmlCacheViewer.aspx" />
     <Content Include="App_Config\Include\zFoundation\zFoundation.HtmlCache.config" />
     <None Include="packages.config" />

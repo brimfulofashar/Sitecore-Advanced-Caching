@@ -26,27 +26,41 @@ namespace Foundation.HtmlCache.Messages
             var suffix = Guid.NewGuid().ToString().Replace("-", string.Empty);
             using (var ctx = ItemTrackingProvider.CreateDummyContext(suffix))
             {
-                var cacheKey = new CacheKey
+                using (var dbContextTransaction = ctx.Database.BeginTransaction())
                 {
-                    Id = Guid.NewGuid(),
-                    HtmlCacheKey = this.RenderingProcessorArgs.CacheKey,
-                    HtmlCacheResult = this.RenderingProcessorArgs.CacheResult,
-                    SiteName = this.SiteInfoName,
-                    SiteLang = this.SiteInfoLanguage
-                };
+                    try
+                    {
+                        var cacheKey = new CacheKey
+                        {
+                            Id = Guid.NewGuid(),
+                            HtmlCacheKey = this.RenderingProcessorArgs.CacheKey,
+                            HtmlCacheResult = this.RenderingProcessorArgs.CacheResult,
+                            SiteName = this.SiteInfoName,
+                            SiteLang = this.SiteInfoLanguage
+                        };
 
-                ctx.CacheKeys.AddOrUpdate(cacheKey);
-                ctx.Upsert(cacheKey).Execute(suffix);
-                
-                var cacheItems = this.RenderingProcessorArgs.ItemAccessList.Select(x => new CacheItem() {Id = Guid.NewGuid(), ItemId = x.Id}).ToArray();
-                ctx.CacheItems.AddOrUpdate(cacheItems);
-                ctx.Upsert(cacheKey).Execute(suffix);
+                        ctx.CacheKeys.AddOrUpdate(cacheKey);
 
-                var cacheKeyItems = cacheItems.Select(x => new CacheKeyItem(){Id = Guid.NewGuid(), CacheKey_Id = cacheKey.Id, CacheItem_Id = x.Id}).ToArray();
-                ctx.CacheKeyItems.AddOrUpdate(cacheKeyItems);
-                ctx.Upsert(cacheKey).Execute(suffix);
+                        var cacheItems = this.RenderingProcessorArgs.ItemAccessList
+                            .Select(x => new CacheItem() {Id = Guid.NewGuid(), ItemId = x.Id}).ToArray();
+                        ctx.CacheItems.AddOrUpdate(cacheItems);
 
-                ctx.SaveChanges();
+                        var cacheKeyItems = cacheItems.Select(x => new CacheKeyItem()
+                            {Id = Guid.NewGuid(), CacheKey_Id = cacheKey.Id, CacheItem_Id = x.Id}).ToArray();
+                        ctx.CacheKeyItems.AddOrUpdate(cacheKeyItems);
+
+                        ctx.SaveChanges();
+
+                        dbContextTransaction.Commit();
+
+                        ctx.Database.ExecuteSqlCommand(ctx.GetMergeStatement(suffix));
+                        ctx.Database.ExecuteSqlCommand(ctx.GetDeleteTempTableStatement(suffix));
+                    }
+                    catch (Exception e)
+                    {
+                        
+                    }
+                }
             }
         }
     }

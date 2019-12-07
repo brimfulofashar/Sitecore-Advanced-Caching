@@ -64,7 +64,6 @@ namespace Foundation.HtmlCache.Providers
             var tempSql = CreateTempTables(suffix);
 
             dummyContext.Database.ExecuteSqlCommand(tempSql);
-
             return dummyContext;
         }
 
@@ -151,6 +150,47 @@ namespace Foundation.HtmlCache.Providers
             ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}]", suffix);
 
             return createScript;
+        }
+
+        public string GetMergeStatement(string suffix)
+        {
+            return string.Format(@"
+            merge into CacheKeys WITH (HOLDLOCK) as T 
+            using CacheKeys_{0} as S 
+            on (T.HtmlCacheKey = S.HtmlCacheKey) 
+            --when matched 
+            --then update set T.HtmlCacheKey = S.HtmlCacheKey, T.HtmlCacheResult = S.HtmlCacheResult, T.SiteName = S.SiteName, T.SiteLang = S.SiteLang
+            when not matched 
+            then insert (Id, HtmlCacheKey, HtmlCacheResult, SiteName, SiteLang) values (S.Id, S.HtmlCacheKey, S.HtmlCacheResult, S.SiteName, S.SiteLang);
+            
+            merge into CacheItems WITH (HOLDLOCK) as T 
+            using CacheItems_{0} as S 
+            on (T.ItemId = S.ItemId) 
+            --when matched 
+            --then update set T.ItemId = S.ItemId
+            when not matched 
+            then insert (Id, ItemId) values (S.Id, S.ItemId);
+            
+            merge into CacheKeysItems WITH (HOLDLOCK) as T 
+            using (SELECT ckiTemp.Id, ck.Id as CacheKey_Id, ci.Id as CacheItem_Id
+            FROM CacheKeys ck
+            INNER JOIN CacheKeys_{0} ckTemp on ck.HtmlCacheKey = ckTemp.HtmlCacheKey
+            INNER JOIN CacheKeysItems_{0} ckiTemp on ckTemp.Id = ckiTemp.CacheKey_Id
+            INNER JOIN CacheItems_{0} ciTemp on ciTemp.Id = ckiTemp.CacheItem_Id
+            INNER JOIN CacheItems ci on ciTemp.ItemId = ci.ItemId) as S 
+            on (T.CacheKey_Id = S.CacheKey_Id AND T.CacheItem_Id = S.CacheItem_Id) 
+            --when matched 
+            --then update set T.CacheItem_Id = S.CacheItem_Id, T.CacheKey_Id = S.CacheKey_Id
+            when not matched 
+            then insert (Id, CacheKey_Id, CacheItem_Id) values (S.Id, S.CacheKey_Id, S.CacheItem_Id);", suffix);
+        }
+
+        public string GetDeleteTempTableStatement(string suffix)
+        {
+            return string.Format(@"
+            DROP TABLE CacheKeysItems_{0};
+            DROP TABLE CacheItems_{0};
+            DROP TABLE CacheKeys_{0};", suffix);
         }
     }
 }

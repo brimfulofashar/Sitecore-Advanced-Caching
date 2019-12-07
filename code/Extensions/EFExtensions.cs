@@ -129,6 +129,7 @@ namespace Foundation.HtmlCache.Extensions
 
             sql.Append("merge into ");
             sql.Append(TableName);
+            sql.Append(" WITH (HOLDLOCK)");
             sql.Append(" as T ");
 
             sql.Append("using");
@@ -152,14 +153,14 @@ namespace Foundation.HtmlCache.Extensions
             Context.Database.ExecuteSqlCommand(sql.ToString(), valueList.ToArray());
 
             /*
-                merge into CacheItems as T 
+                merge into CacheItems WITH (HOLDLOCK) as T 
                 using CacheItems_395eb099a7a54363b464e19389df848f as S 
                 on (T.ItemId = S.ItemId) 
                 when matched 
                 then update set T.ItemId=S.ItemId
                 when not matched 
                 then insert (Id,ItemId) values (S.Id,S.ItemId)
-                OUTPUT $action,inserted.*;
+                OUTPUT $action,inserted.Id;
              */
         }
     }
