@@ -27,6 +27,7 @@ namespace Foundation.HtmlCache.Providers
         public DbSet<CacheKey> CacheKeys { get; set; }
         public DbSet<CacheItem> CacheItems { get; set; }
         public DbSet<CacheKeyItem> CacheKeyItems { get; set; }
+        public DbSet<CacheQueue> CacheQueues { get; set; }
 
         private ItemTrackingProvider(DbCompiledModel compiledModel, string connectionString): base(compiledModel)
         {
@@ -53,6 +54,10 @@ namespace Foundation.HtmlCache.Providers
             builder.Configurations.Add(new EntityTypeConfiguration<CacheKeyItem>());
             tableName = "CacheKeysItems" + suffix;
             builder.Entity<CacheKeyItem>().ToTable(tableName);
+
+            builder.Configurations.Add(new EntityTypeConfiguration<CacheQueue>());
+            tableName = "CacheQueue";
+            builder.Entity<CacheQueue>().ToTable(tableName);
 
             // Compile ORM object, hard link connection
             DbConnection dummyConnection = dummyContext.Database.Connection;

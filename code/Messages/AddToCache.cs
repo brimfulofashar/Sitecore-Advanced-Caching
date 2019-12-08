@@ -7,6 +7,7 @@ using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
 using Newtonsoft.Json;
+using Sitecore.Diagnostics;
 
 namespace Foundation.HtmlCache.Messages
 {
@@ -49,16 +50,15 @@ namespace Foundation.HtmlCache.Messages
                             {Id = Guid.NewGuid(), CacheKey_Id = cacheKey.Id, CacheItem_Id = x.Id}).ToArray();
                         ctx.CacheKeyItems.AddOrUpdate(cacheKeyItems);
 
+                        ctx.CacheQueues.Add(new CacheQueue() {Suffix = suffix});
+
                         ctx.SaveChanges();
 
                         dbContextTransaction.Commit();
-
-                        ctx.Database.ExecuteSqlCommand(ctx.GetMergeStatement(suffix));
-                        ctx.Database.ExecuteSqlCommand(ctx.GetDeleteTempTableStatement(suffix));
                     }
                     catch (Exception e)
                     {
-                        
+                        Log.Error("Can't persist cache", e, this);
                     }
                 }
             }

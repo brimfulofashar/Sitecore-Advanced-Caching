@@ -168,6 +168,7 @@
     <Compile Include="Messages\ClearCacheOperation.cs" />
     <Compile Include="Messages\ICacheMessage.cs" />
     <Compile Include="Messages\ItemMetaData.cs" />
+    <Compile Include="Models\CacheQueue.cs" />
     <Compile Include="Models\CacheItem.cs" />
     <Compile Include="Models\CacheKeyItem.cs" />
     <Compile Include="Models\CacheKey.cs" />
