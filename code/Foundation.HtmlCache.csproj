@@ -172,6 +172,7 @@
     <Compile Include="Models\CacheItem.cs" />
     <Compile Include="Models\CacheKeyItem.cs" />
     <Compile Include="Models\CacheKey.cs" />
+    <Compile Include="Models\CacheQueueMessageType.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Messages\RenderingProcessorArgs.cs" />

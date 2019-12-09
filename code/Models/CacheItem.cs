@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace Foundation.HtmlCache.Models
 {
@@ -20,6 +18,10 @@ namespace Foundation.HtmlCache.Models
         [Index("IX_CacheItems", IsUnique = true)]
         public Guid ItemId { get; set; }
 
+        [Column("CacheKey_Id")]
+        public Guid CacheKey_Id { get; set; }
+
+        [NotMapped]
         public virtual ICollection<CacheKey> CacheKeys { get; set; }
     }
 }

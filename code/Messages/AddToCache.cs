@@ -43,14 +43,14 @@ namespace Foundation.HtmlCache.Messages
                         ctx.CacheKeys.AddOrUpdate(cacheKey);
 
                         var cacheItems = this.RenderingProcessorArgs.ItemAccessList
-                            .Select(x => new CacheItem() {Id = Guid.NewGuid(), ItemId = x.Id}).ToArray();
+                            .Select(x => new CacheItem() {Id = Guid.NewGuid(), ItemId = x.Id, CacheKey_Id = cacheKey.Id}).ToArray();
                         ctx.CacheItems.AddOrUpdate(cacheItems);
 
                         var cacheKeyItems = cacheItems.Select(x => new CacheKeyItem()
                             {Id = Guid.NewGuid(), CacheKey_Id = cacheKey.Id, CacheItem_Id = x.Id}).ToArray();
                         ctx.CacheKeyItems.AddOrUpdate(cacheKeyItems);
 
-                        ctx.CacheQueues.Add(new CacheQueue() {Suffix = suffix});
+                        ctx.CacheQueues.Add(new CacheQueue() {Suffix = suffix, CacheQueueMessageType_Id = (int)CacheQueueMessageType.MessageTypeEnum.AddToCache});
 
                         ctx.SaveChanges();
 

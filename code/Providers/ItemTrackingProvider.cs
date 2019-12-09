@@ -66,7 +66,7 @@ namespace Foundation.HtmlCache.Providers
             // Finally make our database context
             dummyContext = new ItemTrackingProvider(compiledModel, dummyContext.Database.Connection.ConnectionString);
 
-            var tempSql = CreateTempTables(suffix);
+            var tempSql = GetCreateTempTablesStatement(suffix);
 
             dummyContext.Database.ExecuteSqlCommand(tempSql);
             return dummyContext;
@@ -105,12 +105,13 @@ namespace Foundation.HtmlCache.Providers
             base.OnModelCreating(modelBuilder);
         }
 
-        private static string CreateTempTables(string suffix)
+        private static string GetCreateTempTablesStatement(string suffix)
         {
-            var createScript = string.Format(@"
+            var tempTableScript = string.Format(@"
             CREATE TABLE [dbo].[CacheItems{0}] (
               [Id] [uniqueidentifier] NOT NULL,
               [ItemId] [uniqueidentifier] NOT NULL,
+              [CacheKey_Id] [uniqueidentifier] NOT NULL,
               CONSTRAINT [PK_CacheItems{0}] PRIMARY KEY CLUSTERED
               (
               [Id] ASC
@@ -138,7 +139,8 @@ namespace Foundation.HtmlCache.Providers
             ) ON [PRIMARY]
             CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheItems{0}] ON [dbo].[CacheItems{0}]
             (
-            [ItemId] ASC
+            [ItemId] ASC,
+            [CacheKey_Id] ASC
             ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
             CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheKeys{0}] ON [dbo].[CacheKeys{0}]
             (
@@ -149,12 +151,75 @@ namespace Foundation.HtmlCache.Providers
             [CacheKey_Id] ASC,
             [CacheItem_Id] ASC
             ) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-            ALTER TABLE [dbo].[CacheKeysItems{0}] WITH CHECK ADD CONSTRAINT [FK_CacheKeysItems_CacheItems{0}] FOREIGN KEY ([CacheItem_Id]) REFERENCES [dbo].[CacheItems{0}] ([Id])
-            ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheItems{0}]
-            ALTER TABLE [dbo].[CacheKeysItems{0}] WITH CHECK ADD CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}] FOREIGN KEY ([CacheKey_Id]) REFERENCES [dbo].[CacheKeys{0}] ([Id])
-            ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}]", suffix);
+            ALTER TABLE [dbo].[CacheItems{0}]  WITH CHECK ADD  CONSTRAINT [FK_CacheItems_CacheKeys{0}] FOREIGN KEY([CacheKey_Id]) REFERENCES [dbo].[CacheKeys{0}] ([Id]) ON DELETE CASCADE
+			ALTER TABLE [dbo].[CacheItems{0}] CHECK CONSTRAINT [FK_CacheItems_CacheKeys{0}]
+            ALTER TABLE [dbo].[CacheKeysItems{0}] WITH CHECK ADD CONSTRAINT [FK_CacheKeysItems_CacheItems{0}] FOREIGN KEY([CacheItem_Id]) REFERENCES [dbo].[CacheItems{0}] ([Id])
+			ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheItems{0}]
+			ALTER TABLE [dbo].[CacheKeysItems{0}] WITH CHECK ADD CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}] FOREIGN KEY([CacheKey_Id]) REFERENCES [dbo].[CacheKeys{0}] ([Id]) ON DELETE CASCADE
+			ALTER TABLE [dbo].[CacheKeysItems{0}] CHECK CONSTRAINT [FK_CacheKeysItems_CacheKeys{0}]", suffix);
 
-            return createScript;
+            return tempTableScript;
+        }
+
+        public static string GetDeleteFromCacheStatement()
+        {
+            var str = @"
+            SET NOCOUNT ON;
+
+	        DECLARE @Counter BIGINT
+	        SELECT @Counter = MIN(ID) FROM CacheQueue
+	        DECLARE @Suffix char(32)
+	        DECLARE @DeleteFromCacheStatement as NVARCHAR(max)
+	        DECLARE @MaxId BIGINT
+	        SELECT @MaxId = MAX(ID) FROM CacheQueue
+	        DECLARE @MessageId BIGINT
+	        SELECT @MessageId = MIN(ID) FROM CacheQueue WHERE CacheQueueMessageType_Id = 2
+
+	        SET @DeleteFromCacheStatement = '
+		        DELETE FROM CacheKeys
+		        WHERE HtmlCacheKey IN
+		        (
+		        SELECT ck.HtmlCacheKey
+		        FROM CacheKeys ck          
+		        INNER JOIN CacheKeysItems cki 
+		        ON ck.Id = cki.CacheKey_Id 
+		        INNER JOIN CacheItems ci
+		        ON ci.Id = cki.CacheItem_Id
+		        INNER JOIN PublishedItems pi 
+		        ON ci.ItemId = pi.ItemId
+		        INNER JOIN CacheQueue cq
+		        ON pi.CacheQueueId = ' + CAST(@MessageId AS varchar(12)) +')'
+
+            WHILE @Counter < @MaxId
+            BEGIN
+		        SELECT @Suffix = Suffix FROM CacheQueue with (rowlock updlock) WHERE Id = @Counter AND CacheQueueMessageType_Id = 1
+          
+  		        SET @DeleteFromCacheStatement =  CONCAT(@DeleteFromCacheStatement, '            
+                DELETE FROM CacheKeys_' + @Suffix + '
+		        WHERE HtmlCacheKey IN
+		        (
+		        SELECT ckTemp.HtmlCacheKey
+		        FROM CacheKeys_' + @Suffix + ' ckTemp          
+		        INNER JOIN CacheKeysItems_' + @Suffix + ' ckiTemp 
+		        ON ckTemp.Id = ckiTemp.CacheKey_Id 
+		        INNER JOIN CacheItems_' + @Suffix + ' ciTemp
+		        ON ciTemp.Id = ckiTemp.CacheItem_Id
+		        INNER JOIN PublishedItems pi 
+		        ON ciTemp.ItemId = pi.ItemId
+		        INNER JOIN CacheQueue cq
+		        ON pi.CacheQueueId = ' + CAST(@MessageId AS varchar(12)) +')')
+
+		        SET @Counter = @Counter + 1
+	        END
+
+	        SET @DeleteFromCacheStatement = CONCAT(@DeleteFromCacheStatement, '
+	        DELETE FROM PublishedItems WHERE CacheQueueId = ' + CAST(@MessageId AS varchar(12)) +'')
+
+	        SET @DeleteFromCacheStatement = CONCAT(@DeleteFromCacheStatement, '
+	        DELETE FROM CacheQueue WHERE Id = ' + CAST(@MessageId AS varchar(12)) +'')
+
+	        SELECT @DeleteFromCacheStatement";
+            return str;
         }
 
         public string GetMergeStatement(string suffix)

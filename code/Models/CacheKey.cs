@@ -21,6 +21,7 @@ namespace Foundation.HtmlCache.Models
         public string SiteName { get; set; }
         public string SiteLang { get; set; }
 
+        [NotMapped]
         public virtual ICollection<CacheItem> CacheItems { get; set; }
     }
 }
