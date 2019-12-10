@@ -7,16 +7,29 @@ using System.Web;
 
 namespace Foundation.HtmlCache.Models
 {
-    [Table("CacheQueue")]
     public class CacheQueue
     {
+        public long Id { get; set; } // Id (Primary key)
+        public int CacheQueueMessageTypeId { get; set; } // CacheQueueMessageType_Id
+        public string Suffix { get; set; } // Suffix (length: 32)
+
+        // Reverse navigation
+
+        /// <summary>
+        /// Child PublishedItems where [PublishedItems].[CacheQueueId] point to this entity (FK_PublishedItems_CacheQueue)
+        /// </summary>
+        public virtual ICollection<PublishedItem> PublishedItems { get; set; } // PublishedItems.FK_PublishedItems_CacheQueue
+
+        // Foreign keys
+
+        /// <summary>
+        /// Parent CacheQueueMessageType pointed by [CacheQueue].([CacheQueueMessageTypeId]) (FK_CacheQueue_CacheQueueMessageType)
+        /// </summary>
+        public virtual CacheQueueMessageType CacheQueueMessageType { get; set; } // FK_CacheQueue_CacheQueueMessageType
+
         public CacheQueue()
         {
+            PublishedItems = new List<PublishedItem>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public Int64 Id { get; set; }
-        public Int32 CacheQueueMessageType_Id { get; set; }
-        public string Suffix { get; set; }
     }
 }

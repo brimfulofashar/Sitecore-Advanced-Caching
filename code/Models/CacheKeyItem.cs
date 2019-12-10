@@ -4,25 +4,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Foundation.HtmlCache.Models
 {
-    [Table("CacheKeysItems")]
     public class CacheKeyItem
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } // Id (Primary key)
+        public Guid CacheKeyId { get; set; } // CacheKey_Id
+        public Guid CacheItemId { get; set; } // CacheItem_Id
 
-        [Index("IX_CacheKeysItems", 0, IsUnique = true)]
-        [Column("CacheKey_Id")]
-        public Guid CacheKey_Id { get; set; }
+        // Foreign keys
 
-        [Index("IX_CacheKeysItems", 1, IsUnique = true)]
-        [Column("CacheItem_Id")]
-        public Guid CacheItem_Id { get; set; }
+        /// <summary>
+        /// Parent CacheItem pointed by [CacheKeysItems].([CacheItemId]) (FK_CacheKeysItems_CacheItems)
+        /// </summary>
+        public virtual CacheItem CacheItem { get; set; } // FK_CacheKeysItems_CacheItems
 
-        [NotMapped]
-        public virtual CacheItem CacheItem { get; set; }
-
-        [NotMapped]
-        public virtual CacheKey CacheKey { get; set; }
+        /// <summary>
+        /// Parent CacheKey pointed by [CacheKeysItems].([CacheKeyId]) (FK_CacheKeysItems_CacheKeys)
+        /// </summary>
+        public virtual CacheKey CacheKey { get; set; } // FK_CacheKeysItems_CacheKeys
     }
 }

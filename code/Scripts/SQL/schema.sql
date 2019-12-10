@@ -1,18 +1,9 @@
-﻿USE [master]
+﻿USE [HtmlCache]
 GO
-/****** Object:  Database [HtmlCache]    Script Date: 08/12/2019 13:13:03 ******/
-CREATE DATABASE [HtmlCache]
-GO
-ALTER DATABASE [HtmlCache] SET CONTAINMENT = PARTIAL
-GO
-USE [HtmlCache]
-GO
-/****** Object:  User [htmlcacheuser]    Script Date: 08/12/2019 15:41:23 ******/
-CREATE USER [htmlcacheuser] WITH PASSWORD=N'kuqG0I+RD1uBAhZc0Us+Elryv7XDG0S+WhRqs15O0SU=', DEFAULT_SCHEMA=[dbo]
+CREATE USER [htmlcacheuser] WITH PASSWORD=N'gFZaGKek9gehGSA1pkTjfYOaqZyePkPaJCT2olgRsnA=', DEFAULT_SCHEMA=[dbo]
 GO
 ALTER ROLE [db_owner] ADD MEMBER [htmlcacheuser]
 GO
-/****** Object:  Table [dbo].[CacheItems]    Script Date: 08/12/2019 15:41:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,13 +11,13 @@ GO
 CREATE TABLE [dbo].[CacheItems](
 	[Id] [uniqueidentifier] NOT NULL,
 	[ItemId] [uniqueidentifier] NOT NULL,
+	[CacheKey_Id] [uniqueidentifier] NOT NULL,
  CONSTRAINT [PK_CacheItems] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CacheKeys]    Script Date: 08/12/2019 15:41:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -43,7 +34,6 @@ CREATE TABLE [dbo].[CacheKeys](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CacheKeysItems]    Script Date: 08/12/2019 15:41:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -58,7 +48,6 @@ CREATE TABLE [dbo].[CacheKeysItems](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CacheQueue]    Script Date: 08/12/2019 15:41:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -66,14 +55,13 @@ GO
 CREATE TABLE [dbo].[CacheQueue](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[CacheQueueMessageType_Id] [int] NOT NULL,
-	[Suffix] [char](32) NOT NULL,
+	[Suffix] [char](32) NULL,
  CONSTRAINT [PK_CacheQueue] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CacheQueueMessageType]    Script Date: 08/12/2019 15:41:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -87,39 +75,44 @@ CREATE TABLE [dbo].[CacheQueueMessageType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PublishedItems]    Script Date: 08/12/2019 15:41:23 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[PublishedItems](
+	[CacheQueueId] [bigint] NOT NULL,
 	[ItemId] [uniqueidentifier] NOT NULL,
  CONSTRAINT [PK_PublishedItems] PRIMARY KEY CLUSTERED 
 (
+	[CacheQueueId] ASC,
 	[ItemId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_CacheItems]    Script Date: 08/12/2019 15:41:23 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheItems] ON [dbo].[CacheItems]
 (
-	[ItemId] ASC
+	[ItemId] ASC,
+	[CacheKey_Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_CacheKeys]    Script Date: 08/12/2019 15:41:23 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheKeys] ON [dbo].[CacheKeys]
 (
 	[HtmlCacheKey] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_CacheKeysItems]    Script Date: 08/12/2019 15:41:23 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_CacheKeysItems] ON [dbo].[CacheKeysItems]
 (
 	[CacheKey_Id] ASC,
 	[CacheItem_Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = ON, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[CacheItems]  WITH CHECK ADD  CONSTRAINT [FK_CacheItems_CacheKeys] FOREIGN KEY([CacheKey_Id])
+REFERENCES [dbo].[CacheKeys] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[CacheItems] CHECK CONSTRAINT [FK_CacheItems_CacheKeys]
 GO
 ALTER TABLE [dbo].[CacheKeysItems]  WITH CHECK ADD  CONSTRAINT [FK_CacheKeysItems_CacheItems] FOREIGN KEY([CacheItem_Id])
 REFERENCES [dbo].[CacheItems] ([Id])
@@ -128,6 +121,7 @@ ALTER TABLE [dbo].[CacheKeysItems] CHECK CONSTRAINT [FK_CacheKeysItems_CacheItem
 GO
 ALTER TABLE [dbo].[CacheKeysItems]  WITH CHECK ADD  CONSTRAINT [FK_CacheKeysItems_CacheKeys] FOREIGN KEY([CacheKey_Id])
 REFERENCES [dbo].[CacheKeys] ([Id])
+ON DELETE CASCADE
 GO
 ALTER TABLE [dbo].[CacheKeysItems] CHECK CONSTRAINT [FK_CacheKeysItems_CacheKeys]
 GO
@@ -136,7 +130,11 @@ REFERENCES [dbo].[CacheQueueMessageType] ([Id])
 GO
 ALTER TABLE [dbo].[CacheQueue] CHECK CONSTRAINT [FK_CacheQueue_CacheQueueMessageType]
 GO
-/****** Object:  StoredProcedure [dbo].[MergeQueuedTrackingData]    Script Date: 08/12/2019 15:41:23 ******/
+ALTER TABLE [dbo].[PublishedItems]  WITH CHECK ADD  CONSTRAINT [FK_PublishedItems_CacheQueue] FOREIGN KEY([CacheQueueId])
+REFERENCES [dbo].[CacheQueue] ([Id])
+GO
+ALTER TABLE [dbo].[PublishedItems] CHECK CONSTRAINT [FK_PublishedItems_CacheQueue]
+GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

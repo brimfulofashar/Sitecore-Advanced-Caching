@@ -5,23 +5,30 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Foundation.HtmlCache.Models
 {
-    [Table("CacheKeys")]
     public class CacheKey
     {
+        public Guid Id { get; set; } // Id (Primary key)
+        public string SiteName { get; set; } // SiteName (length: 250)
+        public string SiteLang { get; set; } // SiteLang (length: 250)
+        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 500)
+        public string HtmlCacheResult { get; set; } // HtmlCacheResult
+
+        // Reverse navigation
+
+        /// <summary>
+        /// Child CacheItems where [CacheItems].[CacheKey_Id] point to this entity (FK_CacheItems_CacheKeys)
+        /// </summary>
+        public virtual ICollection<CacheItem> CacheItems { get; set; } // CacheItems.FK_CacheItems_CacheKeys
+
+        /// <summary>
+        /// Child CacheKeysItems where [CacheKeysItems].[CacheKey_Id] point to this entity (FK_CacheKeysItems_CacheKeys)
+        /// </summary>
+        public virtual ICollection<CacheKeyItem> CacheKeysItems { get; set; } // CacheKeysItems.FK_CacheKeysItems_CacheKeys
+
         public CacheKey()
         {
-            this.CacheItems = new HashSet<CacheItem>();
+            CacheItems = new List<CacheItem>();
+            CacheKeysItems = new List<CacheKeyItem>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Key]
-        public Guid Id { get; set; }
-        [Index("IX_CacheKeys", IsUnique = true)]
-        public string HtmlCacheKey { get; set; }
-        public string HtmlCacheResult { get; set; }
-        public string SiteName { get; set; }
-        public string SiteLang { get; set; }
-
-        [NotMapped]
-        public virtual ICollection<CacheItem> CacheItems { get; set; }
     }
 }

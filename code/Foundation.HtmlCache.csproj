@@ -168,11 +168,12 @@
     <Compile Include="Messages\ClearCacheOperation.cs" />
     <Compile Include="Messages\ICacheMessage.cs" />
     <Compile Include="Messages\ItemMetaData.cs" />
+    <Compile Include="Models\CacheKeyItem.cs" />
     <Compile Include="Models\CacheQueue.cs" />
     <Compile Include="Models\CacheItem.cs" />
-    <Compile Include="Models\CacheKeyItem.cs" />
     <Compile Include="Models\CacheKey.cs" />
     <Compile Include="Models\CacheQueueMessageType.cs" />
+    <Compile Include="Models\PublishedItem.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Messages\RenderingProcessorArgs.cs" />
@@ -195,9 +196,13 @@
     <Content Include="Scripts\SQL\schema.sql" />
     <Content Include="sitecore\admin\HtmlCacheViewer.aspx" />
     <Content Include="App_Config\Include\zFoundation\zFoundation.HtmlCache.config" />
+    <Content Include="DB\EF.Reverse.POCO.v3.ttinclude" />
     <None Include="packages.config" />
     <Content Include="Views\HtmlCache\HtmlCacheLayout.cshtml" />
     <None Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
