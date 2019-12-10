@@ -7,10 +7,5 @@ namespace Foundation.HtmlCache.Messages
         public DeleteSiteFromCache(string siteInfoName, string siteInfoLanguage) : base(siteInfoName, siteInfoLanguage)
         {
         }
-
-        public void Handle()
-        {
-            ItemTrackingStore.Instance.DeleteSite(this.SiteInfoName, this.SiteInfoLanguage);
-        }
     }
 }

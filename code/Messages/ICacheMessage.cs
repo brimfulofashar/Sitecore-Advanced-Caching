@@ -2,6 +2,6 @@
 {
     public interface ICacheMessage
     {
-        void Handle();
+        
     }
 }

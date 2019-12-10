@@ -39,10 +39,7 @@ namespace Foundation.HtmlCache.Commands
                         SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
                         if (siteInfo != null)
                         {
-                            IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>()
-                                .FirstOrDefault();
-                            redis?.Set("SiteClearCache", new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language), 0);
-                            redis?.Publish(Context.Site.Name + "_" + Context.Site.Language, "SiteClearCache");
+                            
                         }
                     }
                 }

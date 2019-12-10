@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sitecore.Configuration;
 using Sitecore.Publishing.Pipelines.PublishItem;
 using Foundation.HtmlCache.Models;
@@ -9,7 +10,7 @@ namespace Foundation.HtmlCache.Events
 {
     public class ItemPrePublish
     {
-        public void CalculatePublishOperation(object sender, EventArgs args)
+        public void PreCalculatePublishOperation(object sender, EventArgs args)
         {
             PublishItemContext argContext = ((ItemProcessingEventArgs) args).Context;
             ID itemId = argContext.ItemId;
@@ -28,6 +29,15 @@ namespace Foundation.HtmlCache.Events
             {
                 argContext.PublishContext.CustomData[itemId.ToString()] = operation;
             }
+
+            HashSet<string> dic;
+
+            if (argContext.PublishContext.CustomData["Publishing"] == null)
+            {
+                dic = new HashSet<string>();
+                argContext.PublishContext.CustomData["Publishing"] = dic;
+            }
+            
         }
     }
 }

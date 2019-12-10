@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
+﻿using System;
+using System.Linq;
+using System.Web;
 using Foundation.HtmlCache.Messages;
+using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
 using Sitecore;
-using Sitecore.Mvc.Common;
+using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
-using Sitecore.SecurityModel;
 
 namespace Foundation.HtmlCache.Pipelines
 {
@@ -14,33 +14,59 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public override void Process(RenderRenderingArgs args)
         {
-            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey) && !args.Rendering.Caching.VaryByUser)
+            var renderingProcessorArgs = (RenderingProcessorArgs) HttpContext.Current.Items["RenderingArgs"];
+            if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track)
             {
-                bool.TryParse(Sitecore.Configuration.Settings.GetSetting("PersistRecordedHtml"), out var persistRecordedHtml);
-                if (persistRecordedHtml)
+                var trackedItems = renderingProcessorArgs.ItemAccessList.Where(x =>
+                    renderingProcessorArgs.CacheableTemplates.ToLower()
+                        .Contains(x.TempalteId.ToString().ToLower())).ToList();
+                if (trackedItems.Any())
                 {
-                    RecordingTextWriter writer = args.Writer as RecordingTextWriter;
-                    if (writer != null)
+                    var suffix = Guid.NewGuid().ToString().Replace("-", string.Empty);
+                    using (var ctx = ItemTrackingProvider.CreateDummyContext(suffix))
                     {
-                        string recording = writer.GetRecording();
-
-                        using (new SecurityDisabler())
+                        try
                         {
-                            var matchCollection = new Regex("[a-zA-Z0-9]+").Matches(args.CacheKey);
-                            string cacheKey = string.Join("_", matchCollection.Cast<Match>().Select(m => m.Value));
 
-                            var addToCacheStore = new AddToCacheStore(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language, args.CacheKey, args.Rendering.Id.ToString(), recording, cacheKey);
-                            IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>().FirstOrDefault();
-                            if (redis != null)
+                            var cacheKeyId = Guid.NewGuid();
+                            var cacheKey = new CacheKey
                             {
-                                redis.Set(cacheKey, addToCacheStore,
-                                    args.Rendering.Caching.Timeout.TotalMilliseconds);
-                                redis.Publish(Context.Site.Name + "_" + Context.Site.Language, cacheKey);
-                            }
+                                Id = cacheKeyId,
+                                HtmlCacheKey = args.CacheKey,
+                                HtmlCacheResult = renderingProcessorArgs.CacheResult,
+                                SiteName = Context.Site.SiteInfo.Name,
+                                SiteLang = Context.Site.SiteInfo.Language
+                            };
+
+                            var cacheItems = trackedItems.Select(x => new CacheItem
+                                {Id = Guid.NewGuid(), ItemId = x.Id, CacheKeyId = cacheKey.Id}).ToArray();
+
+                            var cacheKeysItems = cacheItems.Select(x => new CacheKeyItem
+                                {Id = Guid.NewGuid(), CacheKeyId = cacheKey.Id, CacheItemId = x.Id}).ToArray();
+
+                            var cacheQueue = new CacheQueue
+                            {
+                                Suffix = suffix,
+                                CacheQueueMessageTypeId = (int) CacheQueueMessageType.MessageTypeEnum.AddToCache
+                            };
+
+                            ctx.CacheKeys.Add(cacheKey);
+                            ctx.CacheItems.AddRange(cacheItems);
+                            ctx.CacheKeysItems.AddRange(cacheKeysItems);
+                            ctx.CacheQueues.Add(cacheQueue);
+
+                            ctx.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Failed to write to cache store", e, this);
+                            ctx.Database.ExecuteSqlCommand(ctx.GetDeleteTempTableStatement(suffix));
                         }
                     }
                 }
             }
+            renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;
+            HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
         }
     }
 }

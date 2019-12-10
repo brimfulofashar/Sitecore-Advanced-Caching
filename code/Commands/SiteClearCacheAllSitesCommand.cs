@@ -19,9 +19,7 @@ namespace Foundation.HtmlCache.Commands
             List<SiteInfo> siteInfos = Factory.GetSiteInfoList();
             foreach (SiteInfo siteInfo in siteInfos)
             {
-                IRedisCacheProvider redis = DependencyResolver.Current.GetServices<IRedisCacheProvider>().FirstOrDefault();
-                redis?.Set("SiteClearCache", new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language), 0);
-                redis?.Publish(siteInfo.Name + "_" + siteInfo.Language, "SiteClearCache");
+                
             }
         }
     }

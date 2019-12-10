@@ -10,9 +10,5 @@ namespace Foundation.HtmlCache.Messages
         }
 
         public Guid ItemId { get; set; }
-        public void Handle()
-        {
-            
-        }
     }
 }
