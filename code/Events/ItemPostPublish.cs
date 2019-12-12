@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Messages;
@@ -21,33 +22,44 @@ namespace Foundation.HtmlCache.Events
         {
             PublishItemContext argContext = ((ItemProcessedEventArgs)args).Context;
 
-            HashSet<string> dic = argContext.PublishContext.CustomData["Publishing"] as HashSet<string>;
-            if (dic != null)
+            var publishItemTracking = Sitecore.Context.Items[PublishItemTracking.Name] as PublishItemTracking;
+            if (publishItemTracking != null)
             {
                 ID itemId = argContext.ItemId;
                 object operation = argContext.PublishContext.CustomData[itemId.ToString()];
                 if (operation != null)
                 {
                     var createUpdateOrDeleteOperation = (PublishOperation.PublishOperationEnum) operation;
-                    Item item = Factory.GetDatabase("web").GetItem(itemId);
-                    var siteInfos = SiteInfoExtensions.GetSites(item);
-
-                    foreach (var siteInfo in siteInfos)
+                    Item item = Factory.GetDatabase(publishItemTracking.DestinationDB).GetItem(itemId);
+                    
+                    if (createUpdateOrDeleteOperation == PublishOperation.PublishOperationEnum.Create)
                     {
-                        if (createUpdateOrDeleteOperation == PublishOperation.PublishOperationEnum.Create)
+                        Item parent = item?.Parent;
+                        if (parent != null)
                         {
-                            Item parent = item?.Parent;
-                            if (parent != null)
+                            foreach (Item child in parent.Children)
                             {
-                                foreach (Item child in parent.Children)
+                                if (!publishItemTracking.PublishedItems.ContainsKey(child.ID.Guid))
                                 {
-                                    dic.Add(child.ID.ToString());
+                                    publishItemTracking.PublishedItems.Add(child.ID.Guid,
+                                        createUpdateOrDeleteOperation);
+                                }
+                                else
+                                {
+                                    publishItemTracking.PublishedItems[child.ID.Guid] = createUpdateOrDeleteOperation;
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                        if (!publishItemTracking.PublishedItems.ContainsKey(itemId.Guid))
+                        {
+                            publishItemTracking.PublishedItems.Add(itemId.Guid, createUpdateOrDeleteOperation);
+                        }
                         else
                         {
-                            dic.Add(itemId.ToString());
+                            publishItemTracking.PublishedItems[itemId.Guid] = createUpdateOrDeleteOperation;
                         }
                     }
                 }

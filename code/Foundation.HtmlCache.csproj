@@ -154,26 +154,21 @@
     <Compile Include="Commands\SiteClearCacheCommand.cs" />
     <Compile Include="Controls\MultiRootTreeList.cs" />
     <Compile Include="Events\ItemPostPublish.cs" />
+    <Compile Include="Events\PublishJobEnd.cs" />
+    <Compile Include="Events\PublishJobBegin.cs" />
     <Compile Include="Extensions\EFExtensions.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
-    <Compile Include="Messages\AddToCacheStore.cs" />
-    <Compile Include="Messages\BroadcastCache.cs" />
-    <Compile Include="Messages\SiteMetaData.cs" />
-    <Compile Include="Messages\DeleteSiteFromCache.cs" />
-    <Compile Include="Messages\DeleteFromCache.cs" />
-    <Compile Include="Messages\AddToCache.cs" />
-    <Compile Include="Messages\ClearCacheOperation.cs" />
-    <Compile Include="Messages\ICacheMessage.cs" />
     <Compile Include="Messages\ItemMetaData.cs" />
+    <Compile Include="Messages\RenderingProcessorArgs.cs" />
     <Compile Include="Models\CacheKeyItem.cs" />
     <Compile Include="Models\CacheQueue.cs" />
     <Compile Include="Models\CacheItem.cs" />
     <Compile Include="Models\CacheKey.cs" />
     <Compile Include="Models\CacheQueueMessageType.cs" />
     <Compile Include="Models\PublishedItem.cs" />
+    <Compile Include="Models\PublishItemTracking.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
-    <Compile Include="Messages\RenderingProcessorArgs.cs" />
     <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />
     <Compile Include="Pipelines\RenderFromPersistantCache.cs" />
@@ -183,6 +178,8 @@
     <Compile Include="Providers\ItemTrackingProvider.cs" />
     <Compile Include="Providers\ItemTrackingStore.cs" />
     <Compile Include="Providers\TrackItemAccess.cs" />
+    <Compile Include="Queries\AddToCache.cs" />
+    <Compile Include="Queries\DeleteFromCache.cs" />
     <Compile Include="Settings\GlobalCacheTemplateSettings.cs" />
   </ItemGroup>
   <ItemGroup>

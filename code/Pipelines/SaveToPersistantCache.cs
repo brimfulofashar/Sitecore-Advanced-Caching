@@ -4,6 +4,7 @@ using System.Web;
 using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Foundation.HtmlCache.Providers;
+using Foundation.HtmlCache.Queries;
 using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
@@ -60,7 +61,7 @@ namespace Foundation.HtmlCache.Pipelines
                         catch (Exception e)
                         {
                             Log.Error("Failed to write to cache store", e, this);
-                            ctx.Database.ExecuteSqlCommand(ctx.GetDeleteTempTableStatement(suffix));
+                            ctx.Database.ExecuteSqlCommand(DeleteFromCache.GetDeleteTempTableQuery(suffix));
                         }
                     }
                 }
