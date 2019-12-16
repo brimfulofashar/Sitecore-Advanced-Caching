@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Foundation.HtmlCache.Extensions;
-using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
-using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;

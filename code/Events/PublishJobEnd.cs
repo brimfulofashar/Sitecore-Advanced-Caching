@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
-using Sitecore.Diagnostics;
-using Sitecore.Events;
-using Sitecore.Publishing;
 
 namespace Foundation.HtmlCache.Events
 {
@@ -18,7 +13,7 @@ namespace Foundation.HtmlCache.Events
             if (publishItemTracking != null)
             {
                 var cacheQueue = new CacheQueue()
-                    {CacheQueueMessageTypeId = (int) CacheQueueMessageType.MessageTypeEnum.DeleteFromCache};
+                    {CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteFromCache};
 
                 var publishedItems = publishItemTracking.PublishedItems.Select(x => new PublishedItem()
                     {CacheQueue = cacheQueue, ItemId = x.Key}).ToList();

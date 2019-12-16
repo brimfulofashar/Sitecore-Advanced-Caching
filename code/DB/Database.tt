@@ -17,10 +17,10 @@
     Settings.UseMappingTables        = false; // Set to false for EfCore. EFCore will add support for this in v3 at some point, so please set this to false. If true, mapping will be used and no mapping tables will be generated. If false, all tables will be generated.
     Settings.FileManagerType         = FileManagerType.Custom; // .NET project = VisualStudio; .NET Core project = Custom; No output (testing only) = Null
     Settings.ConnectionString        = "Data Source=localhost;Initial Catalog=HtmlCache;Integrated security=False;MultipleActiveResultSets=True;User ID=htmlcacheuser;Password=Fj0h3A1zaeJHaLzhIdhq"; // This is used by the generator to reverse engineer your database
-    Settings.ConnectionStringName    = "MyDbContext"; // ConnectionString key as specified in your app.config/web.config/appsettings.json. Not used by the generator, but is placed into the generated DbContext constructor.
-    Settings.DbContextName           = "MyDbContext"; // Class name for the DbContext to be generated. Note: If generating separate files, please give the db context a different name from this tt filename.
-    //Settings.DbContextInterfaceName= "IMyDbContext"; // Defaults to "I" + DbContextName or set string empty to not implement any interface.
-    Settings.GenerateSeparateFiles   = false;
+    Settings.ConnectionStringName    = "HtmlCache"; // ConnectionString key as specified in your app.config/web.config/appsettings.json. Not used by the generator, but is placed into the generated DbContext constructor.
+    Settings.DbContextName           = "ItemTrackingProvider"; // Class name for the DbContext to be generated. Note: If generating separate files, please give the db context a different name from this tt filename.
+    Settings.DbContextInterfaceName  = "IItemTrackingProvider"; // Defaults to "I" + DbContextName or set string empty to not implement any interface.
+    Settings.GenerateSeparateFiles   = true;
     Settings.Namespace               = DefaultNamespace; // Override the default namespace here. Please use double quotes, example: "Accounts.Billing"
     Settings.TemplateFolder          = Path.Combine(Settings.Root, "Templates"); // Only used if Settings.TemplateType = TemplateType.FileBased. Specify folder name where the mustache folders can be found. Please read https://github.com/sjh37/EntityFramework-Reverse-POCO-Code-First-Generator/wiki/Custom-file-based-templates
     Settings.AddUnitTestingDbContext = false; // Will add a FakeDbContext and FakeDbSet for easy unit testing. Read https://github.com/sjh37/EntityFramework-Reverse-POCO-Code-First-Generator/wiki/FakeDbContext
@@ -79,14 +79,14 @@
     Settings.UsePropertyInitialisers            = false; // Removes POCO constructor and instead uses C# 6 property initialisers to set defaults
     Settings.UseLazyLoading                     = true; // Marks all navigation properties as virtual or not, to support or disable EF Lazy Loading feature
     Settings.UseInheritedBaseInterfaceFunctions = false; // If true, the main DBContext interface functions will come from the DBContextInterfaceBaseClasses and not generated. If false, the functions will be generated.
-    Settings.IncludeComments                    = CommentsStyle.AtEndOfField; // Adds comments to the generated code
-    Settings.IncludeExtendedPropertyComments    = CommentsStyle.InSummaryBlock; // Adds extended properties as comments to the generated code
-    Settings.IncludeConnectionSettingComments   = true; // Add comments describing connection settings used to generate file
-    Settings.DisableGeographyTypes              = false; // Turns off use of System.Data.Entity.Spatial.DbGeography and System.Data.Entity.Spatial.DbGeometry as OData doesn't support entities with geometry/geography types.
+    //Settings.IncludeComments                    = CommentsStyle.AtEndOfField; // Adds comments to the generated code
+    //Settings.IncludeExtendedPropertyComments    = CommentsStyle.InSummaryBlock; // Adds extended properties as comments to the generated code
+    Settings.IncludeConnectionSettingComments   = false; // Add comments describing connection settings used to generate file
+    Settings.DisableGeographyTypes              = true; // Turns off use of System.Data.Entity.Spatial.DbGeography and System.Data.Entity.Spatial.DbGeometry as OData doesn't support entities with geometry/geography types.
     Settings.CollectionInterfaceType            = "ICollection"; //  = "System.Collections.Generic.List"; // Determines the declaration type of collections for the Navigation Properties. ICollection is used if not set.
     Settings.CollectionType                     = "List"; // Determines the type of collection for the Navigation Properties. "ObservableCollection" for example. Add "System.Collections.ObjectModel" to AdditionalNamespaces if setting the CollectionType = "ObservableCollection".
     Settings.NullableShortHand                  = true; // true => T?, false => Nullable<T>
-    Settings.AddIDbContextFactory               = true; // Will add a default IDbContextFactory<DbContextName> implementation for easy dependency injection
+    Settings.AddIDbContextFactory               = false; // Will add a default IDbContextFactory<DbContextName> implementation for easy dependency injection
     Settings.IncludeQueryTraceOn9481Flag        = false; // If SqlServer 2014 appears frozen / take a long time when this file is saved, try setting this to true (you will also need elevated privileges).
     Settings.IncludeCodeGeneratedAttribute      = false; // If true, will include the GeneratedCode attribute, false to remove it.
     Settings.UsePrivateSetterForComputedColumns = true; // If the columns is computed, use a private setter.
@@ -98,9 +98,9 @@
     Settings.FileExtension      = ".cs";
 
     // Code suppression (useful for non C# file generation) *******************************************************************************
-    Settings.UseRegions   = true; // If false, suppresses the use of #region
+    Settings.UseRegions   = false; // If false, suppresses the use of #region
     Settings.UseNamespace = true; // If false, suppresses the writing of a namespace
-    Settings.UsePragma    = true; // If false, suppresses the writing of #pragma
+    Settings.UsePragma    = false; // If false, suppresses the writing of #pragma
 
     // Enumerations ***********************************************************************************************************************
     // Create enumerations from database tables
@@ -128,6 +128,14 @@
         //     NameField = ValueField,
         //     etc
         // }
+
+		new EnumerationSettings
+        {
+            Name       = "MessageTypeEnum",          // Enum to generate. e.g. "DaysOfWeek" would result in "public enum DaysOfWeek {...}"
+            Table      = "CacheQueueMessageType", // Database table containing enum values. e.g. "DaysOfWeek"
+            NameField  = "MessageType",            // Column containing the name for the enum. e.g. "TypeName"
+            ValueField = "Id"               // Column containing the values for the enum. e.g. "TypeId"
+        }
     };
 
     // Column modification ****************************************************************************************************************

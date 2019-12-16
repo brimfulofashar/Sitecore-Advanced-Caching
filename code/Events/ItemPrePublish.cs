@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Web;
 using Sitecore.Configuration;
 using Sitecore.Publishing.Pipelines.PublishItem;
 using Foundation.HtmlCache.Models;

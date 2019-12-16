@@ -11,9 +11,13 @@ namespace Foundation.HtmlCache.Models
     {
         public long Id { get; set; } // Id (Primary key)
         public int CacheQueueMessageTypeId { get; set; } // CacheQueueMessageType_Id
-        public string Suffix { get; set; } // Suffix (length: 32)
 
         // Reverse navigation
+
+        /// <summary>
+        /// Child CacheKeysTemps where [CacheKeysTemp].[CacheQueue_Id] point to this entity (FK_CacheKeysTemp_CacheQueue)
+        /// </summary>
+        public virtual ICollection<CacheKeyTemp> CacheKeysTemps { get; set; } // CacheKeysTemp.FK_CacheKeysTemp_CacheQueue
 
         /// <summary>
         /// Child PublishedItems where [PublishedItems].[CacheQueueId] point to this entity (FK_PublishedItems_CacheQueue)
@@ -29,6 +33,7 @@ namespace Foundation.HtmlCache.Models
 
         public CacheQueue()
         {
+            CacheKeysTemps = new List<CacheKeyTemp>();
             PublishedItems = new List<PublishedItem>();
         }
     }

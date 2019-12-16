@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using Foundation.HtmlCache.Models;
-using Sitecore.Diagnostics;
 using Sitecore.Events;
 using Sitecore.Publishing;
 
