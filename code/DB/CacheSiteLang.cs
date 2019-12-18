@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ using System.Threading.Tasks;
 namespace Foundation.HtmlCache.DB
 {
     // CacheSiteLang
+    [Table("CacheSiteLang")]
     public class CacheSiteLang
     {
         public Guid Id { get; set; } // Id (Primary key)
@@ -44,12 +46,13 @@ namespace Foundation.HtmlCache.DB
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheKeys where [CacheKeys].[CacheSiteLang_Id] point to this entity (FK_CacheKeys_CacheSiteLang)
+        /// Child CacheKeys where [CacheKey].[CacheSiteLangId] point to this entity (FK_CacheKey_CacheSiteLang)
         /// </summary>
-        public virtual ICollection<CacheKey> CacheKeys { get; set; } // CacheKeys.FK_CacheKeys_CacheSiteLang
+        public virtual ICollection<CacheKey> CacheKeys { get; set; } // CacheKey.FK_CacheKey_CacheSiteLang
 
         public CacheSiteLang()
         {
+            Id = Guid.NewGuid();
             CacheKeys = new List<CacheKey>();
         }
     }

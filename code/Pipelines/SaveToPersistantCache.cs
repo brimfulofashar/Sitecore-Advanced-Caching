@@ -47,12 +47,8 @@ namespace Foundation.HtmlCache.Pipelines
                             var cacheItems = trackedItems.Select(x => new CacheItemsTemp
                                 {Id = Guid.NewGuid(), ItemId = x.Id, CacheKeyId = cacheKey.Id, CacheQueue = cacheQueue }).ToArray();
 
-                            var cacheKeysItems = cacheItems.Select(x => new CacheKeysItemsTemp
-                                {Id = Guid.NewGuid(), CacheKeyId = cacheKey.Id, CacheItemId = x.Id, CacheQueue = cacheQueue }).ToArray();
-
                             ctx.CacheKeysTemps.Add(cacheKey);
                             ctx.CacheItemsTemps.AddRange(cacheItems);
-                            ctx.CacheKeysItemsTemps.AddRange(cacheKeysItems);
                             ctx.CacheQueues.Add(cacheQueue);
 
                             ctx.SaveChanges();

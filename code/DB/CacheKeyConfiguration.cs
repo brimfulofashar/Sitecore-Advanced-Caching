@@ -32,7 +32,7 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheKeys
+    // CacheKey
     public class CacheKeyConfiguration : EntityTypeConfiguration<CacheKey>
     {
         public CacheKeyConfiguration()
@@ -42,16 +42,16 @@ namespace Foundation.HtmlCache.DB
 
         public CacheKeyConfiguration(string schema)
         {
-            ToTable("CacheKeys", schema);
+            ToTable("CacheKey", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-            Property(x => x.CacheSiteLangId).HasColumnName(@"CacheSiteLang_Id").HasColumnType("uniqueidentifier").IsOptional();
+            Property(x => x.CacheSiteLangId).HasColumnName(@"CacheSiteLangId").HasColumnType("uniqueidentifier").IsRequired();
             Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(500);
             Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
 
             // Foreign keys
-            HasOptional(a => a.CacheSiteLang).WithMany(b => b.CacheKeys).HasForeignKey(c => c.CacheSiteLangId); // FK_CacheKeys_CacheSiteLang
+            HasRequired(a => a.CacheSiteLang).WithMany(b => b.CacheKeys).HasForeignKey(c => c.CacheSiteLangId); // FK_CacheKey_CacheSiteLang
         }
     }
 

@@ -90,7 +90,7 @@
     Settings.IncludeQueryTraceOn9481Flag        = false; // If SqlServer 2014 appears frozen / take a long time when this file is saved, try setting this to true (you will also need elevated privileges).
     Settings.IncludeCodeGeneratedAttribute      = false; // If true, will include the GeneratedCode attribute, false to remove it.
     Settings.UsePrivateSetterForComputedColumns = true; // If the columns is computed, use a private setter.
-    Settings.AdditionalNamespaces               = new List<string>(); // To include extra namespaces, include them here. i.e. "Microsoft.AspNet.Identity.EntityFramework", "System.ComponentModel.DataAnnotations"
+    Settings.AdditionalNamespaces               = new List<string>(){"System.ComponentModel.DataAnnotations.Schema"}; // To include extra namespaces, include them here. i.e. "Microsoft.AspNet.Identity.EntityFramework", "System.ComponentModel.DataAnnotations"
     Settings.AdditionalContextInterfaceItems    = new List<string>(); //  example: "void SetAutoDetectChangesEnabled(bool flag);"
 
     // Language choices
@@ -260,6 +260,7 @@
 
         // To add attributes
         //table.Attributes.Add("[Serializable]");
+		table.Attributes.Add("[Table(\"" + table.DbName + "\")]");
     };
 
     // Use the following function if you need to apply additional modifications to a column

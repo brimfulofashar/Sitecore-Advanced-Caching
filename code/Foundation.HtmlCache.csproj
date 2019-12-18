@@ -157,8 +157,6 @@
     <Compile Include="DB\CacheKeyConfiguration.cs" />
     <Compile Include="DB\CacheKeysItem.cs" />
     <Compile Include="DB\CacheKeysItemConfiguration.cs" />
-    <Compile Include="DB\CacheKeysItemsTemp.cs" />
-    <Compile Include="DB\CacheKeysItemsTempConfiguration.cs" />
     <Compile Include="DB\CacheKeysTemp.cs" />
     <Compile Include="DB\CacheKeysTempConfiguration.cs" />
     <Compile Include="DB\CacheQueue.cs" />
@@ -180,8 +178,6 @@
     <Compile Include="DB\ItemTrackingProvider.cs" />
     <Compile Include="DB\MessageTypeEnum.cs" />
     <Compile Include="DB\ProcessQueueReturnModel.cs" />
-    <Compile Include="DB\PublishedItem.cs" />
-    <Compile Include="DB\PublishedItemConfiguration.cs" />
     <Compile Include="Events\ItemPrePublish.cs" />
     <Compile Include="Commands\SiteClearCacheAllSitesCommand.cs" />
     <Compile Include="Commands\SiteClearCacheAllLanguagesCommand.cs" />

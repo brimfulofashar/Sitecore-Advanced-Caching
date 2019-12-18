@@ -28,41 +28,44 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheKeys
+    // CacheKey
+    [Table("CacheKey")]
     public class CacheKey
     {
         public Guid Id { get; set; } // Id (Primary key)
-        public Guid? CacheSiteLangId { get; set; } // CacheSiteLang_Id
+        public Guid CacheSiteLangId { get; set; } // CacheSiteLangId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 500)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
 
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheItems where [CacheItems].[CacheKey_Id] point to this entity (FK_CacheItems_CacheKeys)
+        /// Child CacheItems where [CacheItem].[CacheKeyId] point to this entity (FK_CacheItem_CacheKey)
         /// </summary>
-        public virtual ICollection<CacheItem> CacheItems { get; set; } // CacheItems.FK_CacheItems_CacheKeys
+        public virtual ICollection<CacheItem> CacheItems { get; set; } // CacheItem.FK_CacheItem_CacheKey
 
         /// <summary>
-        /// Child CacheKeysItems where [CacheKeysItems].[CacheKey_Id] point to this entity (FK_CacheKeysItems_CacheKeys)
+        /// Child CacheKeysItems where [CacheKeysItem].[CacheKeyId] point to this entity (FK_CacheKeysItem_CacheKey)
         /// </summary>
-        public virtual ICollection<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItems.FK_CacheKeysItems_CacheKeys
+        public virtual ICollection<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem.FK_CacheKeysItem_CacheKey
 
         // Foreign keys
 
         /// <summary>
-        /// Parent CacheSiteLang pointed by [CacheKeys].([CacheSiteLangId]) (FK_CacheKeys_CacheSiteLang)
+        /// Parent CacheSiteLang pointed by [CacheKey].([CacheSiteLangId]) (FK_CacheKey_CacheSiteLang)
         /// </summary>
-        public virtual CacheSiteLang CacheSiteLang { get; set; } // FK_CacheKeys_CacheSiteLang
+        public virtual CacheSiteLang CacheSiteLang { get; set; } // FK_CacheKey_CacheSiteLang
 
         public CacheKey()
         {
+            Id = Guid.NewGuid();
             CacheItems = new List<CacheItem>();
             CacheKeysItems = new List<CacheKeysItem>();
         }

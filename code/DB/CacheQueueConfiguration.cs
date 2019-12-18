@@ -46,7 +46,7 @@ namespace Foundation.HtmlCache.DB
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageType_Id").HasColumnType("int").IsRequired();
+            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
             Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
             Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
 

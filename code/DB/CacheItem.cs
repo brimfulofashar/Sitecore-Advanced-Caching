@@ -28,35 +28,38 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheItems
+    // CacheItem
+    [Table("CacheItem")]
     public class CacheItem
     {
         public Guid Id { get; set; } // Id (Primary key)
         public Guid ItemId { get; set; } // ItemId
-        public Guid CacheKeyId { get; set; } // CacheKey_Id
+        public Guid CacheKeyId { get; set; } // CacheKeyId
 
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheKeysItems where [CacheKeysItems].[CacheItem_Id] point to this entity (FK_CacheKeysItems_CacheItems)
+        /// Child CacheKeysItems where [CacheKeysItem].[CacheItemId] point to this entity (FK_CacheKeysItem_CacheItem)
         /// </summary>
-        public virtual ICollection<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItems.FK_CacheKeysItems_CacheItems
+        public virtual ICollection<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem.FK_CacheKeysItem_CacheItem
 
         // Foreign keys
 
         /// <summary>
-        /// Parent CacheKey pointed by [CacheItems].([CacheKeyId]) (FK_CacheItems_CacheKeys)
+        /// Parent CacheKey pointed by [CacheItem].([CacheKeyId]) (FK_CacheItem_CacheKey)
         /// </summary>
-        public virtual CacheKey CacheKey { get; set; } // FK_CacheItems_CacheKeys
+        public virtual CacheKey CacheKey { get; set; } // FK_CacheItem_CacheKey
 
         public CacheItem()
         {
+            Id = Guid.NewGuid();
             CacheKeysItems = new List<CacheKeysItem>();
         }
     }

@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Web;
+using Foundation.HtmlCache.DB;
 
 namespace Foundation.HtmlCache.Extensions
 {
@@ -26,6 +27,9 @@ namespace Foundation.HtmlCache.Extensions
 
         private readonly List<string> keyNames = new List<string>();
         public IEnumerable<string> KeyNames { get { return keyNames; } }
+
+        private readonly List<string> outputKeyNames = new List<string>();
+        public IEnumerable<string> OutputKeyNames { get { return outputKeyNames; } }
 
         private readonly List<string> excludeProperties = new List<string>();
 
@@ -59,15 +63,18 @@ namespace Foundation.HtmlCache.Extensions
             TableName = tableAttr.Name;
         }
 
-        public abstract TRet Execute(string suffix);
-//        public void Run()
-//        {
-//            Execute();
-//        }
+        public abstract TRet Execute();
+        
 
         public EntityOp<TEntity, TRet> Key<TKey>(Expression<Func<TEntity, TKey>> selectKey)
         {
             keyNames.Add(GetMemberName(selectKey));
+            return this;
+        }
+
+        public EntityOp<TEntity, TRet> OutputKey<TKey>(Expression<Func<TEntity, TKey>> selectKey)
+        {
+            outputKeyNames.Add(GetMemberName(selectKey));
             return this;
         }
 
@@ -86,24 +93,23 @@ namespace Foundation.HtmlCache.Extensions
         }
     }
 
-    public abstract class EntityOp<TEntity> : EntityOp<TEntity, int>
+    public abstract class EntityOp<TEntity> : EntityOp<TEntity, Guid>
     {
         public EntityOp(DbContext context, TEntity entity) : base(context, entity) { }
 
-        public sealed override int Execute(string suffix)
+        public sealed override Guid Execute()
         {
-            ExecuteNoRet(suffix);
-            return 0;
+            return ExecuteNoRet();
         }
 
-        protected abstract void ExecuteNoRet(string suffix);
+        protected abstract Guid ExecuteNoRet();
     }
 
     public class UpsertOp<TEntity> : EntityOp<TEntity>
     {
         public UpsertOp(DbContext context, TEntity entity) : base(context, entity) { }
 
-        protected override void ExecuteNoRet(string suffix)
+        protected override Guid ExecuteNoRet()
         {
             StringBuilder sql = new StringBuilder();
 
@@ -127,41 +133,41 @@ namespace Foundation.HtmlCache.Extensions
             }
             var columns = columnList.ToArray();
 
-            sql.Append("merge into ");
+            var outputKeys = OutputKeyNames.ToArray();
+            sql.Append("declare @MergeResult table (Id uniqueidentifier)");
+            sql.AppendLine("");
+            sql.AppendLine("merge into ");
             sql.Append(TableName);
-            sql.Append(" WITH (HOLDLOCK)");
             sql.Append(" as T ");
-
-            sql.Append("using");
-            sql.Append(TableName + "_" + suffix);
-            sql.Append(" as S ");
-
+            sql.AppendLine("");
+            sql.Append("using (values (");
+            sql.Append(string.Join(",", valueKeyList.ToArray()));
+            sql.Append(")) as S (");
+            sql.Append(string.Join(",", columns));
+            sql.Append(") ");
+            sql.AppendLine("");
             sql.Append("on (");
             var mergeCond = string.Join(" and ", KeyNames.Select(kn => "T." + kn + "=S." + kn));
             sql.Append(mergeCond);
             sql.Append(") ");
-
-            sql.Append("when matched then update set ");
-            sql.Append(string.Join(",", columns.Select(c => "T." + c + "=S." + c).ToArray()));
-
-            sql.Append(" when not matched then insert (");
-            sql.Append(string.Join(",", columns));
+            sql.AppendLine("");
+            sql.Append("when matched then");
+            sql.AppendLine("");
+            sql.Append("update set " + string.Join(", ", columns.Select(c => "T." + c + "=S." + c).ToArray()));
+            sql.AppendLine("");
+            sql.Append("when not matched");
+            sql.AppendLine("");
+            sql.Append("then insert ( " + string.Join(", ", columns));
             sql.Append(") values (S.");
             sql.Append(string.Join(",S.", columns));
-            sql.Append(");");
+            sql.Append(")");
+            sql.AppendLine("");
+            sql.Append("output " + string.Join(", ",outputKeys.Select(x => "inserted." + x)));
+            sql.Append(" into @MergeResult(Id);");
+            sql.AppendLine("");
+            sql.Append("select Id from @MergeResult");
 
-            Context.Database.ExecuteSqlCommand(sql.ToString(), valueList.ToArray());
-
-            /*
-                merge into CacheItems WITH (HOLDLOCK) as T 
-                using CacheItems_395eb099a7a54363b464e19389df848f as S 
-                on (T.ItemId = S.ItemId) 
-                when matched 
-                then update set T.ItemId=S.ItemId
-                when not matched 
-                then insert (Id,ItemId) values (S.Id,S.ItemId)
-                OUTPUT $action,inserted.Id;
-             */
+            return Context.Database.SqlQuery<Guid>(sql.ToString(), valueList.ToArray()).First();
         }
     }
 }

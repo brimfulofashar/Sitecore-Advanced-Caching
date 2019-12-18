@@ -32,7 +32,7 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheItems
+    // CacheItem
     public class CacheItemConfiguration : EntityTypeConfiguration<CacheItem>
     {
         public CacheItemConfiguration()
@@ -42,15 +42,15 @@ namespace Foundation.HtmlCache.DB
 
         public CacheItemConfiguration(string schema)
         {
-            ToTable("CacheItems", schema);
+            ToTable("CacheItem", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
             Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
-            Property(x => x.CacheKeyId).HasColumnName(@"CacheKey_Id").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.CacheKeyId).HasColumnName(@"CacheKeyId").HasColumnType("uniqueidentifier").IsRequired();
 
             // Foreign keys
-            HasRequired(a => a.CacheKey).WithMany(b => b.CacheItems).HasForeignKey(c => c.CacheKeyId); // FK_CacheItems_CacheKeys
+            HasRequired(a => a.CacheKey).WithMany(b => b.CacheItems).HasForeignKey(c => c.CacheKeyId); // FK_CacheItem_CacheKey
         }
     }
 

@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
@@ -39,18 +40,16 @@ namespace Foundation.HtmlCache.DB
 {
     public interface IItemTrackingProvider : IDisposable
     {
-        DbSet<CacheItem> CacheItems { get; set; } // CacheItems
+        DbSet<CacheItem> CacheItems { get; set; } // CacheItem
         DbSet<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp
-        DbSet<CacheKey> CacheKeys { get; set; } // CacheKeys
-        DbSet<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItems
-        DbSet<CacheKeysItemsTemp> CacheKeysItemsTemps { get; set; } // CacheKeysItemsTemp
+        DbSet<CacheKey> CacheKeys { get; set; } // CacheKey
+        DbSet<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem
         DbSet<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp
         DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
         DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
         DbSet<CacheSiteLang> CacheSiteLangs { get; set; } // CacheSiteLang
         DbSet<CacheSiteLangTemp> CacheSiteLangTemps { get; set; } // CacheSiteLangTemp
-        DbSet<PublishedItem> PublishedItems { get; set; } // PublishedItems
 
         int SaveChanges();
         Task<int> SaveChangesAsync();
@@ -66,9 +65,8 @@ namespace Foundation.HtmlCache.DB
         string ToString();
 
         // Stored Procedures
-        List<ProcessQueueReturnModel> ProcessQueue();
-        List<ProcessQueueReturnModel> ProcessQueue(out int procResult);
-        Task<List<ProcessQueueReturnModel>> ProcessQueueAsync();
+        int ProcessQueue();
+        // ProcessQueueAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
     }
 }

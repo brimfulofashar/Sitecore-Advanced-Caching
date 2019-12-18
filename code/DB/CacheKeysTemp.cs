@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,42 +36,38 @@ using System.Threading.Tasks;
 namespace Foundation.HtmlCache.DB
 {
     // CacheKeysTemp
+    [Table("CacheKeysTemp")]
     public class CacheKeysTemp
     {
         public Guid Id { get; set; } // Id (Primary key)
-        public long CacheQueueId { get; set; } // CacheQueue_Id
-        public Guid? CacheSiteLangId { get; set; } // CacheSiteLang_Id
+        public long CacheQueueId { get; set; } // CacheQueueId
+        public Guid CacheSiteLangId { get; set; } // CacheSiteLangId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 500)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
 
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheItemsTemps where [CacheItemsTemp].[CacheKey_Id] point to this entity (FK_CacheItemsTemp_CacheKeysTemp)
+        /// Child CacheItemsTemps where [CacheItemsTemp].[CacheKeyId] point to this entity (FK_CacheItemTemp_CacheKeyTemp)
         /// </summary>
-        public virtual ICollection<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp.FK_CacheItemsTemp_CacheKeysTemp
-
-        /// <summary>
-        /// Child CacheKeysItemsTemps where [CacheKeysItemsTemp].[CacheKey_Id] point to this entity (FK_CacheKeysItemsTemp_CacheKeysTemp)
-        /// </summary>
-        public virtual ICollection<CacheKeysItemsTemp> CacheKeysItemsTemps { get; set; } // CacheKeysItemsTemp.FK_CacheKeysItemsTemp_CacheKeysTemp
+        public virtual ICollection<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp.FK_CacheItemTemp_CacheKeyTemp
 
         // Foreign keys
 
         /// <summary>
-        /// Parent CacheQueue pointed by [CacheKeysTemp].([CacheQueueId]) (FK_CacheKeysTemp_CacheQueue)
+        /// Parent CacheQueue pointed by [CacheKeysTemp].([CacheQueueId]) (FK_CacheKeyTemp_CacheQueue)
         /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheKeysTemp_CacheQueue
+        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheKeyTemp_CacheQueue
 
         /// <summary>
-        /// Parent CacheSiteLangTemp pointed by [CacheKeysTemp].([CacheSiteLangId]) (FK_CacheKeysTemp_CacheSiteLangTemp)
+        /// Parent CacheSiteLangTemp pointed by [CacheKeysTemp].([CacheSiteLangId]) (FK_CacheKeyTemp_CacheSiteLangTemp)
         /// </summary>
-        public virtual CacheSiteLangTemp CacheSiteLangTemp { get; set; } // FK_CacheKeysTemp_CacheSiteLangTemp
+        public virtual CacheSiteLangTemp CacheSiteLangTemp { get; set; } // FK_CacheKeyTemp_CacheSiteLangTemp
 
         public CacheKeysTemp()
         {
+            Id = Guid.NewGuid();
             CacheItemsTemps = new List<CacheItemsTemp>();
-            CacheKeysItemsTemps = new List<CacheKeysItemsTemp>();
         }
     }
 

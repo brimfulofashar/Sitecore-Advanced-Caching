@@ -46,7 +46,7 @@ namespace Foundation.HtmlCache.DB
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueue_Id").HasColumnType("bigint").IsRequired();
+            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
             Property(x => x.Name).HasColumnName(@"Name").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
             Property(x => x.Lang).HasColumnName(@"Lang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
 

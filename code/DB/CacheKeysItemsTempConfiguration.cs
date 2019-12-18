@@ -46,14 +46,14 @@ namespace Foundation.HtmlCache.DB
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueue_Id").HasColumnType("bigint").IsOptional();
-            Property(x => x.CacheKeyId).HasColumnName(@"CacheKey_Id").HasColumnType("uniqueidentifier").IsRequired();
-            Property(x => x.CacheItemId).HasColumnName(@"CacheItem_Id").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
+            Property(x => x.CacheKeyId).HasColumnName(@"CacheKeyId").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.CacheItemId).HasColumnName(@"CacheItemId").HasColumnType("uniqueidentifier").IsRequired();
 
             // Foreign keys
-            HasOptional(a => a.CacheQueue).WithMany(b => b.CacheKeysItemsTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheKeysItemsTemp_CacheQueue
-            HasRequired(a => a.CacheItemsTemp).WithMany(b => b.CacheKeysItemsTemps).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheKeysItemsTemp_CacheItemsTemp
-            HasRequired(a => a.CacheKeysTemp).WithMany(b => b.CacheKeysItemsTemps).HasForeignKey(c => c.CacheKeyId); // FK_CacheKeysItemsTemp_CacheKeysTemp
+            HasRequired(a => a.CacheItemsTemp).WithMany(b => b.CacheKeysItemsTemps).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheKeyItemTemp_CacheItemTemp
+            HasRequired(a => a.CacheKeysTemp).WithMany(b => b.CacheKeysItemsTemps).HasForeignKey(c => c.CacheKeyId).WillCascadeOnDelete(false); // FK_CacheKeyItemTemp_CacheKeyTemp
+            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheKeysItemsTemps).HasForeignKey(c => c.CacheQueueId); // FK_CacheKeyItemTemp_CacheQueue
         }
     }
 

@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,44 +36,30 @@ using System.Threading.Tasks;
 namespace Foundation.HtmlCache.DB
 {
     // CacheQueue
+    [Table("CacheQueue")]
     public class CacheQueue
     {
         public long Id { get; set; } // Id (Primary key)
-        public int CacheQueueMessageTypeId { get; set; } // CacheQueueMessageType_Id
+        public int CacheQueueMessageTypeId { get; set; } // CacheQueueMessageTypeId
         public bool Processing { get; set; } // Processing
         public byte[] UpdateVersion { get; set; } // UpdateVersion (length: 8)
 
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheItemsTemps where [CacheItemsTemp].[CacheQueue_Id] point to this entity (FK_CacheItemsTemp_CacheQueue)
+        /// Child CacheItemsTemps where [CacheItemsTemp].[CacheQueueId] point to this entity (FK_CacheItemTemp_CacheQueue)
         /// </summary>
-        public virtual ICollection<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp.FK_CacheItemsTemp_CacheQueue
+        public virtual ICollection<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp.FK_CacheItemTemp_CacheQueue
 
         /// <summary>
-        /// Child CacheKeysItemsTemps where [CacheKeysItemsTemp].[CacheQueue_Id] point to this entity (FK_CacheKeysItemsTemp_CacheQueue)
+        /// Child CacheKeysTemps where [CacheKeysTemp].[CacheQueueId] point to this entity (FK_CacheKeyTemp_CacheQueue)
         /// </summary>
-        public virtual ICollection<CacheKeysItemsTemp> CacheKeysItemsTemps { get; set; } // CacheKeysItemsTemp.FK_CacheKeysItemsTemp_CacheQueue
+        public virtual ICollection<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp.FK_CacheKeyTemp_CacheQueue
 
         /// <summary>
-        /// Child CacheKeysTemps where [CacheKeysTemp].[CacheQueue_Id] point to this entity (FK_CacheKeysTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp.FK_CacheKeysTemp_CacheQueue
-
-        /// <summary>
-        /// Child CacheQueueBlockers where [CacheQueueBlocker].[CacheQueue_Id] point to this entity (FK_CacheQueueBlocker_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker.FK_CacheQueueBlocker_CacheQueue
-
-        /// <summary>
-        /// Child CacheSiteLangTemps where [CacheSiteLangTemp].[CacheQueue_Id] point to this entity (FK_CacheSiteLangTemp_CacheQueue)
+        /// Child CacheSiteLangTemps where [CacheSiteLangTemp].[CacheQueueId] point to this entity (FK_CacheSiteLangTemp_CacheQueue)
         /// </summary>
         public virtual ICollection<CacheSiteLangTemp> CacheSiteLangTemps { get; set; } // CacheSiteLangTemp.FK_CacheSiteLangTemp_CacheQueue
-
-        /// <summary>
-        /// Child PublishedItems where [PublishedItems].[CacheQueue_Id] point to this entity (FK_PublishedItems_CacheQueue)
-        /// </summary>
-        public virtual ICollection<PublishedItem> PublishedItems { get; set; } // PublishedItems.FK_PublishedItems_CacheQueue
 
         // Foreign keys
 
@@ -84,11 +71,8 @@ namespace Foundation.HtmlCache.DB
         public CacheQueue()
         {
             CacheItemsTemps = new List<CacheItemsTemp>();
-            CacheKeysItemsTemps = new List<CacheKeysItemsTemp>();
             CacheKeysTemps = new List<CacheKeysTemp>();
-            CacheQueueBlockers = new List<CacheQueueBlocker>();
             CacheSiteLangTemps = new List<CacheSiteLangTemp>();
-            PublishedItems = new List<PublishedItem>();
         }
     }
 

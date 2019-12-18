@@ -48,18 +48,16 @@ namespace Foundation.HtmlCache.DB
 {
     public class ItemTrackingProvider : DbContext, IItemTrackingProvider
     {
-        public DbSet<CacheItem> CacheItems { get; set; } // CacheItems
+        public DbSet<CacheItem> CacheItems { get; set; } // CacheItem
         public DbSet<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp
-        public DbSet<CacheKey> CacheKeys { get; set; } // CacheKeys
-        public DbSet<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItems
-        public DbSet<CacheKeysItemsTemp> CacheKeysItemsTemps { get; set; } // CacheKeysItemsTemp
+        public DbSet<CacheKey> CacheKeys { get; set; } // CacheKey
+        public DbSet<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem
         public DbSet<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp
         public DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
         public DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         public DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
         public DbSet<CacheSiteLang> CacheSiteLangs { get; set; } // CacheSiteLang
         public DbSet<CacheSiteLangTemp> CacheSiteLangTemps { get; set; } // CacheSiteLangTemp
-        public DbSet<PublishedItem> PublishedItems { get; set; } // PublishedItems
 
         static ItemTrackingProvider()
         {
@@ -124,14 +122,12 @@ namespace Foundation.HtmlCache.DB
             modelBuilder.Configurations.Add(new CacheItemsTempConfiguration());
             modelBuilder.Configurations.Add(new CacheKeyConfiguration());
             modelBuilder.Configurations.Add(new CacheKeysItemConfiguration());
-            modelBuilder.Configurations.Add(new CacheKeysItemsTempConfiguration());
             modelBuilder.Configurations.Add(new CacheKeysTempConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueBlockerConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueMessageTypeConfiguration());
             modelBuilder.Configurations.Add(new CacheSiteLangConfiguration());
             modelBuilder.Configurations.Add(new CacheSiteLangTempConfiguration());
-            modelBuilder.Configurations.Add(new PublishedItemConfiguration());
 
             // Indexes        
             modelBuilder.Entity<CacheItem>()
@@ -147,6 +143,14 @@ namespace Foundation.HtmlCache.DB
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("PK_CacheItemsTemp", 1) { IsUnique = true, IsClustered = true })
+                );
+
+
+            modelBuilder.Entity<CacheItemsTemp>()
+                .Property(e => e.ItemId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheItemsTemp", 1))
                 );
 
 
@@ -166,19 +170,19 @@ namespace Foundation.HtmlCache.DB
                 );
 
 
-            modelBuilder.Entity<CacheKeysItemsTemp>()
-                .Property(e => e.Id)
-                .HasColumnAnnotation(
-                    IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheKeysItemsTemp", 1) { IsUnique = true, IsClustered = true })
-                );
-
-
             modelBuilder.Entity<CacheKeysTemp>()
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("PK_CacheKeysTemp", 1) { IsUnique = true, IsClustered = true })
+                );
+
+
+            modelBuilder.Entity<CacheKeysTemp>()
+                .Property(e => e.HtmlCacheKey)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheKeysTemp", 1))
                 );
 
 
@@ -237,22 +241,6 @@ namespace Foundation.HtmlCache.DB
                     new IndexAnnotation(new IndexAttribute("IX_CacheSiteLangTemp", 2))
                 );
 
-
-            modelBuilder.Entity<PublishedItem>()
-                .Property(e => e.CacheQueueId)
-                .HasColumnAnnotation(
-                    IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_PublishedItems", 1) { IsUnique = true, IsClustered = true })
-                );
-
-
-            modelBuilder.Entity<PublishedItem>()
-                .Property(e => e.ItemId)
-                .HasColumnAnnotation(
-                    IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_PublishedItems", 2) { IsUnique = true, IsClustered = true })
-                );
-
         }
 
         public static DbModelBuilder CreateModel(DbModelBuilder modelBuilder, string schema)
@@ -261,38 +249,27 @@ namespace Foundation.HtmlCache.DB
             modelBuilder.Configurations.Add(new CacheItemsTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheKeyConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheKeysItemConfiguration(schema));
-            modelBuilder.Configurations.Add(new CacheKeysItemsTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheKeysTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueBlockerConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueMessageTypeConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheSiteLangConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheSiteLangTempConfiguration(schema));
-            modelBuilder.Configurations.Add(new PublishedItemConfiguration(schema));
 
             return modelBuilder;
         }
 
         // Stored Procedures
-        public List<ProcessQueueReturnModel> ProcessQueue()
-        {
-            int procResult;
-            return ProcessQueue(out procResult);
-        }
-
-        public List<ProcessQueueReturnModel> ProcessQueue(out int procResult)
+        public int ProcessQueue()
         {
             var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
-            var procResultData = Database.SqlQuery<ProcessQueueReturnModel>("EXEC @procResult = [dbo].[ProcessQueue]", procResultParam).ToList();
-            procResult = (int) procResultParam.Value;
-            return procResultData;
+
+            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[ProcessQueue] ", procResultParam);
+
+            return (int)procResultParam.Value;
         }
 
-        public async Task<List<ProcessQueueReturnModel>> ProcessQueueAsync()
-        {
-            var procResultData = await Database.SqlQuery<ProcessQueueReturnModel>("EXEC [dbo].[ProcessQueue]").ToListAsync();
-            return procResultData;
-        }
+        // ProcessQueueAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
     }
 }

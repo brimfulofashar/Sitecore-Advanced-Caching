@@ -47,11 +47,7 @@ namespace Foundation.HtmlCache.DB
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("int").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.BlockingMode).HasColumnName(@"BlockingMode").HasColumnType("bit").IsRequired();
-            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueue_Id").HasColumnType("bigint").IsOptional();
             Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
-
-            // Foreign keys
-            HasOptional(a => a.CacheQueue).WithMany(b => b.CacheQueueBlockers).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheQueueBlocker_CacheQueue
         }
     }
 

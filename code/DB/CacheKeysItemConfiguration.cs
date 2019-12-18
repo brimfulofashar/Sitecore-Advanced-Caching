@@ -32,7 +32,7 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheKeysItems
+    // CacheKeysItem
     public class CacheKeysItemConfiguration : EntityTypeConfiguration<CacheKeysItem>
     {
         public CacheKeysItemConfiguration()
@@ -42,16 +42,16 @@ namespace Foundation.HtmlCache.DB
 
         public CacheKeysItemConfiguration(string schema)
         {
-            ToTable("CacheKeysItems", schema);
+            ToTable("CacheKeysItem", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-            Property(x => x.CacheKeyId).HasColumnName(@"CacheKey_Id").HasColumnType("uniqueidentifier").IsRequired();
-            Property(x => x.CacheItemId).HasColumnName(@"CacheItem_Id").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.CacheKeyId).HasColumnName(@"CacheKeyId").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.CacheItemId).HasColumnName(@"CacheItemId").HasColumnType("uniqueidentifier").IsRequired();
 
             // Foreign keys
-            HasRequired(a => a.CacheItem).WithMany(b => b.CacheKeysItems).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheKeysItems_CacheItems
-            HasRequired(a => a.CacheKey).WithMany(b => b.CacheKeysItems).HasForeignKey(c => c.CacheKeyId); // FK_CacheKeysItems_CacheKeys
+            HasRequired(a => a.CacheItem).WithMany(b => b.CacheKeysItems).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheKeysItem_CacheItem
+            HasRequired(a => a.CacheKey).WithMany(b => b.CacheKeysItems).HasForeignKey(c => c.CacheKeyId); // FK_CacheKeysItem_CacheKey
         }
     }
 

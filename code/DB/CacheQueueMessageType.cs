@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ using System.Threading.Tasks;
 namespace Foundation.HtmlCache.DB
 {
     // CacheQueueMessageType
+    [Table("CacheQueueMessageType")]
     public class CacheQueueMessageType
     {
         public int Id { get; set; } // Id (Primary key)
@@ -43,7 +45,7 @@ namespace Foundation.HtmlCache.DB
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheQueues where [CacheQueue].[CacheQueueMessageType_Id] point to this entity (FK_CacheQueue_CacheQueueMessageType)
+        /// Child CacheQueues where [CacheQueue].[CacheQueueMessageTypeId] point to this entity (FK_CacheQueue_CacheQueueMessageType)
         /// </summary>
         public virtual ICollection<CacheQueue> CacheQueues { get; set; } // CacheQueue.FK_CacheQueue_CacheQueueMessageType
 

@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,19 +36,12 @@ using System.Threading.Tasks;
 namespace Foundation.HtmlCache.DB
 {
     // CacheQueueBlocker
+    [Table("CacheQueueBlocker")]
     public class CacheQueueBlocker
     {
         public int Id { get; set; } // Id (Primary key)
         public bool BlockingMode { get; set; } // BlockingMode
-        public long? CacheQueueId { get; set; } // CacheQueue_Id
         public byte[] UpdateVersion { get; set; } // UpdateVersion (length: 8)
-
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheQueue pointed by [CacheQueueBlocker].([CacheQueueId]) (FK_CacheQueueBlocker_CacheQueue)
-        /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheQueueBlocker_CacheQueue
     }
 
 }
