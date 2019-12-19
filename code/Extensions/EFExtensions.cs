@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -107,7 +108,9 @@ namespace Foundation.HtmlCache.Extensions
 
     public class UpsertOp<TEntity> : EntityOp<TEntity>
     {
-        public UpsertOp(DbContext context, TEntity entity) : base(context, entity) { }
+        public UpsertOp(DbContext context, TEntity entity) : base(context, entity)
+        {
+        }
 
         protected override Guid ExecuteNoRet()
         {
@@ -131,6 +134,7 @@ namespace Foundation.HtmlCache.Extensions
                     valueKeyList.Add("null");
                 }
             }
+
             var columns = columnList.ToArray();
 
             var outputKeys = OutputKeyNames.ToArray();
@@ -162,12 +166,17 @@ namespace Foundation.HtmlCache.Extensions
             sql.Append(string.Join(",S.", columns));
             sql.Append(")");
             sql.AppendLine("");
-            sql.Append("output " + string.Join(", ",outputKeys.Select(x => "inserted." + x)));
+            sql.Append("output " + string.Join(", ", outputKeys.Select(x => "inserted." + x)));
             sql.Append(" into @MergeResult(Id);");
             sql.AppendLine("");
             sql.Append("select Id from @MergeResult");
 
             return Context.Database.SqlQuery<Guid>(sql.ToString(), valueList.ToArray()).First();
+        }
+
+        public void GetDbColums(Type clrEntityType)
+        {
+            var metadata = ((IObjectContextAdapter) Context.Database).ObjectContext.MetadataWorkspace;
         }
     }
 }

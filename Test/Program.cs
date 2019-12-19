@@ -14,77 +14,97 @@ namespace Test
     {
         static void Main(string[] args)
         {
+            bool hasQueueItems = true;
             using (var ctx = new ItemTrackingProvider())
             {
-                var cacheQueueEntry = ctx.CacheQueues
-                    .OrderByDescending(x => x.CacheQueueMessageType.Id)
-                    .ThenBy(x => x.Id)
-                    .FirstOrDefault(x => !x.Processing);
-
-                var processQueue = true;
-                if (cacheQueueEntry != null)
+                while (hasQueueItems)
                 {
-                    using (var ctxProcessing = new ItemTrackingProvider())
-                    {
-                        cacheQueueEntry.Processing = true;
-                        ctxProcessing.Upsert(cacheQueueEntry).ExcludeField(x => x.CacheItemsTemps).ExcludeField(x => x.CacheSiteLangTemps).ExcludeField(x => x.CacheKeysTemps).Key(x => x.Id).OutputKey(x => x.Id);
-                        ctxProcessing.SaveChanges();
-                    }
+                    var cacheQueueEntry = ctx.CacheQueues
+                        .OrderByDescending(x => x.CacheQueueMessageType.Id)
+                        .ThenBy(x => x.Id).AsNoTracking()
+                        .FirstOrDefault(x => !x.Processing);
 
-                    if (cacheQueueEntry.CacheQueueMessageTypeId > (int) MessageTypeEnum.AddToCache)
-                    {
-                        var cacheQueueBlocker = ctx.CacheQueueBlockers.First();
-                        if (!cacheQueueBlocker.BlockingMode)
-                        {
-                            using (var ctxBlocking = new ItemTrackingProvider())
-                            {
-                                ctxBlocking.Database.BeginTransaction();
-                                ctxBlocking.CacheQueueBlockers
-                                    .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion).BlockingMode = true;
-                                processQueue = ctxBlocking.SaveChanges() > 0;
-                                ctxBlocking.Database.CurrentTransaction.Commit();
-                            }
-                        }
-                    }
-
+                    var processQueue = cacheQueueEntry != null;
+                    hasQueueItems = cacheQueueEntry != null;
                     if (processQueue)
                     {
-                        try
+                        if (cacheQueueEntry.CacheQueueMessageTypeId > (int)MessageTypeEnum.AddToCache)
                         {
-                            ctx.Database.BeginTransaction();
-                            switch (cacheQueueEntry.CacheQueueMessageType.Id)
+                            var cacheQueueBlocker = ctx.CacheQueueBlockers.First();
+                            if (!cacheQueueBlocker.BlockingMode)
                             {
-
-                                case (int) MessageTypeEnum.DeleteSiteFromCache:
+                                using (var ctxBlocking = new ItemTrackingProvider())
                                 {
-                                    DeleteSiteCache(ctx, cacheQueueEntry);
-                                    break;
+                                    ctxBlocking.Database.BeginTransaction();
+                                    ctxBlocking.CacheQueueBlockers
+                                            .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
+                                            .BlockingMode =
+                                        true;
+                                    processQueue = ctxBlocking.SaveChanges() > 0;
+                                    ctxBlocking.Database.CurrentTransaction.Commit();
                                 }
-                                case (int) MessageTypeEnum.DeleteFromCache:
-                                {
-                                    DeleteFromCache(ctx, cacheQueueEntry);
-                                    break;
-                                }
-                                case (int) MessageTypeEnum.AddToCache:
-                                {
-                                    AddToCache(ctx, cacheQueueEntry);
-                                    break;
-                                }
-                            }
-
-                            ctx.SaveChanges();
-                            ctx.Database.CurrentTransaction.Commit();
-
-                            using (var ctxDeleteQueue = new ItemTrackingProvider())
-                            {
-                                cacheQueueEntry = ctxDeleteQueue.CacheQueues.First(x => x.Id == cacheQueueEntry.Id);
-                                ctxDeleteQueue.CacheQueues.Remove(cacheQueueEntry);
-                                ctxDeleteQueue.SaveChanges();
                             }
                         }
-                        catch (Exception e)
+
+                        if (processQueue)
                         {
-                            ctx.Database.CurrentTransaction.Rollback();
+                            using (var ctxProcessing = new ItemTrackingProvider())
+                            {
+                                try
+                                {
+                                    cacheQueueEntry.Processing = true;
+                                    ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntry);
+                                    var saved = ctxProcessing.SaveChanges() > 0;
+                                    if (!saved)
+                                    {
+                                        processQueue = false;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+
+                                }
+                            }
+
+                            if (processQueue)
+                            {
+                                try
+                                {
+                                    switch (cacheQueueEntry.CacheQueueMessageType.Id)
+                                    {
+
+                                        case (int)MessageTypeEnum.DeleteSiteFromCache:
+                                            {
+                                                DeleteSiteCache(ctx, cacheQueueEntry);
+                                                break;
+                                            }
+                                        case (int)MessageTypeEnum.DeleteFromCache:
+                                            {
+                                                DeleteFromCache(ctx, cacheQueueEntry);
+                                                break;
+                                            }
+                                        case (int)MessageTypeEnum.AddToCache:
+                                            {
+                                                AddToCache(ctx, cacheQueueEntry);
+                                                break;
+                                            }
+                                    }
+
+                                    ctx.SaveChanges();
+
+                                    using (var ctxDeleteQueue = new ItemTrackingProvider())
+                                    {
+                                        cacheQueueEntry =
+                                            ctxDeleteQueue.CacheQueues.First(x => x.Id == cacheQueueEntry.Id);
+                                        ctxDeleteQueue.CacheQueues.Remove(cacheQueueEntry);
+                                        ctxDeleteQueue.SaveChanges();
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    
+                                }
+                            }
                         }
                     }
                 }
@@ -99,7 +119,7 @@ namespace Test
                 .GroupJoin(ctx.CacheSiteLangs, x => x.Name, y => y.Name,
                     (left, right) => new
                     {
-                        cq = left.CacheKeysTemps.Select(x => x.CacheQueue),
+                        cq = left.CacheKeyTemps.Select(x => x.CacheQueue),
                         csl = right.Select(x => x)
                     });
 
@@ -111,12 +131,12 @@ namespace Test
 
         public static void DeleteFromCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            var result = ctx.CacheItemsTemps
-                .Join(ctx.CacheItemsTemps, x => x.ItemId, y => y.ItemId,
+            var result = ctx.CacheItemTemps
+                .Join(ctx.CacheItemTemps, x => x.ItemId, y => y.ItemId,
                     (left, right) => new { cit1 = left, cit2 = right })
                 .Where(x => x.cit1.CacheKeyId == null)
                 .Where(x => x.cit1.CacheQueueId == cacheQueueEntry.Id)
-                .Join(ctx.CacheKeysTemps, x => x.cit2.CacheKeyId, y => y.Id,
+                .Join(ctx.CacheKeyTemps, x => x.cit2.CacheKeyId, y => y.Id,
                     (left, right) => new { cit2 = left, ckt = right })
                 .GroupJoin(ctx.CacheKeys, x => x.ckt.HtmlCacheKey, y => y.HtmlCacheKey,
                     (left, right) => new
@@ -146,24 +166,24 @@ namespace Test
                     .ExcludeField(x => x.CacheKeys)
                     .OutputKey(x => x.Id).Execute();
 
-                foreach (var cachekeyTemp in cacheSiteLangTemp.CacheKeysTemps)
+                foreach (var cacheKeyTemp in cacheSiteLangTemp.CacheKeyTemps)
                 {
                     var cacheKey = new CacheKey
                     {
-                        HtmlCacheKey = cachekeyTemp.HtmlCacheKey,
-                        HtmlCacheResult = cachekeyTemp.HtmlCacheResult,
+                        HtmlCacheKey = cacheKeyTemp.HtmlCacheKey,
+                        HtmlCacheResult = cacheKeyTemp.HtmlCacheResult,
                         CacheSiteLangId = cacheSiteLangId
                     };
 
                     var cacheKeyId = ctx.Upsert(cacheKey).Key(x => x.HtmlCacheKey)
                         .Key(x => x.CacheSiteLangId)
                         .ExcludeField(x => x.Id)
-                        .ExcludeField(x => x.CacheKeysItems)
+                        .ExcludeField(x => x.CacheKeyItems)
                         .ExcludeField(x => x.CacheSiteLang)
                         .ExcludeField(x => x.CacheItems)
                         .OutputKey(x => x.Id).Execute();
 
-                    foreach (var cacheKeyItemTemp in cachekeyTemp.CacheItemsTemps)
+                    foreach (var cacheKeyItemTemp in cacheKeyTemp.CacheItemTemps)
                     {
                         var cacheItem = new CacheItem
                         {
@@ -175,10 +195,10 @@ namespace Test
                             .Key(x => x.CacheKeyId)
                             .ExcludeField(x => x.Id)
                             .ExcludeField(x => x.CacheKey)
-                            .ExcludeField(x => x.CacheKeysItems)
+                            .ExcludeField(x => x.CacheKeyItems)
                             .OutputKey(x => x.Id).Execute();
 
-                        var cacheKeyItem = new CacheKeysItem()
+                        var cacheKeyItem = new CacheKeyItem()
                         {
                             CacheKeyId = cacheKeyId,
                             CacheItemId = cacheItemId

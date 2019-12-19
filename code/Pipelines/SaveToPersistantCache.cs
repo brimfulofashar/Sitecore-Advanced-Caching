@@ -31,24 +31,23 @@ namespace Foundation.HtmlCache.Pipelines
                                 CacheQueueMessageTypeId = (int)MessageTypeEnum.AddToCache
                             };
 
-                            var cacheSiteLang = new CacheSiteLangTemp()
-                                {Id = Guid.NewGuid(), Name = Context.Site.SiteInfo.Name, Lang = Context.Site.SiteInfo.Language, CacheQueue = cacheQueue};
+                            var cacheSiteLang = new CacheSiteLangTemp
+                                {Name = Context.Site.SiteInfo.Name, Lang = Context.Site.SiteInfo.Language, CacheQueue = cacheQueue};
 
-                            var cacheKeyId = Guid.NewGuid();
-                            var cacheKey = new CacheKeysTemp
+                            var cacheKey = new CacheKeyTemp
                             {
-                                Id = cacheKeyId,
                                 HtmlCacheKey = args.CacheKey,
                                 HtmlCacheResult = renderingProcessorArgs.CacheResult,
                                 CacheSiteLangTemp = cacheSiteLang,
-                                CacheQueue = cacheQueue
+                                CacheQueue = cacheQueue,
                             };
 
-                            var cacheItems = trackedItems.Select(x => new CacheItemsTemp
-                                {Id = Guid.NewGuid(), ItemId = x.Id, CacheKeyId = cacheKey.Id, CacheQueue = cacheQueue }).ToArray();
+                            var cacheItems = trackedItems.Select(x => new CacheItemTemp{ItemId = x.Id, CacheKeyId = cacheKey.Id, CacheQueue = cacheQueue }).ToArray();
 
-                            ctx.CacheKeysTemps.Add(cacheKey);
-                            ctx.CacheItemsTemps.AddRange(cacheItems);
+                            cacheKey.CacheItemTemps = cacheItems;
+                            cacheSiteLang.CacheKeyTemps.Add(cacheKey);
+                            cacheQueue.CacheSiteLangTemps.Add(cacheSiteLang);
+
                             ctx.CacheQueues.Add(cacheQueue);
 
                             ctx.SaveChanges();

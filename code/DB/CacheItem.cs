@@ -46,9 +46,9 @@ namespace Foundation.HtmlCache.DB
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheKeysItems where [CacheKeysItem].[CacheItemId] point to this entity (FK_CacheKeysItem_CacheItem)
+        /// Child CacheKeyItems where [CacheKeyItem].[CacheItemId] point to this entity (FK_CacheKeyItem_CacheItem)
         /// </summary>
-        public virtual ICollection<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem.FK_CacheKeysItem_CacheItem
+        public virtual ICollection<CacheKeyItem> CacheKeyItems { get; set; } // CacheKeyItem.FK_CacheKeyItem_CacheItem
 
         // Foreign keys
 
@@ -60,7 +60,7 @@ namespace Foundation.HtmlCache.DB
         public CacheItem()
         {
             Id = Guid.NewGuid();
-            CacheKeysItems = new List<CacheKeysItem>();
+            CacheKeyItems = new List<CacheKeyItem>();
         }
     }
 

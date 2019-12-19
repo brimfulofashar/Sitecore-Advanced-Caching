@@ -41,10 +41,10 @@ namespace Foundation.HtmlCache.DB
     public interface IItemTrackingProvider : IDisposable
     {
         DbSet<CacheItem> CacheItems { get; set; } // CacheItem
-        DbSet<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp
+        DbSet<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp
         DbSet<CacheKey> CacheKeys { get; set; } // CacheKey
-        DbSet<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem
-        DbSet<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp
+        DbSet<CacheKeyItem> CacheKeyItems { get; set; } // CacheKeyItem
+        DbSet<CacheKeyTemp> CacheKeyTemps { get; set; } // CacheKeyTemp
         DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
         DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
@@ -63,11 +63,6 @@ namespace Foundation.HtmlCache.DB
         DbSet Set(Type entityType);
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         string ToString();
-
-        // Stored Procedures
-        int ProcessQueue();
-        // ProcessQueueAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
-
     }
 }
 // </auto-generated>

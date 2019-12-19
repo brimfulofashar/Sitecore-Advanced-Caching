@@ -47,14 +47,14 @@ namespace Foundation.HtmlCache.DB
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheItemsTemps where [CacheItemsTemp].[CacheQueueId] point to this entity (FK_CacheItemTemp_CacheQueue)
+        /// Child CacheItemTemps where [CacheItemTemp].[CacheQueueId] point to this entity (FK_CacheItemTemp_CacheQueue)
         /// </summary>
-        public virtual ICollection<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp.FK_CacheItemTemp_CacheQueue
+        public virtual ICollection<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp.FK_CacheItemTemp_CacheQueue
 
         /// <summary>
-        /// Child CacheKeysTemps where [CacheKeysTemp].[CacheQueueId] point to this entity (FK_CacheKeyTemp_CacheQueue)
+        /// Child CacheKeyTemps where [CacheKeyTemp].[CacheQueueId] point to this entity (FK_CacheKeyTemp_CacheQueue)
         /// </summary>
-        public virtual ICollection<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp.FK_CacheKeyTemp_CacheQueue
+        public virtual ICollection<CacheKeyTemp> CacheKeyTemps { get; set; } // CacheKeyTemp.FK_CacheKeyTemp_CacheQueue
 
         /// <summary>
         /// Child CacheSiteLangTemps where [CacheSiteLangTemp].[CacheQueueId] point to this entity (FK_CacheSiteLangTemp_CacheQueue)
@@ -70,8 +70,8 @@ namespace Foundation.HtmlCache.DB
 
         public CacheQueue()
         {
-            CacheItemsTemps = new List<CacheItemsTemp>();
-            CacheKeysTemps = new List<CacheKeysTemp>();
+            CacheItemTemps = new List<CacheItemTemp>();
+            CacheKeyTemps = new List<CacheKeyTemp>();
             CacheSiteLangTemps = new List<CacheSiteLangTemp>();
         }
     }

@@ -49,10 +49,10 @@ namespace Foundation.HtmlCache.DB
     public class ItemTrackingProvider : DbContext, IItemTrackingProvider
     {
         public DbSet<CacheItem> CacheItems { get; set; } // CacheItem
-        public DbSet<CacheItemsTemp> CacheItemsTemps { get; set; } // CacheItemsTemp
+        public DbSet<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp
         public DbSet<CacheKey> CacheKeys { get; set; } // CacheKey
-        public DbSet<CacheKeysItem> CacheKeysItems { get; set; } // CacheKeysItem
-        public DbSet<CacheKeysTemp> CacheKeysTemps { get; set; } // CacheKeysTemp
+        public DbSet<CacheKeyItem> CacheKeyItems { get; set; } // CacheKeyItem
+        public DbSet<CacheKeyTemp> CacheKeyTemps { get; set; } // CacheKeyTemp
         public DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
         public DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         public DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
@@ -119,10 +119,10 @@ namespace Foundation.HtmlCache.DB
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Configurations.Add(new CacheItemConfiguration());
-            modelBuilder.Configurations.Add(new CacheItemsTempConfiguration());
+            modelBuilder.Configurations.Add(new CacheItemTempConfiguration());
             modelBuilder.Configurations.Add(new CacheKeyConfiguration());
-            modelBuilder.Configurations.Add(new CacheKeysItemConfiguration());
-            modelBuilder.Configurations.Add(new CacheKeysTempConfiguration());
+            modelBuilder.Configurations.Add(new CacheKeyItemConfiguration());
+            modelBuilder.Configurations.Add(new CacheKeyTempConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueBlockerConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueMessageTypeConfiguration());
@@ -134,23 +134,23 @@ namespace Foundation.HtmlCache.DB
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheItems", 1) { IsUnique = true, IsClustered = true })
+                    new IndexAnnotation(new IndexAttribute("PK_CacheItem", 1) { IsUnique = true, IsClustered = true })
                 );
 
 
-            modelBuilder.Entity<CacheItemsTemp>()
+            modelBuilder.Entity<CacheItemTemp>()
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheItemsTemp", 1) { IsUnique = true, IsClustered = true })
+                    new IndexAnnotation(new IndexAttribute("PK_CacheItemTemp", 1) { IsUnique = true, IsClustered = true })
                 );
 
 
-            modelBuilder.Entity<CacheItemsTemp>()
+            modelBuilder.Entity<CacheItemTemp>()
                 .Property(e => e.ItemId)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("IX_CacheItemsTemp", 1))
+                    new IndexAnnotation(new IndexAttribute("IX_CacheItemTemp", 1))
                 );
 
 
@@ -158,31 +158,31 @@ namespace Foundation.HtmlCache.DB
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheKeys", 1) { IsUnique = true, IsClustered = true })
+                    new IndexAnnotation(new IndexAttribute("PK_CacheKey", 1) { IsUnique = true, IsClustered = true })
                 );
 
 
-            modelBuilder.Entity<CacheKeysItem>()
+            modelBuilder.Entity<CacheKeyItem>()
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheKeysItems", 1) { IsUnique = true, IsClustered = true })
+                    new IndexAnnotation(new IndexAttribute("PK_CacheKeyItem", 1) { IsUnique = true, IsClustered = true })
                 );
 
 
-            modelBuilder.Entity<CacheKeysTemp>()
+            modelBuilder.Entity<CacheKeyTemp>()
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheKeysTemp", 1) { IsUnique = true, IsClustered = true })
+                    new IndexAnnotation(new IndexAttribute("PK_CacheKeyTemp", 1) { IsUnique = true, IsClustered = true })
                 );
 
 
-            modelBuilder.Entity<CacheKeysTemp>()
+            modelBuilder.Entity<CacheKeyTemp>()
                 .Property(e => e.HtmlCacheKey)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("IX_CacheKeysTemp", 1))
+                    new IndexAnnotation(new IndexAttribute("IX_CacheKeyTemp", 1))
                 );
 
 
@@ -246,10 +246,10 @@ namespace Foundation.HtmlCache.DB
         public static DbModelBuilder CreateModel(DbModelBuilder modelBuilder, string schema)
         {
             modelBuilder.Configurations.Add(new CacheItemConfiguration(schema));
-            modelBuilder.Configurations.Add(new CacheItemsTempConfiguration(schema));
+            modelBuilder.Configurations.Add(new CacheItemTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheKeyConfiguration(schema));
-            modelBuilder.Configurations.Add(new CacheKeysItemConfiguration(schema));
-            modelBuilder.Configurations.Add(new CacheKeysTempConfiguration(schema));
+            modelBuilder.Configurations.Add(new CacheKeyItemConfiguration(schema));
+            modelBuilder.Configurations.Add(new CacheKeyTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueBlockerConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueMessageTypeConfiguration(schema));
@@ -258,19 +258,6 @@ namespace Foundation.HtmlCache.DB
 
             return modelBuilder;
         }
-
-        // Stored Procedures
-        public int ProcessQueue()
-        {
-            var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
-
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[ProcessQueue] ", procResultParam);
-
-            return (int)procResultParam.Value;
-        }
-
-        // ProcessQueueAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
-
     }
 }
 // </auto-generated>

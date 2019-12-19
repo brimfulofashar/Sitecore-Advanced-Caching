@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using Foundation.HtmlCache.DB;
-using Foundation.HtmlCache.Models;
+using Foundation.HtmlCache.Extensions;
 
 namespace Foundation.HtmlCache.Agents
 {
@@ -9,211 +11,206 @@ namespace Foundation.HtmlCache.Agents
     {
         public void ProcessCacheQueue()
         {
-            
+            bool hasQueueItems = true;
+            using (var ctx = new ItemTrackingProvider())
+            {
+                while (hasQueueItems)
+                {
+                    var cacheQueueEntry = ctx.CacheQueues
+                        .OrderByDescending(x => x.CacheQueueMessageType.Id)
+                        .ThenBy(x => x.Id).AsNoTracking()
+                        .FirstOrDefault(x => !x.Processing);
+
+                    var processQueue = cacheQueueEntry != null;
+                    hasQueueItems = cacheQueueEntry != null;
+                    if (processQueue)
+                    {
+                        if (cacheQueueEntry.CacheQueueMessageTypeId > (int)MessageTypeEnum.AddToCache)
+                        {
+                            var cacheQueueBlocker = ctx.CacheQueueBlockers.First();
+                            if (!cacheQueueBlocker.BlockingMode)
+                            {
+                                using (var ctxBlocking = new ItemTrackingProvider())
+                                {
+                                    ctxBlocking.Database.BeginTransaction();
+                                    ctxBlocking.CacheQueueBlockers
+                                            .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
+                                            .BlockingMode =
+                                        true;
+                                    processQueue = ctxBlocking.SaveChanges() > 0;
+                                    ctxBlocking.Database.CurrentTransaction.Commit();
+                                }
+                            }
+                        }
+
+                        if (processQueue)
+                        {
+                            using (var ctxProcessing = new ItemTrackingProvider())
+                            {
+                                try
+                                {
+                                    cacheQueueEntry.Processing = true;
+                                    ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntry);
+                                    var saved = ctxProcessing.SaveChanges() > 0;
+                                    if (!saved)
+                                    {
+                                        processQueue = false;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+
+                                }
+                            }
+
+                            if (processQueue)
+                            {
+                                try
+                                {
+                                    switch (cacheQueueEntry.CacheQueueMessageType.Id)
+                                    {
+
+                                        case (int) MessageTypeEnum.DeleteSiteFromCache:
+                                        {
+                                            DeleteSiteCache(ctx, cacheQueueEntry);
+                                            break;
+                                        }
+                                        case (int) MessageTypeEnum.DeleteFromCache:
+                                        {
+                                            DeleteFromCache(ctx, cacheQueueEntry);
+                                            break;
+                                        }
+                                        case (int) MessageTypeEnum.AddToCache:
+                                        {
+                                            AddToCache(ctx, cacheQueueEntry);
+                                            break;
+                                        }
+                                    }
+
+                                    ctx.SaveChanges();
+
+                                    using (var ctxDeleteQueue = new ItemTrackingProvider())
+                                    {
+                                        cacheQueueEntry =
+                                            ctxDeleteQueue.CacheQueues.First(x => x.Id == cacheQueueEntry.Id);
+                                        ctxDeleteQueue.CacheQueues.Remove(cacheQueueEntry);
+                                        ctxDeleteQueue.SaveChanges();
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        public string sql = @"
-            DECLARE @CacheQueueId BIGINT
-DECLARE @CacheQueueMessageType_Id INT
-DECLARE @CacheQueueUpdateVersion ROWVERSION
-DECLARE @CacheQueueBlockerUpdateVersion ROWVERSION
-DECLARE @BlockingMode BIT
-DECLARE @BlockTokenTaken BIT
-DECLARE @PendingQueueLength BIGINT
-DECLARE @SiteName VARCHAR(250)
-DECLARE @SiteLang VARCHAR(250)
-DECLARE @HtmlCacheKeys NVARCHAR(250)
+        private void DeleteSiteCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
+        {
+            var result = ctx.CacheSiteLangTemps.Where(x =>
+                    x.Name == cacheQueueEntry.CacheSiteLangTemps.First().Name &&
+                    x.Lang == cacheQueueEntry.CacheSiteLangTemps.First().Lang)
+                .GroupJoin(ctx.CacheSiteLangs, x => x.Name, y => y.Name,
+                    (left, right) => new
+                    {
+                        cq = left.CacheKeyTemps.Select(x => x.CacheQueue),
+                        csl = right.Select(x => x)
+                    });
 
-BEGIN TRY
-	BEGIN TRANSACTION;
+            ctx.CacheQueues.RemoveRange(result.SelectMany(x => x.cq));
+            ctx.CacheSiteLangs.RemoveRange(result.SelectMany(x => x.csl));
 
-		SELECT @PendingQueueLength = COUNT(Id) FROM CacheQueue;
+            // raise event
+        }
 
-		SELECT @BlockingMode = BlockingMode FROM [CacheQueueBlocker] WHERE Id = 1
+        public void DeleteFromCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
+        {
+            var result = ctx.CacheItemTemps
+                .Join(ctx.CacheItemTemps, x => x.ItemId, y => y.ItemId,
+                    (left, right) => new { cit1 = left, cit2 = right })
+                .Where(x => x.cit1.CacheKeyId == null)
+                .Where(x => x.cit1.CacheQueueId == cacheQueueEntry.Id)
+                .Join(ctx.CacheKeyTemps, x => x.cit2.CacheKeyId, y => y.Id,
+                    (left, right) => new { cit2 = left, ckt = right })
+                .GroupJoin(ctx.CacheKeys, x => x.ckt.HtmlCacheKey, y => y.HtmlCacheKey,
+                    (left, right) => new
+                    {
+                        cq = left.ckt.CacheQueue,
+                        ck = right.Select(x => x).Where(x => x != null)
+                    });
 
-		IF (@BlockingMode = 0)
-		BEGIN
-			WITH CTE (Id)
-			AS
-			(
-				SELECT TOP 1 cq.Id FROM CacheQueue cq WHERE Processing = 0 GROUP BY cq.Id, cq.CacheQueueMessageType_Id ORDER BY cq.CacheQueueMessageType_Id DESC, cq.Id ASC
-			)
-			SELECT @CacheQueueId = cq.Id, @CacheQueueMessageType_Id = cq.CacheQueueMessageType_Id, @CacheQueueUpdateVersion = cq.UpdateVersion
-			FROM CTE
-			INNER JOIN CacheQueue cq
-			ON cq.Id = CTE.Id
-						
-			SELECT @CacheQueueBlockerUpdateVersion = UpdateVersion
-			FROM CacheQueueBlocker
-	
-			SELECT @CacheQueueUpdateVersion, @CacheQueueBlockerUpdateVersion, @CacheQueueMessageType_Id	
+            ctx.CacheQueues.RemoveRange(result.Select(x => x.cq));
+            ctx.CacheKeys.RemoveRange(result.SelectMany(x => x.ck));
+        }
 
-		END
-		UPDATE CacheQueue SET Processing = 1 WHERE Id = @CacheQueueId AND UpdateVersion = @CacheQueueUpdateVersion
-		DECLARE @Updated bit
-		IF (@@ROWCOUNT > 0)
-		BEGIN
-			SET @Updated = 1
-		END
-		ELSE
-		BEGIN
-			SET @Updated = 0
-		END
-		SELECT @Updated as Updated
-		IF @Updated = 1
-		BEGIN		            
-			IF (@CacheQueueMessageType_Id <> 1)
-			BEGIN
-				UPDATE [CacheQueueBlocker]
-				SET BlockingMode = 1
-				WHERE Id = 1
-				AND UpdateVersion = @CacheQueueBlockerUpdateVersion
-				IF @@ROWCOUNT > 0
-				BEGIN
-					SELECT 'BlockTokenTaken'
-					SET @BlockTokenTaken = 1
-				END
-				ELSE
-				BEGIN
-					SELECT 'BlockTokenNOTTaken';
-					SET @BlockTokenTaken = 0;
-					THROW 5000,'Block Token Not Taken',1;
-				END
-			END
+        private void AddToCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
+        {
+            foreach (var cacheSiteLangTemp in cacheQueueEntry.CacheSiteLangTemps)
+            {
+                var cacheSiteLang = new CacheSiteLang
+                {
+                    Lang = cacheSiteLangTemp.Lang,
+                    Name = cacheSiteLangTemp.Name,
+                };
 
-			IF ((@BlockingMode = 0 AND @CacheQueueMessageType_Id = 1))
-			BEGIN
-				merge into CacheSiteLang WITH (HOLDLOCK) as T 
-				using (SELECT Id, Name, Lang FROM CacheSiteLangTemp WHERE CacheQueue_Id = @CacheQueueId) as S 
-				on (T.Name = S.Name AND T.Lang = S.Lang) 
-				when matched
-				then update set T.Name = S.Name, T.Lang = S.Lang				
-				when not matched
-				then insert (Id, Name, Lang) values (S.Id, S.Name, S.Lang);
-			            
-				merge into CacheKeys WITH (HOLDLOCK) as T 
-				using (SELECT ckt.Id, csl.Id as cslId, cslt.Id as csltId, ckt.HtmlCacheKey, ckt.HtmlCacheResult 
-				FROM CacheSiteLangTemp cslt
-				INNER JOIN CacheKeysTemp ckt
-				ON cslt.Id = ckt.CacheSiteLang_Id
-				LEFT JOIN CacheSiteLang csl
-				ON cslt.Name = csl.Name
-				AND cslt.Lang = csl.Lang
-				WHERE cslt.CacheQueue_Id = @CacheQueueId) as S 
-				on (T.HtmlCacheKey = S.HtmlCacheKey AND T.CacheSiteLang_Id = S.cslId)
-				when matched
-				then update set T.HtmlCacheKey = S.HtmlCacheKey, T.HtmlCacheResult = S.HtmlCacheResult, T.CacheSiteLang_Id = S.cslId
-				when not matched
-				then insert (Id, HtmlCacheKey, HtmlCacheResult, CacheSiteLang_Id) values (S.Id, S.HtmlCacheKey, S.HtmlCacheResult, S.csltId);				
-                        
-				merge into CacheItems WITH (HOLDLOCK) as T 
-				using (SELECT Id, ItemId, CacheKey_Id FROM CacheItemsTemp WHERE CacheQueue_Id = @CacheQueueId) as S 
-				on (T.ItemId = S.ItemId) 
-				when matched
-				then update set T.ItemId = S.ItemId, T.CacheKey_Id = S.CacheKey_Id
-				when not matched
-				then insert (Id, ItemId, CacheKey_Id) values (S.Id, S.ItemId, S.CacheKey_Id);
-                        
-				merge into CacheKeysItems WITH (HOLDLOCK) as T 
-				using (SELECT ckiTemp.Id, ck.Id as CacheKey_Id, ci.Id as CacheItem_Id
-				FROM CacheKeys ck
-				INNER JOIN CacheKeysTemp ckTemp on ck.HtmlCacheKey = ckTemp.HtmlCacheKey
-				INNER JOIN CacheKeysItemsTemp ckiTemp on ckTemp.Id = ckiTemp.CacheKey_Id
-				INNER JOIN CacheItemsTemp ciTemp on ciTemp.Id = ckiTemp.CacheItem_Id
-				INNER JOIN CacheItems ci on ciTemp.ItemId = ci.ItemId WHERE ckiTemp.CacheQueue_Id = @CacheQueueId) as S 
-				on (T.CacheKey_Id = S.CacheKey_Id AND T.CacheItem_Id = S.CacheItem_Id) 
-				when matched
-				then update set T.CacheItem_Id = S.CacheItem_Id, T.CacheKey_Id = S.CacheKey_Id
-				when not matched
-				then insert (Id, CacheKey_Id, CacheItem_Id) values (S.Id, S.CacheKey_Id, S.CacheItem_Id);
+                var cacheSiteLangId = ctx.Upsert(cacheSiteLang)
+                    .Key(x => x.Name)
+                    .Key(x => x.Lang)
+                    .ExcludeField(x => x.Id)
+                    .ExcludeField(x => x.CacheKeys)
+                    .OutputKey(x => x.Id).Execute();
 
-				DELETE FROM CacheQueue WHERE Id = @CacheQueueId;
+                foreach (var cachekeyTemp in cacheSiteLangTemp.CacheKeyTemps)
+                {
+                    var cacheKey = new CacheKey
+                    {
+                        HtmlCacheKey = cachekeyTemp.HtmlCacheKey,
+                        HtmlCacheResult = cachekeyTemp.HtmlCacheResult,
+                        CacheSiteLangId = cacheSiteLangId
+                    };
 
-				IF (@BlockTokenTaken = 1)
-				BEGIN
-					UPDATE [CacheQueueBlocker]
-					SET BlockingMode = 0, CacheQueue_Id = NULL
-					WHERE BlockingMode = 1 AND CacheQueue_Id IS NOT NULL
-				END			
-			END
-			IF(@BlockTokenTaken = 1 AND @CacheQueueMessageType_Id = 2)
-			BEGIN
-				DECLARE @DeletedCacheKeys table (HtmlCacheKey nvarchar(3000));
+                    var cacheKeyId = ctx.Upsert(cacheKey).Key(x => x.HtmlCacheKey)
+                        .Key(x => x.CacheSiteLangId)
+                        .ExcludeField(x => x.Id)
+                        .ExcludeField(x => x.CacheKeyItems)
+                        .ExcludeField(x => x.CacheSiteLang)
+                        .ExcludeField(x => x.CacheItems)
+                        .OutputKey(x => x.Id).Execute();
 
-				SELECT @SiteName = Name, @SiteLang = Lang 
-				FROM [CacheSiteLangTemp]
-				WHERE CacheQueue_Id = @CacheQueueId;
+                    foreach (var cacheKeyItemTemp in cachekeyTemp.CacheItemTemps)
+                    {
+                        var cacheItem = new CacheItem
+                        {
+                            ItemId = cacheKeyItemTemp.ItemId,
+                            CacheKeyId = cacheKeyId
+                        };
 
-				WITH CTECacheTemp (HtmlCacheKey)
-				AS
-				(
-					SELECT ckt.HtmlCacheKey FROM PublishedItems pi				
-					INNER JOIN CacheItemsTemp cit
-					ON pi.ItemId = cit.ItemId
-					INNER JOIN CacheKeysItemsTemp ckit
-					ON cit.ItemId = ckit.CacheItem_Id
-					INNER JOIN CacheKeysTemp ckt
-					ON ckit.CacheKey_Id = ckt.Id
-					WHERE pi.CacheQueue_Id = @CacheQueueId
-				)
-				DELETE FROM CacheKeysTemp OUTPUT deleted.HtmlCacheKey INTO @DeletedCacheKeys WHERE HtmlCacheKey IN (SELECT HtmlCacheKey FROM CTECacheTemp);
+                        var cacheItemId = ctx.Upsert(cacheItem).Key(x => x.ItemId)
+                            .Key(x => x.CacheKeyId)
+                            .ExcludeField(x => x.Id)
+                            .ExcludeField(x => x.CacheKey)
+                            .ExcludeField(x => x.CacheKeyItems)
+                            .OutputKey(x => x.Id).Execute();
 
-				WITH CTECache (HtmlCacheKey)
-				AS
-				(
-					SELECT ck.HtmlCacheKey FROM PublishedItems pi
-					INNER JOIN CacheItems ci
-					ON pi.ItemId = ci.ItemId
-					INNER JOIN CacheKeysItems cki
-					ON ci.ItemId = cki.CacheItem_Id
-					INNER JOIN CacheKeys ck
-					ON cki.CacheKey_Id = ck.Id
-					WHERE pi.CacheQueue_Id = @CacheQueueId			
-				)
-				DELETE FROM CacheKeys OUTPUT deleted.HtmlCacheKey INTO @DeletedCacheKeys WHERE HtmlCacheKey IN (SELECT HtmlCacheKey FROM CTECache);
+                        var cacheKeyItem = new CacheKeyItem()
+                        {
+                            CacheKeyId = cacheKeyId,
+                            CacheItemId = cacheItemId
+                        };
 
-				DELETE FROM CacheQueue WHERE Id = @CacheQueueId;
-
-				UPDATE CacheQueueBlocker SET BlockingMode = 0 WHERE ID = 1 AND UpdateVersion = @CacheQueueBlockerUpdateVersion
-
-				SELECT @HtmlCacheKeys = COALESCE(@HtmlCacheKeys + '|', '') + HtmlCacheKey FROM (SELECT DISTINCT(HtmlCacheKey) FROM @DeletedCacheKeys) as cachekeys
-			END
-			SELECT @BlockTokenTaken
-			IF(@BlockTokenTaken = 1 AND @CacheQueueMessageType_Id = 3)
-			BEGIN
-			            
-				SELECT @SiteName = Name, @SiteLang = Lang 
-				FROM [CacheSiteLangTemp]
-				WHERE CacheQueue_Id = @CacheQueueId
-
-				SELECT @SiteName, @SiteLang;
-
-				WITH CTEDeleteSite(CacheQueueId)
-				AS
-				(
-					SELECT cq.Id FROM CacheQueue cq
-					INNER JOIN CacheSiteLangTemp cslt
-					ON cq.Id = cslt.CacheQueue_Id
-					WHERE cslt.Name = @SiteName AND cslt.Lang = @SiteLang
-				)
-				DELETE FROM CacheQueue WHERE Id IN (SELECT CacheQueueId FROM CTEDeleteSite)
-
-				DELETE csl FROM CacheSiteLang csl WHERE csl.Name = @SiteName AND csl.Lang = @SiteLang
-					
-				UPDATE CacheQueueBlocker SET BlockingMode = 0 WHERE ID = 1 AND UpdateVersion = @CacheQueueBlockerUpdateVersion				
-			END				
-		END
-		SELECT @PendingQueueLength as PendingQueueLength, @SiteName as SiteName, @SiteLang as SiteLang, @HtmlCacheKeys as DeletedCacheKeys
-		
-	COMMIT TRANSACTION;
-END TRY
-BEGIN CATCH
-	SELECT   
-        ERROR_NUMBER() AS ErrorNumber  
-       ,ERROR_MESSAGE() AS ErrorMessage;   
-    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
-END CATCH";
+                        ctx.Upsert(cacheKeyItem)
+                            .Key(x => x.CacheKeyId)
+                            .Key(x => x.CacheItemId)
+                            .ExcludeField(x => x.Id)
+                            .ExcludeField(x => x.CacheItem)
+                            .ExcludeField(x => x.CacheKey)
+                            .OutputKey(x => x.Id).Execute();
+                    }
+                }
+            }
+        }
     }
-
-
 }
