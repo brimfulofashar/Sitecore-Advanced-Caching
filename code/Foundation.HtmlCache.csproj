@@ -195,11 +195,9 @@
     <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />
-    <Compile Include="Pipelines\RenderFromPersistantCache.cs" />
     <Compile Include="Pipelines\EndRenderingContext.cs" />
     <Compile Include="Pipelines\BeginRenderingContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\ItemTrackingStore.cs" />
     <Compile Include="Providers\TrackItemAccess.cs" />
     <Compile Include="Settings\GlobalCacheTemplateSettings.cs" />
   </ItemGroup>

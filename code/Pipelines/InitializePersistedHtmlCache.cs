@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Providers;
-using Newtonsoft.Json;
+﻿using Foundation.HtmlCache.DB;
+using Sitecore.Caching;
+using Sitecore.Configuration;
 using Sitecore.Pipelines;
+using Sitecore.Sites;
 
 namespace Foundation.HtmlCache.Pipelines
 {
@@ -12,7 +10,17 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public void Initialize(PipelineArgs args)
         {
-            
+            using (var ctx = new ItemTrackingProvider())
+            {
+                foreach (var cacheSiteLang in ctx.CacheSiteLangs)
+                {
+                    SiteContext siteContext = Factory.GetSite(cacheSiteLang.Name);
+                    foreach (var cacheKey in cacheSiteLang.CacheKeys)
+                    {
+                        CacheManager.GetHtmlCache(siteContext).SetHtml(cacheKey.HtmlCacheKey, cacheKey.HtmlCacheResult);
+                    }
+                }
+            }
 
         }
     }

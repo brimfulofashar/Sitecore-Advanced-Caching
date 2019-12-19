@@ -4,6 +4,7 @@ using System.Data.Entity.Migrations;
 using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
+using Sitecore.Diagnostics;
 
 namespace Foundation.HtmlCache.Agents
 {
@@ -99,7 +100,7 @@ namespace Foundation.HtmlCache.Agents
                                 }
                                 catch (Exception e)
                                 {
-
+                                    Log.Error(string.Format("Failed to process cache queue entry {0}", cacheQueueEntry.Id), e, this);
                                 }
                             }
                         }
