@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Foundation.HtmlCache.Messages
+namespace Foundation.HtmlCache.Arguments
 {
     [Serializable]
     public class ItemMetaData

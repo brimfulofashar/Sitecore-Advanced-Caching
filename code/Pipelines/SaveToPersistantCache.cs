@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Web;
+using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.DB;
-using Foundation.HtmlCache.Messages;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Diagnostics;

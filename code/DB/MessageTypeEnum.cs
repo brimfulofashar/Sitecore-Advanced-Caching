@@ -33,6 +33,8 @@ namespace Foundation.HtmlCache.DB
         AddToCache = 1,
         DeleteFromCache = 2,
         DeleteSiteFromCache = 3,
+        DeleteSiteFromCacheAllLanguages = 4,
+        DeleteSiteFromCacheAllSites = 5,
     }
 
 }

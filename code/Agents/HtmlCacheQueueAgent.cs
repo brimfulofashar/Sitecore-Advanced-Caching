@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Data.Entity;
+using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using Foundation.HtmlCache.DB;
+using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Models;
+using Sitecore.Configuration;
 using Sitecore.Diagnostics;
 
 namespace Foundation.HtmlCache.Agents
@@ -19,7 +22,7 @@ namespace Foundation.HtmlCache.Agents
                 {
                     var cacheQueueEntry = ctx.CacheQueues
                         .OrderByDescending(x => x.CacheQueueMessageType.Id)
-                        .ThenBy(x => x.Id).AsNoTracking()
+                        .ThenBy(x => x.Id)
                         .FirstOrDefault(x => !x.Processing);
 
                     var processQueue = cacheQueueEntry != null;
@@ -33,13 +36,12 @@ namespace Foundation.HtmlCache.Agents
                             {
                                 using (var ctxBlocking = new ItemTrackingProvider())
                                 {
-                                    ctxBlocking.Database.BeginTransaction();
                                     ctxBlocking.CacheQueueBlockers
                                             .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
                                             .BlockingMode =
                                         true;
                                     processQueue = ctxBlocking.SaveChanges() > 0;
-                                    ctxBlocking.Database.CurrentTransaction.Commit();
+                                    ctxBlocking.SaveChanges();
                                 }
                             }
                         }
@@ -50,17 +52,23 @@ namespace Foundation.HtmlCache.Agents
                             {
                                 try
                                 {
-                                    cacheQueueEntry.Processing = true;
-                                    ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntry);
-                                    var saved = ctxProcessing.SaveChanges() > 0;
-                                    if (!saved)
+                                    var cacheQueueEntryToLock = ctxProcessing.CacheQueues.AsNoTracking().FirstOrDefault(x =>
+                                        x.Id == cacheQueueEntry.Id && x.UpdateVersion == cacheQueueEntry.UpdateVersion);
+                                    if (cacheQueueEntryToLock != null)
                                     {
-                                        processQueue = false;
+                                        cacheQueueEntryToLock.Processing = true;
+                                        ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntryToLock);
+                                        var saved = ctxProcessing.SaveChanges() > 0;
+                                        if (!saved)
+                                        {
+                                            processQueue = false;
+                                        }
                                     }
                                 }
                                 catch (Exception e)
                                 {
-
+                                    Log.Error(string.Format("Failed to lock cache queue entry {0}", cacheQueueEntry.Id), e, this);
+                                    processQueue = false;
                                 }
                             }
 
@@ -70,7 +78,16 @@ namespace Foundation.HtmlCache.Agents
                                 {
                                     switch (cacheQueueEntry.CacheQueueMessageType.Id)
                                     {
-
+                                        case (int) MessageTypeEnum.DeleteSiteFromCacheAllSites:
+                                        {
+                                            DeleteAllSiteCache(ctx);
+                                            break;
+                                        }
+                                        case (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages:
+                                        {
+                                            DeleteSiteAllLangugageCache(ctx, cacheQueueEntry);
+                                            break;
+                                        }
                                         case (int) MessageTypeEnum.DeleteSiteFromCache:
                                         {
                                             DeleteSiteCache(ctx, cacheQueueEntry);
@@ -109,6 +126,25 @@ namespace Foundation.HtmlCache.Agents
             }
         }
 
+        private void DeleteAllSiteCache(ItemTrackingProvider ctx)
+        {
+            ctx.CacheQueues.RemoveRange(ctx.CacheQueues);
+            ctx.CacheSiteLangs.RemoveRange(ctx.CacheSiteLangs);
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", null, null, null, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
+            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+        }
+
+        private void DeleteSiteAllLangugageCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
+        {
+            var name = cacheQueueEntry.CacheSiteLangTemps.First().Name;
+            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.CacheSiteLangTemps.Any(y => y.Name == name)));
+            ctx.CacheSiteLangs.RemoveRange(ctx.CacheSiteLangs.Where(x => x.Name == name));
+
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSiteAllLanguages:Remote", new List<string>(){ name }, null, null, ClearCacheOperation.ClearCacheOperationEnum.SiteAllLanguages);
+            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+
+        }
+
         private void DeleteSiteCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
             var result = ctx.CacheSiteLangTemps.Where(x =>
@@ -124,7 +160,9 @@ namespace Foundation.HtmlCache.Agents
             ctx.CacheQueues.RemoveRange(result.SelectMany(x => x.cq));
             ctx.CacheSiteLangs.RemoveRange(result.SelectMany(x => x.csl));
 
-            // raise event
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSite:Remote", cacheQueueEntry.CacheSiteLangTemps.First().Name, cacheQueueEntry.CacheSiteLangTemps.First().Lang, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.Site);
+            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+
         }
 
         public void DeleteFromCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
@@ -143,8 +181,20 @@ namespace Foundation.HtmlCache.Agents
                         ck = right.Select(x => x).Where(x => x != null)
                     });
 
+            var queuedCacheKeys = result.SelectMany(x => x.cq.CacheKeyTemps.Select(y => y.HtmlCacheKey)).ToList();
+            var processedCacheKeys = result.SelectMany(x => x.ck.Select(y => y.HtmlCacheKey).ToList()).ToList();
+            
+
+            var finalList = new List<string>();
+            finalList.AddRange(processedCacheKeys);
+            finalList.AddRange(queuedCacheKeys);
+
             ctx.CacheQueues.RemoveRange(result.Select(x => x.cq));
             ctx.CacheKeys.RemoveRange(result.SelectMany(x => x.ck));
+
+
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheHtml:Remote", null, null,null, ClearCacheOperation.ClearCacheOperationEnum.Site);
+            Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
         }
 
         private void AddToCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)

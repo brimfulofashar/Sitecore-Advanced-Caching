@@ -4,7 +4,7 @@ using Foundation.HtmlCache.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Foundation.HtmlCache.Messages
+namespace Foundation.HtmlCache.Arguments
 {
     [Serializable]
     public class RenderingProcessorArgs

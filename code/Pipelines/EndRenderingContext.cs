@@ -1,5 +1,5 @@
 ﻿using System.Web;
-using Foundation.HtmlCache.Messages;
+using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.Models;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;

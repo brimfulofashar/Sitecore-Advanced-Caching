@@ -1,18 +1,13 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Mvc;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
-using Foundation.HtmlCache.Messages;
-using Foundation.HtmlCache.Providers;
 using Sitecore;
-using Sitecore.Configuration;
-using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
-
 using Sitecore.Globalization;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Web;
+using Sitecore.Web.UI.Sheer;
 
 namespace Foundation.HtmlCache.Commands
 {
@@ -24,26 +19,32 @@ namespace Foundation.HtmlCache.Commands
         {
             Assert.ArgumentNotNull(context, nameof(context));
             this.item = context.Items.FirstOrDefault();
-            if (item != null)
-            {
-                this.language = this.item.Language;
+            this.language = this.item.Language;
+            Context.ClientPage.Start(this, "Run");
+        }
 
-                Guid? itemId = this.item?.ID.Guid;
-                string languageStr = language.Name;
-                if (!string.IsNullOrEmpty(languageStr))
+        protected void Run(ClientPipelineArgs args)
+        {
+            using (var ctx = new ItemTrackingProvider())
+            {
+                var cacheQueue = new CacheQueue
                 {
-                    Language language = Language.Parse(languageStr);
-                    Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId), language);
-                    if (item != null)
+                    CacheQueueMessageTypeId = (int)MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
+                    CacheSiteLangTemps = new List<CacheSiteLangTemp>()
                     {
-                        SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
-                        if (siteInfo != null)
+                        new CacheSiteLangTemp
                         {
-                            
+                            Name = SiteInfoExtensions.GetSites(this.item).FirstOrDefault()?.Name,
+                            Lang = language.Name
                         }
                     }
-                }
+                };
+                ctx.CacheQueues.Add(cacheQueue);
+                ctx.SaveChanges();
             }
+
+            SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
+            args.WaitForPostBack(false);
         }
     }
 }

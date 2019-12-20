@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
 
@@ -14,6 +11,15 @@ namespace Test
     {
         static void Main(string[] args)
         {
+            for (int i = 0; i < 2; i++)
+            {
+                Thread thread = new Thread(new ThreadStart(ProcessQueue));
+                thread.Start();
+            }
+        }
+
+        private static void ProcessQueue()
+        {
             bool hasQueueItems = true;
             using (var ctx = new ItemTrackingProvider())
             {
@@ -21,7 +27,7 @@ namespace Test
                 {
                     var cacheQueueEntry = ctx.CacheQueues
                         .OrderByDescending(x => x.CacheQueueMessageType.Id)
-                        .ThenBy(x => x.Id).AsNoTracking()
+                        .ThenBy(x => x.Id)
                         .FirstOrDefault(x => !x.Processing);
 
                     var processQueue = cacheQueueEntry != null;
@@ -35,13 +41,12 @@ namespace Test
                             {
                                 using (var ctxBlocking = new ItemTrackingProvider())
                                 {
-                                    ctxBlocking.Database.BeginTransaction();
                                     ctxBlocking.CacheQueueBlockers
                                             .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
                                             .BlockingMode =
                                         true;
                                     processQueue = ctxBlocking.SaveChanges() > 0;
-                                    ctxBlocking.Database.CurrentTransaction.Commit();
+                                    ctxBlocking.SaveChanges();
                                 }
                             }
                         }
@@ -52,17 +57,22 @@ namespace Test
                             {
                                 try
                                 {
-                                    cacheQueueEntry.Processing = true;
-                                    ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntry);
-                                    var saved = ctxProcessing.SaveChanges() > 0;
-                                    if (!saved)
+                                    var cacheQueueEntryToLock = ctxProcessing.CacheQueues.AsNoTracking().FirstOrDefault(x =>
+                                        x.Id == cacheQueueEntry.Id && x.UpdateVersion == cacheQueueEntry.UpdateVersion);
+                                    if (cacheQueueEntryToLock != null)
                                     {
-                                        processQueue = false;
+                                        cacheQueueEntryToLock.Processing = true;
+                                        ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntryToLock);
+                                        var saved = ctxProcessing.SaveChanges() > 0;
+                                        if (!saved)
+                                        {
+                                            processQueue = false;
+                                        }
                                     }
                                 }
                                 catch (Exception e)
                                 {
-
+                                    processQueue = false;
                                 }
                             }
 
@@ -102,7 +112,7 @@ namespace Test
                                 }
                                 catch (Exception e)
                                 {
-                                    
+
                                 }
                             }
                         }
