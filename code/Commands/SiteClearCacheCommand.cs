@@ -27,23 +27,32 @@ namespace Foundation.HtmlCache.Commands
         {
             using (var ctx = new ItemTrackingProvider())
             {
-                var cacheQueue = new CacheQueue
+                var siteInfo = SiteInfoExtensions.GetSites(this.item).FirstOrDefault();
+                if (siteInfo != null)
                 {
-                    CacheQueueMessageTypeId = (int)MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
-                    CacheSiteLangTemps = new List<CacheSiteLangTemp>()
+                    var cacheQueue = new CacheQueue
                     {
-                        new CacheSiteLangTemp
+
+                        CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
+                        CacheSiteLangTemps = new List<CacheSiteLangTemp>()
                         {
-                            Name = SiteInfoExtensions.GetSites(this.item).FirstOrDefault()?.Name,
-                            Lang = language.Name
+                            new CacheSiteLangTemp
+                            {
+                                Name = siteInfo.Name,
+                                Lang = language.Name
+                            }
                         }
-                    }
-                };
-                ctx.CacheQueues.Add(cacheQueue);
-                ctx.SaveChanges();
+                    };
+                    ctx.CacheQueues.Add(cacheQueue);
+                    ctx.SaveChanges();
+                    SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
+                }
+                else
+                {
+                    SheerResponse.Alert("Site could not be determined by the item in context", true);
+                }
             }
 
-            SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
             args.WaitForPostBack(false);
         }
     }

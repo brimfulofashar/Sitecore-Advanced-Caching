@@ -130,17 +130,20 @@ namespace Foundation.HtmlCache.Agents
         {
             ctx.CacheQueues.RemoveRange(ctx.CacheQueues);
             ctx.CacheSiteLangs.RemoveRange(ctx.CacheSiteLangs);
-            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", null, null, null, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", null, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
         }
 
         private void DeleteSiteAllLangugageCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
             var name = cacheQueueEntry.CacheSiteLangTemps.First().Name;
-            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.CacheSiteLangTemps.Any(y => y.Name == name)));
+            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.CacheSiteLangTemps.Any(y => y.Name == name && y.CacheQueueId != cacheQueueEntry.Id)));
             ctx.CacheSiteLangs.RemoveRange(ctx.CacheSiteLangs.Where(x => x.Name == name));
 
-            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSiteAllLanguages:Remote", new List<string>(){ name }, null, null, ClearCacheOperation.ClearCacheOperationEnum.SiteAllLanguages);
+            var dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+            dic.Add(name, null);
+
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSiteAllLanguages:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.SiteAllLanguages);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
 
         }
@@ -157,44 +160,62 @@ namespace Foundation.HtmlCache.Agents
                         csl = right.Select(x => x)
                     });
 
-            ctx.CacheQueues.RemoveRange(result.SelectMany(x => x.cq));
-            ctx.CacheSiteLangs.RemoveRange(result.SelectMany(x => x.csl));
+            var name = cacheQueueEntry.CacheSiteLangTemps.First().Name;
+            var lang = cacheQueueEntry.CacheSiteLangTemps.First().Lang;
+            var dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+            dic.Add(name, new Dictionary<string, HashSet<string>>());
+            dic[name].Add(lang, null);
 
-            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSite:Remote", cacheQueueEntry.CacheSiteLangTemps.First().Name, cacheQueueEntry.CacheSiteLangTemps.First().Lang, string.Empty, ClearCacheOperation.ClearCacheOperationEnum.Site);
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSite:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.Site);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+
+            ctx.CacheQueues.RemoveRange(result.SelectMany(x => x.cq).Where(x => x.Id != cacheQueueEntry.Id));
+            ctx.CacheSiteLangs.RemoveRange(result.SelectMany(x => x.csl));
 
         }
 
         public void DeleteFromCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
             var result = ctx.CacheItemTemps
-                .Join(ctx.CacheItemTemps, x => x.ItemId, y => y.ItemId,
-                    (left, right) => new { cit1 = left, cit2 = right })
-                .Where(x => x.cit1.CacheKeyId == null)
-                .Where(x => x.cit1.CacheQueueId == cacheQueueEntry.Id)
-                .Join(ctx.CacheKeyTemps, x => x.cit2.CacheKeyId, y => y.Id,
-                    (left, right) => new { cit2 = left, ckt = right })
-                .GroupJoin(ctx.CacheKeys, x => x.ckt.HtmlCacheKey, y => y.HtmlCacheKey,
-                    (left, right) => new
+                .Join(ctx.CacheItems, x => x.ItemId, y => y.ItemId, (left, right) => new {cit = left, ci = right})
+                .Where(x => x.cit.CacheQueueId == cacheQueueEntry.Id);
+
+
+            var dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+
+            foreach (var cacheItemTemp in result.Select(x => x.cit))
+            {
+                foreach (var cacheItem in result.Select(x => x.ci))
+                {
+                    if (cacheItemTemp.ItemId == cacheItem.ItemId)
                     {
-                        cq = left.ckt.CacheQueue,
-                        ck = right.Select(x => x).Where(x => x != null)
-                    });
+                        if (!dic.ContainsKey(cacheItem.CacheKey.CacheSiteLang.Name))
+                        {
+                            dic.Add(cacheItem.CacheKey.CacheSiteLang.Name, new Dictionary<string, HashSet<string>>());
+                        }
 
-            var queuedCacheKeys = result.SelectMany(x => x.cq.CacheKeyTemps.Select(y => y.HtmlCacheKey)).ToList();
-            var processedCacheKeys = result.SelectMany(x => x.ck.Select(y => y.HtmlCacheKey).ToList()).ToList();
-            
+                        if (!dic[cacheItem.CacheKey.CacheSiteLang.Name].ContainsKey(cacheItem.CacheKey.CacheSiteLang.Lang))
+                        {
+                            dic[cacheItem.CacheKey.CacheSiteLang.Name].Add(cacheItem.CacheKey.CacheSiteLang.Lang, new HashSet<string>());
+                        }
 
-            var finalList = new List<string>();
-            finalList.AddRange(processedCacheKeys);
-            finalList.AddRange(queuedCacheKeys);
+                        foreach (var cacheKeyEntry in cacheItem.CacheKeyItems.Select(x => x.CacheKey))
+                        {
+                            dic[cacheItem.CacheKey.CacheSiteLang.Name][cacheItem.CacheKey.CacheSiteLang.Lang].Add(cacheKeyEntry.HtmlCacheKey);
+                        }
+                    }
+                }
+            }
 
-            ctx.CacheQueues.RemoveRange(result.Select(x => x.cq));
-            ctx.CacheKeys.RemoveRange(result.SelectMany(x => x.ck));
-
-
-            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheHtml:Remote", null, null,null, ClearCacheOperation.ClearCacheOperationEnum.Site);
+            ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheHtml:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.Site);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
+
+            var result2 = ctx.CacheItemTemps
+                .Join(ctx.CacheItems, x => x.ItemId, y => y.ItemId, (left, right) => new {cit = left, ci = right})
+                .Where(x => x.cit.CacheQueueId == cacheQueueEntry.Id);
+
+            ctx.CacheQueues.RemoveRange(result2.Select(x => x.cit.CacheQueue).Where(x => x.Id != cacheQueueEntry.Id));
+            ctx.CacheKeys.RemoveRange(result2.Select(x => x.ci.CacheKey));
         }
 
         private void AddToCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)

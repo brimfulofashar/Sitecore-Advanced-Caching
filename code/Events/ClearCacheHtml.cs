@@ -13,10 +13,16 @@ namespace Foundation.HtmlCache.Events
             RemoteEventArgs<ClearCacheArgs> clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
             if (clearCacheArgs != null)
             {
-                foreach (var nameLangKey in clearCacheArgs.Event.NameLangKeys)
+                foreach (var name in clearCacheArgs.Event.NameLangKeys.Keys)
                 {
-                    SiteContext siteContext = Factory.GetSite(nameLangKey.Key);
-                    CacheManager.GetHtmlCache(siteContext)?.RemoveKeysContaining(htmlCacheKey);
+                    foreach (var lang in clearCacheArgs.Event.NameLangKeys[name].Keys)
+                    {
+                        foreach (var htmlCacheKey in clearCacheArgs.Event.NameLangKeys[name][lang])
+                        {
+                            SiteContext siteContext = Factory.GetSite(name);
+                            CacheManager.GetHtmlCache(siteContext)?.RemoveKeysContaining(htmlCacheKey);
+                        }
+                    }
                 }
             }
         }

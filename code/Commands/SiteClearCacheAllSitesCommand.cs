@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Foundation.HtmlCache.DB;
-using Foundation.HtmlCache.Events;
-using Foundation.HtmlCache.Extensions;
-using Foundation.HtmlCache.Models;
+﻿using Foundation.HtmlCache.DB;
 using Sitecore;
-using Sitecore.Configuration;
 using Sitecore.Diagnostics;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web.UI.Sheer;
@@ -33,7 +26,7 @@ namespace Foundation.HtmlCache.Commands
                 ctx.SaveChanges();
             }
 
-            SheerResponse.Alert("Cache for the Site has been cleared", true);
+            SheerResponse.Alert("Caches for the all sites in all languages have been queue to be cleared", true);
             args.WaitForPostBack(false);
         }
     }

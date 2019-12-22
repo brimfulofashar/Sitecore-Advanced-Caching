@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Foundation.HtmlCache.Extensions;
 using Sitecore.Caching;
 using Sitecore.Configuration;
-using Sitecore.Data;
 using Sitecore.Data.Events;
-using Sitecore.Data.Items;
-using Sitecore.Globalization;
 using Sitecore.Sites;
-using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Events
 {
@@ -19,20 +13,14 @@ namespace Foundation.HtmlCache.Events
             RemoteEventArgs<ClearCacheArgs> clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
             if (clearCacheArgs != null)
             {
-                Guid? itemId = clearCacheArgs.Event.ItemId;
-                string languageStr = clearCacheArgs.Event.Language;
-                if (itemId != null && !string.IsNullOrEmpty(languageStr))
+                foreach (var name in clearCacheArgs.Event.NameLangKeys.Keys)
                 {
-                    Language language = Language.Parse(languageStr);
-                    Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId), language);
-                    if (item != null)
+                    foreach (var lang in clearCacheArgs.Event.NameLangKeys[name].Keys)
                     {
-                        SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
-                        if (siteInfo != null)
-                        {
-                            SiteContext siteContext = Factory.GetSite(siteInfo.Name);
-                            CacheManager.GetHtmlCache(siteContext)?.Clear();
-                        }
+                        var stringToMatch = string.Format("#lang:{0}", lang);
+
+                        SiteContext siteContext = Factory.GetSite(name);
+                        CacheManager.GetHtmlCache(siteContext)?.RemoveKeysContaining(stringToMatch);
                     }
                 }
             }

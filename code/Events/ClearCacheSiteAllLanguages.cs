@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using Foundation.HtmlCache.Extensions;
+using System.Linq;
 using Sitecore.Caching;
 using Sitecore.Configuration;
-using Sitecore.Data;
 using Sitecore.Data.Events;
-using Sitecore.Data.Items;
 using Sitecore.Sites;
-using Sitecore.Web;
 
 namespace Foundation.HtmlCache.Events
 {
@@ -18,12 +14,9 @@ namespace Foundation.HtmlCache.Events
             RemoteEventArgs<ClearCacheArgs> clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
             if (clearCacheArgs != null)
             {
-                List<SiteInfo> siteInfos = SiteInfoExtensions.GetSites(item);
-                foreach (SiteInfo siteInfo in siteInfos)
-                {
-                    SiteContext siteContext = Factory.GetSite(siteInfo.Name);
-                    CacheManager.GetHtmlCache(siteContext)?.Clear();
-                }
+                var siteInfo = Factory.GetSiteInfo(clearCacheArgs.Event.NameLangKeys.FirstOrDefault().Key);
+                SiteContext siteContext = Factory.GetSite(siteInfo.Name);
+                CacheManager.GetHtmlCache(siteContext)?.Clear();
             }
         }
     }
