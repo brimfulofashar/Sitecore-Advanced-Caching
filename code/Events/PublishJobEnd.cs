@@ -13,12 +13,12 @@ namespace Foundation.HtmlCache.Events
             if (publishItemTracking != null)
             {
                 var cacheQueue = new CacheQueue()
-                    {CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteFromCache};
+                    { CacheQueueMessageTypeId = (int)MessageTypeEnum.DeleteFromCache };
 
-                var publishedItems = publishItemTracking.PublishedItems.Select(x => new CacheItemTemp()
-                    {Id = Guid.NewGuid(), CacheQueue = cacheQueue, ItemId = x.Key}).ToList();
+                var publishedItems = publishItemTracking.PublishedItems.Select(x => new CacheTemp()
+                    { CacheQueue = cacheQueue, ItemId = x.Key}).ToList();
 
-                cacheQueue.CacheItemTemps = publishedItems;
+                cacheQueue.CacheTemps = publishedItems;
 
                 using (var ctx = new ItemTrackingProvider())
                 {

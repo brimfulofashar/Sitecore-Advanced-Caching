@@ -35,11 +35,11 @@ namespace Foundation.HtmlCache.Commands
                     var cacheQueue = new CacheQueue
                     {
                         CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
-                        CacheSiteLangTemps = new List<CacheSiteLangTemp>()
+                        CacheTemps = new List<CacheTemp>()
                         {
-                            new CacheSiteLangTemp
+                            new CacheTemp()
                             {
-                                Name = siteInfo.Name
+                                SiteName = siteInfo.Name
                             }
                         }
                     };

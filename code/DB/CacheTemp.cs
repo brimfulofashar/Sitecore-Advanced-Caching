@@ -35,27 +35,27 @@ using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheKeyItem
-    [Table("CacheKeyItem")]
-    public class CacheKeyItem
+    // CacheTemp
+    [Table("CacheTemp")]
+    public class CacheTemp
     {
         public Guid Id { get; set; } // Id (Primary key)
-        public Guid CacheKeyId { get; set; } // CacheKeyId
-        public Guid CacheItemId { get; set; } // CacheItemId
+        public long CacheQueueId { get; set; } // CacheQueueId
+        public string SiteName { get; set; } // SiteName (length: 250)
+        public string SiteLang { get; set; } // SiteLang (length: 250)
+        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
+        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
+        public string HtmlCacheResult { get; set; } // HtmlCacheResult
+        public Guid ItemId { get; set; } // ItemId
 
         // Foreign keys
 
         /// <summary>
-        /// Parent CacheItem pointed by [CacheKeyItem].([CacheItemId]) (FK_CacheKeyItem_CacheItem)
+        /// Parent CacheQueue pointed by [CacheTemp].([CacheQueueId]) (FK_CacheTemp_CacheQueue)
         /// </summary>
-        public virtual CacheItem CacheItem { get; set; } // FK_CacheKeyItem_CacheItem
+        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheTemp_CacheQueue
 
-        /// <summary>
-        /// Parent CacheKey pointed by [CacheKeyItem].([CacheKeyId]) (FK_CacheKeyItem_CacheKey)
-        /// </summary>
-        public virtual CacheKey CacheKey { get; set; } // FK_CacheKeyItem_CacheKey
-
-        public CacheKeyItem()
+        public CacheTemp()
         {
             Id = Guid.NewGuid();
         }

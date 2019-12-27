@@ -32,25 +32,26 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheItem
-    public class CacheItemConfiguration : EntityTypeConfiguration<CacheItem>
+    // Cache
+    public class CacheConfiguration : EntityTypeConfiguration<Cache>
     {
-        public CacheItemConfiguration()
+        public CacheConfiguration()
             : this("dbo")
         {
         }
 
-        public CacheItemConfiguration(string schema)
+        public CacheConfiguration(string schema)
         {
-            ToTable("CacheItem", schema);
+            ToTable("Cache", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+            Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
+            Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
+            Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
+            Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("varbinary").IsOptional().HasMaxLength(8000).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
+            Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
             Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
-            Property(x => x.CacheKeyId).HasColumnName(@"CacheKeyId").HasColumnType("uniqueidentifier").IsRequired();
-
-            // Foreign keys
-            HasRequired(a => a.CacheKey).WithMany(b => b.CacheItems).HasForeignKey(c => c.CacheKeyId); // FK_CacheItem_CacheKey
         }
     }
 

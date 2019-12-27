@@ -118,6 +118,30 @@ namespace Foundation.HtmlCache.Agents
                                 catch (Exception e)
                                 {
                                     Log.Error(string.Format("Failed to process cache queue entry {0}", cacheQueueEntry.Id), e, this);
+
+                                    using (var ctxProcessing = new ItemTrackingProvider())
+                                    {
+                                        try
+                                        {
+                                            var cacheQueueEntryToLock = ctxProcessing.CacheQueues.AsNoTracking().FirstOrDefault(x =>
+                                                x.Id == cacheQueueEntry.Id && x.UpdateVersion == cacheQueueEntry.UpdateVersion);
+                                            if (cacheQueueEntryToLock != null)
+                                            {
+                                                cacheQueueEntryToLock.Processing = true;
+                                                ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntryToLock);
+                                                var saved = ctxProcessing.SaveChanges() > 0;
+                                                if (!saved)
+                                                {
+                                                    processQueue = false;
+                                                }
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Log.Error(string.Format("Failed to unlock cache queue entry {0}", cacheQueueEntry.Id), ex, this);
+                                            processQueue = false;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -129,16 +153,16 @@ namespace Foundation.HtmlCache.Agents
         private void DeleteAllSiteCache(ItemTrackingProvider ctx)
         {
             ctx.CacheQueues.RemoveRange(ctx.CacheQueues);
-            ctx.CacheSiteLangs.RemoveRange(ctx.CacheSiteLangs);
+            ctx.Caches.RemoveRange(ctx.Caches);
             ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", null, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
         }
 
         private void DeleteSiteAllLangugageCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            var name = cacheQueueEntry.CacheSiteLangTemps.First().Name;
-            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.CacheSiteLangTemps.Any(y => y.Name == name && y.CacheQueueId != cacheQueueEntry.Id)));
-            ctx.CacheSiteLangs.RemoveRange(ctx.CacheSiteLangs.Where(x => x.Name == name));
+            var name = cacheQueueEntry.CacheTemps.First().SiteName;
+            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.CacheTemps.Any(y => y.SiteName == name && y.CacheQueueId != cacheQueueEntry.Id)));
+            ctx.Caches.RemoveRange(ctx.Caches.Where(x => x.SiteName == name));
 
             var dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
             dic.Add(name, null);
@@ -150,18 +174,8 @@ namespace Foundation.HtmlCache.Agents
 
         private void DeleteSiteCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            var result = ctx.CacheSiteLangTemps.Where(x =>
-                    x.Name == cacheQueueEntry.CacheSiteLangTemps.First().Name &&
-                    x.Lang == cacheQueueEntry.CacheSiteLangTemps.First().Lang)
-                .GroupJoin(ctx.CacheSiteLangs, x => x.Name, y => y.Name,
-                    (left, right) => new
-                    {
-                        cq = left.CacheKeyTemps.Select(x => x.CacheQueue),
-                        csl = right.Select(x => x)
-                    });
-
-            var name = cacheQueueEntry.CacheSiteLangTemps.First().Name;
-            var lang = cacheQueueEntry.CacheSiteLangTemps.First().Lang;
+            var name = cacheQueueEntry.CacheTemps.First().SiteName;
+            var lang = cacheQueueEntry.CacheTemps.First().SiteLang;
             var dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
             dic.Add(name, new Dictionary<string, HashSet<string>>());
             dic[name].Add(lang, null);
@@ -169,120 +183,89 @@ namespace Foundation.HtmlCache.Agents
             ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSite:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.Site);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
 
-            ctx.CacheQueues.RemoveRange(result.SelectMany(x => x.cq).Where(x => x.Id != cacheQueueEntry.Id));
-            ctx.CacheSiteLangs.RemoveRange(result.SelectMany(x => x.csl));
 
+            var result = ctx.CacheTemps
+                .Join(ctx.Caches, x => x.ItemId, y => y.ItemId, (left, right) => new {ct = left, c = right})
+                .Where(x => (x.c.SiteName == name && x.c.SiteLang == lang) || (x.ct.SiteName == name && x.ct.SiteLang == lang));
+
+
+            ctx.CacheQueues.RemoveRange(result.Select(x => x.ct.CacheQueue).Where(x => x.Id != cacheQueueEntry.Id));
+            ctx.Caches.RemoveRange(result.Select(x => x.c));
         }
 
         public void DeleteFromCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            var result = ctx.CacheItemTemps
-                .Join(ctx.CacheItems, x => x.ItemId, y => y.ItemId, (left, right) => new {cit = left, ci = right})
-                .Where(x => x.cit.CacheQueueId == cacheQueueEntry.Id);
-
+            var result = ctx.CacheTemps
+                .Join(ctx.Caches, x => x.ItemId, y => y.ItemId, (left, right) => new {ct = left, c = right})
+                .Where(x => x.ct.CacheQueueId == cacheQueueEntry.Id)
+                .Join(ctx.Caches, x => x.c.HtmlCacheKeyHash, y=> y.HtmlCacheKeyHash, (left, right) => new { left.ct, c = right});
 
             var dic = new Dictionary<string, Dictionary<string, HashSet<string>>>();
 
-            foreach (var cacheItemTemp in result.Select(x => x.cit))
+            foreach (var cacheItem in result.Select(x => x.c))
             {
-                foreach (var cacheItem in result.Select(x => x.ci))
+                if (!dic.ContainsKey(cacheItem.SiteName))
                 {
-                    if (cacheItemTemp.ItemId == cacheItem.ItemId)
-                    {
-                        if (!dic.ContainsKey(cacheItem.CacheKey.CacheSiteLang.Name))
-                        {
-                            dic.Add(cacheItem.CacheKey.CacheSiteLang.Name, new Dictionary<string, HashSet<string>>());
-                        }
-
-                        if (!dic[cacheItem.CacheKey.CacheSiteLang.Name].ContainsKey(cacheItem.CacheKey.CacheSiteLang.Lang))
-                        {
-                            dic[cacheItem.CacheKey.CacheSiteLang.Name].Add(cacheItem.CacheKey.CacheSiteLang.Lang, new HashSet<string>());
-                        }
-
-                        foreach (var cacheKeyEntry in cacheItem.CacheKeyItems.Select(x => x.CacheKey))
-                        {
-                            dic[cacheItem.CacheKey.CacheSiteLang.Name][cacheItem.CacheKey.CacheSiteLang.Lang].Add(cacheKeyEntry.HtmlCacheKey);
-                        }
-                    }
+                    dic.Add(cacheItem.SiteName, new Dictionary<string, HashSet<string>>());
                 }
+
+                if (!dic[cacheItem.SiteName].ContainsKey(cacheItem.SiteLang))
+                {
+                    dic[cacheItem.SiteName].Add(cacheItem.SiteLang, new HashSet<string>());
+                }
+
+                dic[cacheItem.SiteName][cacheItem.SiteLang].Add(cacheItem.HtmlCacheKey);
             }
 
             ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheHtml:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.Site);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
 
-            var result2 = ctx.CacheItemTemps
-                .Join(ctx.CacheItems, x => x.ItemId, y => y.ItemId, (left, right) => new {cit = left, ci = right})
-                .Where(x => x.cit.CacheQueueId == cacheQueueEntry.Id);
-
-            ctx.CacheQueues.RemoveRange(result2.Select(x => x.cit.CacheQueue).Where(x => x.Id != cacheQueueEntry.Id));
-            ctx.CacheKeys.RemoveRange(result2.Select(x => x.ci.CacheKey));
+            ctx.CacheQueues.RemoveRange(result.Select(x => x.ct.CacheQueue)).Where(x => x.Id != cacheQueueEntry.Id);
+            ctx.Caches.RemoveRange(result.Select(x => x.c));
         }
 
         private void AddToCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            foreach (var cacheSiteLangTemp in cacheQueueEntry.CacheSiteLangTemps)
-            {
-                var cacheSiteLang = new CacheSiteLang
-                {
-                    Lang = cacheSiteLangTemp.Lang,
-                    Name = cacheSiteLangTemp.Name,
-                };
+            //            foreach (var cacheTemp in cacheQueueEntry.CacheTemps)
+            //            {
+            //                var cache = new Cache
+            //                {
+            //                    SiteName = cacheTemp.SiteName,
+            //                    SiteLang = cacheTemp.SiteLang,
+            //                    ItemId = cacheTemp.ItemId,
+            //                    HtmlCacheKey = cacheTemp.HtmlCacheKey,
+            //                    HtmlCacheResult = cacheTemp.HtmlCacheResult
+            //                };
+            //
+            //                ctx.Upsert(cache)
+            //                    .Key(x => x.SiteName)
+            //                    .Key(x => x.SiteLang)
+            //                    .Key(x => x.HtmlCacheKeyHash)
+            //                    .Key(x => x.ItemId)
+            //                    .ExcludeField(x => x.Id)
+            //                    .ExcludeField(x => x.HtmlCacheKeyHash)
+            //                    .OutputKey(x => x.Id).Execute();
+            //            }
 
-                var cacheSiteLangId = ctx.Upsert(cacheSiteLang)
-                    .Key(x => x.Name)
-                    .Key(x => x.Lang)
-                    .ExcludeField(x => x.Id)
-                    .ExcludeField(x => x.CacheKeys)
-                    .OutputKey(x => x.Id).Execute();
-
-                foreach (var cachekeyTemp in cacheSiteLangTemp.CacheKeyTemps)
-                {
-                    var cacheKey = new CacheKey
-                    {
-                        HtmlCacheKey = cachekeyTemp.HtmlCacheKey,
-                        HtmlCacheResult = cachekeyTemp.HtmlCacheResult,
-                        CacheSiteLangId = cacheSiteLangId
-                    };
-
-                    var cacheKeyId = ctx.Upsert(cacheKey).Key(x => x.HtmlCacheKey)
-                        .Key(x => x.CacheSiteLangId)
-                        .ExcludeField(x => x.Id)
-                        .ExcludeField(x => x.CacheKeyItems)
-                        .ExcludeField(x => x.CacheSiteLang)
-                        .ExcludeField(x => x.CacheItems)
-                        .OutputKey(x => x.Id).Execute();
-
-                    foreach (var cacheKeyItemTemp in cachekeyTemp.CacheItemTemps)
-                    {
-                        var cacheItem = new CacheItem
-                        {
-                            ItemId = cacheKeyItemTemp.ItemId,
-                            CacheKeyId = cacheKeyId
-                        };
-
-                        var cacheItemId = ctx.Upsert(cacheItem).Key(x => x.ItemId)
-                            .Key(x => x.CacheKeyId)
-                            .ExcludeField(x => x.Id)
-                            .ExcludeField(x => x.CacheKey)
-                            .ExcludeField(x => x.CacheKeyItems)
-                            .OutputKey(x => x.Id).Execute();
-
-                        var cacheKeyItem = new CacheKeyItem()
-                        {
-                            CacheKeyId = cacheKeyId,
-                            CacheItemId = cacheItemId
-                        };
-
-                        ctx.Upsert(cacheKeyItem)
-                            .Key(x => x.CacheKeyId)
-                            .Key(x => x.CacheItemId)
-                            .ExcludeField(x => x.Id)
-                            .ExcludeField(x => x.CacheItem)
-                            .ExcludeField(x => x.CacheKey)
-                            .OutputKey(x => x.Id).Execute();
-                    }
-                }
-            }
+            var sql = string.Format(@"
+                MERGE [Cache] WITH (HOLDLOCK) AS t 
+                USING [CacheTemp] AS s
+            ON (s.SiteName = t.SiteName AND s.SiteLang = t.SiteLang AND s.HtmlCacheKeyHash = t.HtmlCacheKeyHash AND s.ItemId = t.ItemId AND s.CacheQueueId = {0})
+            WHEN MATCHED
+                THEN UPDATE SET 
+                    t.SiteName = s.SiteName,
+                    t.SiteLang = s.SiteLang,
+                    t.HtmlCacheKey = s.HtmlCacheKey,
+                    t.HtmlCacheResult = s.HtmlCacheResult
+            WHEN NOT MATCHED BY TARGET 
+                THEN INSERT ([SiteName]
+                           ,[SiteLang]
+                           ,[HtmlCacheKey]
+                           ,[HtmlCacheResult]
+                           ,[ItemId])
+                     VALUES (s.SiteName, s.SiteLang, s.HtmlCacheKey, s.HtmlCacheResult, s.ItemId);",
+                cacheQueueEntry.Id);
+            ctx.Database.ExecuteSqlCommand(sql);
         }
     }
 }

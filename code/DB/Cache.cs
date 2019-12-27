@@ -35,25 +35,21 @@ using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheSiteLang
-    [Table("CacheSiteLang")]
-    public class CacheSiteLang
+    // Cache
+    [Table("Cache")]
+    public class Cache
     {
         public Guid Id { get; set; } // Id (Primary key)
-        public string Name { get; set; } // Name (length: 250)
-        public string Lang { get; set; } // Lang (length: 250)
+        public string SiteName { get; set; } // SiteName (length: 250)
+        public string SiteLang { get; set; } // SiteLang (length: 250)
+        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
+        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
+        public string HtmlCacheResult { get; set; } // HtmlCacheResult
+        public Guid ItemId { get; set; } // ItemId
 
-        // Reverse navigation
-
-        /// <summary>
-        /// Child CacheKeys where [CacheKey].[CacheSiteLangId] point to this entity (FK_CacheKey_CacheSiteLang)
-        /// </summary>
-        public virtual ICollection<CacheKey> CacheKeys { get; set; } // CacheKey.FK_CacheKey_CacheSiteLang
-
-        public CacheSiteLang()
+        public Cache()
         {
             Id = Guid.NewGuid();
-            CacheKeys = new List<CacheKey>();
         }
     }
 

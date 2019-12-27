@@ -40,16 +40,11 @@ namespace Foundation.HtmlCache.DB
 {
     public interface IItemTrackingProvider : IDisposable
     {
-        DbSet<CacheItem> CacheItems { get; set; } // CacheItem
-        DbSet<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp
-        DbSet<CacheKey> CacheKeys { get; set; } // CacheKey
-        DbSet<CacheKeyItem> CacheKeyItems { get; set; } // CacheKeyItem
-        DbSet<CacheKeyTemp> CacheKeyTemps { get; set; } // CacheKeyTemp
+        DbSet<Cache> Caches { get; set; } // Cache
         DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
         DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
-        DbSet<CacheSiteLang> CacheSiteLangs { get; set; } // CacheSiteLang
-        DbSet<CacheSiteLangTemp> CacheSiteLangTemps { get; set; } // CacheSiteLangTemp
+        DbSet<CacheTemp> CacheTemps { get; set; } // CacheTemp
 
         int SaveChanges();
         Task<int> SaveChangesAsync();

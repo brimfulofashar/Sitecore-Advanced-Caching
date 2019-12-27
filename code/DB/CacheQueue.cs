@@ -47,19 +47,9 @@ namespace Foundation.HtmlCache.DB
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheItemTemps where [CacheItemTemp].[CacheQueueId] point to this entity (FK_CacheItemTemp_CacheQueue)
+        /// Child CacheTemps where [CacheTemp].[CacheQueueId] point to this entity (FK_CacheTemp_CacheQueue)
         /// </summary>
-        public virtual ICollection<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp.FK_CacheItemTemp_CacheQueue
-
-        /// <summary>
-        /// Child CacheKeyTemps where [CacheKeyTemp].[CacheQueueId] point to this entity (FK_CacheKeyTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheKeyTemp> CacheKeyTemps { get; set; } // CacheKeyTemp.FK_CacheKeyTemp_CacheQueue
-
-        /// <summary>
-        /// Child CacheSiteLangTemps where [CacheSiteLangTemp].[CacheQueueId] point to this entity (FK_CacheSiteLangTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheSiteLangTemp> CacheSiteLangTemps { get; set; } // CacheSiteLangTemp.FK_CacheSiteLangTemp_CacheQueue
+        public virtual ICollection<CacheTemp> CacheTemps { get; set; } // CacheTemp.FK_CacheTemp_CacheQueue
 
         // Foreign keys
 
@@ -70,9 +60,7 @@ namespace Foundation.HtmlCache.DB
 
         public CacheQueue()
         {
-            CacheItemTemps = new List<CacheItemTemp>();
-            CacheKeyTemps = new List<CacheKeyTemp>();
-            CacheSiteLangTemps = new List<CacheSiteLangTemp>();
+            CacheTemps = new List<CacheTemp>();
         }
     }
 

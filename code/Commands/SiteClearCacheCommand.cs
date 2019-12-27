@@ -34,12 +34,12 @@ namespace Foundation.HtmlCache.Commands
                     {
 
                         CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
-                        CacheSiteLangTemps = new List<CacheSiteLangTemp>()
+                        CacheTemps = new List<CacheTemp>()
                         {
-                            new CacheSiteLangTemp
+                            new CacheTemp()
                             {
-                                Name = siteInfo.Name,
-                                Lang = language.Name
+                                SiteName = siteInfo.Name,
+                                SiteLang = language.Name
                             }
                         }
                     };

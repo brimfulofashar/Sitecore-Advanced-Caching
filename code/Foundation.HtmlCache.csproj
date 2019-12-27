@@ -150,26 +150,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agents\HtmlCacheQueueAgent.cs" />
-    <Compile Include="DB\CacheItem.cs" />
-    <Compile Include="DB\CacheItemConfiguration.cs" />
-    <Compile Include="DB\CacheItemTemp.cs" />
-    <Compile Include="DB\CacheItemTempConfiguration.cs" />
-    <Compile Include="DB\CacheKey.cs" />
-    <Compile Include="DB\CacheKeyConfiguration.cs" />
-    <Compile Include="DB\CacheKeyItem.cs" />
-    <Compile Include="DB\CacheKeyItemConfiguration.cs" />
-    <Compile Include="DB\CacheKeyTemp.cs" />
-    <Compile Include="DB\CacheKeyTempConfiguration.cs" />
+    <Compile Include="DB\Cache.cs" />
+    <Compile Include="DB\CacheConfiguration.cs" />
     <Compile Include="DB\CacheQueue.cs" />
     <Compile Include="DB\CacheQueueBlocker.cs" />
     <Compile Include="DB\CacheQueueBlockerConfiguration.cs" />
     <Compile Include="DB\CacheQueueConfiguration.cs" />
     <Compile Include="DB\CacheQueueMessageType.cs" />
     <Compile Include="DB\CacheQueueMessageTypeConfiguration.cs" />
-    <Compile Include="DB\CacheSiteLang.cs" />
-    <Compile Include="DB\CacheSiteLangConfiguration.cs" />
-    <Compile Include="DB\CacheSiteLangTemp.cs" />
-    <Compile Include="DB\CacheSiteLangTempConfiguration.cs" />
+    <Compile Include="DB\CacheTemp.cs" />
+    <Compile Include="DB\CacheTempConfiguration.cs" />
     <Compile Include="DB\Database.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -191,8 +181,8 @@
     <Compile Include="Controls\MultiRootTreeList.cs" />
     <Compile Include="Events\ItemPostPublish.cs" />
     <Compile Include="Events\ItemPublishedArgs.cs" />
-    <Compile Include="Events\PublishJobEnd.cs" />
     <Compile Include="Events\PublishJobBegin.cs" />
+    <Compile Include="Events\PublishJobEnd.cs" />
     <Compile Include="Extensions\EFExtensions.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
     <Compile Include="Arguments\ItemMetaData.cs" />

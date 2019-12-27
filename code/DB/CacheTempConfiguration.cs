@@ -32,26 +32,30 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheKey
-    public class CacheKeyConfiguration : EntityTypeConfiguration<CacheKey>
+    // CacheTemp
+    public class CacheTempConfiguration : EntityTypeConfiguration<CacheTemp>
     {
-        public CacheKeyConfiguration()
+        public CacheTempConfiguration()
             : this("dbo")
         {
         }
 
-        public CacheKeyConfiguration(string schema)
+        public CacheTempConfiguration(string schema)
         {
-            ToTable("CacheKey", schema);
+            ToTable("CacheTemp", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-            Property(x => x.CacheSiteLangId).HasColumnName(@"CacheSiteLangId").HasColumnType("uniqueidentifier").IsRequired();
-            Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(500);
+            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
+            Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
+            Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
+            Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
+            Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("varbinary").IsOptional().HasMaxLength(8000).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
+            Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
 
             // Foreign keys
-            HasRequired(a => a.CacheSiteLang).WithMany(b => b.CacheKeys).HasForeignKey(c => c.CacheSiteLangId); // FK_CacheKey_CacheSiteLang
+            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheTemps).HasForeignKey(c => c.CacheQueueId); // FK_CacheTemp_CacheQueue
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Foundation.HtmlCache.Arguments;
@@ -31,22 +32,22 @@ namespace Foundation.HtmlCache.Pipelines
                                 CacheQueueMessageTypeId = (int)MessageTypeEnum.AddToCache
                             };
 
-                            var cacheSiteLang = new CacheSiteLangTemp
-                                {Name = Context.Site.SiteInfo.Name, Lang = Context.Site.SiteInfo.Language, CacheQueue = cacheQueue};
+                            var cacheTemps = new List<CacheTemp>();
 
-                            var cacheKey = new CacheKeyTemp
+                            foreach (var trackedItem in trackedItems)
                             {
-                                HtmlCacheKey = args.CacheKey,
-                                HtmlCacheResult = renderingProcessorArgs.CacheResult,
-                                CacheSiteLangTemp = cacheSiteLang,
-                                CacheQueue = cacheQueue,
-                            };
+                                cacheTemps.Add(new CacheTemp
+                                {
+                                    SiteName = Context.Site.SiteInfo.Name,
+                                    SiteLang = Context.Site.SiteInfo.Language,
+                                    CacheQueue = cacheQueue,
+                                    HtmlCacheKey = args.CacheKey,
+                                    HtmlCacheResult = renderingProcessorArgs.CacheResult,
+                                    ItemId = trackedItem.Id
+                                });
+                            }
 
-                            var cacheItems = trackedItems.Select(x => new CacheItemTemp{ItemId = x.Id, CacheKeyId = cacheKey.Id, CacheQueue = cacheQueue }).ToArray();
-
-                            cacheKey.CacheItemTemps = cacheItems;
-                            cacheSiteLang.CacheKeyTemps.Add(cacheKey);
-                            cacheQueue.CacheSiteLangTemps.Add(cacheSiteLang);
+                            cacheQueue.CacheTemps = cacheTemps;
 
                             ctx.CacheQueues.Add(cacheQueue);
 
