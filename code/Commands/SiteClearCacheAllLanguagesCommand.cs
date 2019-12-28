@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Foundation.HtmlCache.Bus;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
 using Sitecore;
-using Sitecore.Caching;
 using Sitecore.Configuration;
-using Sitecore.Data;
 using Sitecore.Data.Items;
-using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
-using Sitecore.Framework.Messaging;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Sites;
 using Sitecore.Web;
 using Sitecore.Web.UI.Sheer;
 
@@ -24,23 +17,48 @@ namespace Foundation.HtmlCache.Commands
     public class SiteClearCacheAllLanguagesCommand : Command
     {
         private Item Item { get; set; }
+
         public override void Execute(CommandContext context)
         {
             Assert.ArgumentNotNull(context, nameof(context));
             this.Item = context.Items.FirstOrDefault();
+            Context.ClientPage.Start(this, "Run");
+        }
 
-            Guid? itemId = this.Item?.ID.Guid;
-            if (itemId != null)
+        protected void Run(ClientPipelineArgs args)
+        {
+            using (var ctx = new ItemTrackingProvider())
             {
-                Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId));
-                if (item != null)
+                var siteInfos = SiteInfoExtensions.GetSites(this.Item);
+                if (siteInfos != null)
                 {
-                    List<SiteInfo> siteInfos = SiteInfoExtensions.GetSites(item);
-                    foreach (SiteInfo siteInfo in siteInfos)
+                    foreach (var siteInfo in siteInfos)
                     {
-                        ((IMessageBus<HtmlCacheMessageBus>) ServiceLocator.ServiceProvider.GetService(typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        var cacheQueue = new CacheQueue
+                        {
+                            CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
+                            CacheTemps = new List<CacheTemp>()
+                            {
+                                new CacheTemp()
+                                {
+                                    SiteName = siteInfo.Name,
+                                    SiteLang = siteInfo.Language
+                                }
+                            }
+                        };
+                        ctx.CacheQueues.Add(cacheQueue);
                     }
+
+                    ctx.SaveChanges();
+
+                    SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);
                 }
+                else
+                {
+                    SheerResponse.Alert("Site could not be determined by the item in context", true);
+                }
+
+                args.WaitForPostBack(false);
             }
 
         }

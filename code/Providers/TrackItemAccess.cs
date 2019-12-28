@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.Models;
 using Sitecore.Data.Items;
 using Sitecore.Pipelines.ItemProvider.GetItem;

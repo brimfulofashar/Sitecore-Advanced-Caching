@@ -1,21 +1,13 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Foundation.HtmlCache.Bus;
-using Foundation.HtmlCache.Events;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
-using Foundation.HtmlCache.Models;
-using Foundation.HtmlCache.Providers;
 using Sitecore;
-using Sitecore.Caching;
-using Sitecore.Configuration;
-using Sitecore.Data;
 using Sitecore.Data.Items;
-using Sitecore.DependencyInjection;
 using Sitecore.Diagnostics;
-using Sitecore.Framework.Messaging;
 using Sitecore.Globalization;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Web;
+using Sitecore.Web.UI.Sheer;
 
 namespace Foundation.HtmlCache.Commands
 {
@@ -28,24 +20,46 @@ namespace Foundation.HtmlCache.Commands
             Assert.ArgumentNotNull(context, nameof(context));
             this.item = context.Items.FirstOrDefault();
             this.language = this.item.Language;
+            Context.ClientPage.Start(this, "Run");
+        }
 
-            Guid? itemId = this.item?.ID.Guid;
-            string languageStr = language.Name;
-            if (itemId != null && !string.IsNullOrEmpty(languageStr))
+        protected void Run(ClientPipelineArgs args)
+        {
+            if (item != null && language != null)
             {
-                Language language = Language.Parse(languageStr);
-                Item item = Factory.GetDatabase("web").GetItem(ID.Parse(itemId), language);
-                if (item != null)
+                using (var ctx = new ItemTrackingProvider())
                 {
-                    SiteInfo siteInfo = SiteInfoExtensions.GetSites(item, language).FirstOrDefault();
+                    var siteInfo = SiteInfoExtensions.GetSites(this.item, item.Language).FirstOrDefault();
                     if (siteInfo != null)
                     {
-                        ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(
-                            typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                        var cacheQueue = new CacheQueue
+                        {
+
+                            CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCache,
+                            CacheTemps = new List<CacheTemp>()
+                            {
+                                new CacheTemp()
+                                {
+                                    SiteName = siteInfo.Name,
+                                    SiteLang = language.Name
+                                }
+                            }
+                        };
+                        ctx.CacheQueues.Add(cacheQueue);
+                        ctx.SaveChanges();
+                        SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
+                    }
+                    else
+                    {
+                        SheerResponse.Alert("Site could not be determined by the item in context", true);
                     }
                 }
             }
-
+            else
+            {
+                SheerResponse.Alert("Site could not be determined by the item in context", true);
+            }
+            args.WaitForPostBack(false);
         }
     }
 }

@@ -1,14 +1,8 @@
-﻿using System.Collections.Generic;
-using Foundation.HtmlCache.Bus;
-using Foundation.HtmlCache.Models;
-using Sitecore.Caching;
-using Sitecore.Configuration;
-using Sitecore.DependencyInjection;
+﻿using Foundation.HtmlCache.DB;
+using Sitecore;
 using Sitecore.Diagnostics;
-using Sitecore.Framework.Messaging;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Sites;
-using Sitecore.Web;
+using Sitecore.Web.UI.Sheer;
 
 namespace Foundation.HtmlCache.Commands
 {
@@ -17,12 +11,23 @@ namespace Foundation.HtmlCache.Commands
         public override void Execute(CommandContext context)
         {
             Assert.ArgumentNotNull(context, nameof(context));
-            List<SiteInfo> siteInfos = Factory.GetSiteInfoList();
-            foreach (SiteInfo siteInfo in siteInfos)
+            Context.ClientPage.Start(this, "Run");
+        }
+
+        protected void Run(ClientPipelineArgs args)
+        {
+            using (var ctx = new ItemTrackingProvider())
             {
-                ((IMessageBus<HtmlCacheMessageBus>)ServiceLocator.ServiceProvider.GetService(
-                    typeof(IMessageBus<HtmlCacheMessageBus>))).Send(new DeleteSiteFromCache(siteInfo.Name, siteInfo.Language));
+                var cacheQueue = new CacheQueue
+                {
+                    CacheQueueMessageTypeId = (int)MessageTypeEnum.DeleteSiteFromCacheAllSites,
+                };
+                ctx.CacheQueues.Add(cacheQueue);
+                ctx.SaveChanges();
             }
+
+            SheerResponse.Alert("Caches for the all sites in all languages have been queue to be cleared", true);
+            args.WaitForPostBack(false);
         }
     }
 }
