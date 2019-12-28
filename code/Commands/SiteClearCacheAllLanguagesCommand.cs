@@ -29,21 +29,26 @@ namespace Foundation.HtmlCache.Commands
         {
             using (var ctx = new ItemTrackingProvider())
             {
-                var siteInfo = SiteInfoExtensions.GetSites(this.Item).FirstOrDefault();
-                if (siteInfo != null)
+                var siteInfos = SiteInfoExtensions.GetSites(this.Item);
+                if (siteInfos != null)
                 {
-                    var cacheQueue = new CacheQueue
+                    foreach (var siteInfo in siteInfos)
                     {
-                        CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
-                        CacheTemps = new List<CacheTemp>()
+                        var cacheQueue = new CacheQueue
                         {
-                            new CacheTemp()
+                            CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
+                            CacheTemps = new List<CacheTemp>()
                             {
-                                SiteName = siteInfo.Name
+                                new CacheTemp()
+                                {
+                                    SiteName = siteInfo.Name,
+                                    SiteLang = siteInfo.Language
+                                }
                             }
-                        }
-                    };
-                    ctx.CacheQueues.Add(cacheQueue);
+                        };
+                        ctx.CacheQueues.Add(cacheQueue);
+                    }
+
                     ctx.SaveChanges();
 
                     SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);

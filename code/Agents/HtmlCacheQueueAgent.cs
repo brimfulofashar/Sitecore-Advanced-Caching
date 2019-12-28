@@ -20,7 +20,7 @@ namespace Foundation.HtmlCache.Agents
             {
                 while (hasQueueItems)
                 {
-                    var cacheQueueEntry = ctx.CacheQueues
+                    var cacheQueueEntry = ctx.CacheQueues.AsNoTracking()
                         .OrderByDescending(x => x.CacheQueueMessageType.Id)
                         .ThenBy(x => x.Id)
                         .FirstOrDefault(x => !x.Processing);
@@ -31,18 +31,19 @@ namespace Foundation.HtmlCache.Agents
                     {
                         if (cacheQueueEntry.CacheQueueMessageTypeId > (int)MessageTypeEnum.AddToCache)
                         {
-                            var cacheQueueBlocker = ctx.CacheQueueBlockers.First();
-                            if (!cacheQueueBlocker.BlockingMode)
+                            if (!cacheQueueEntry.Processing)
                             {
                                 using (var ctxBlocking = new ItemTrackingProvider())
                                 {
-                                    ctxBlocking.CacheQueueBlockers
-                                            .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
-                                            .BlockingMode =
-                                        true;
+                                    ctxBlocking.CacheQueues.First(x => x.UpdateVersion == cacheQueueEntry.UpdateVersion)
+                                        .Processing = true;
                                     processQueue = ctxBlocking.SaveChanges() > 0;
                                     ctxBlocking.SaveChanges();
                                 }
+                            }
+                            else
+                            {
+                                processQueue = false;
                             }
                         }
 
@@ -80,7 +81,7 @@ namespace Foundation.HtmlCache.Agents
                                     {
                                         case (int) MessageTypeEnum.DeleteSiteFromCacheAllSites:
                                         {
-                                            DeleteAllSiteCache(ctx);
+                                            DeleteAllSiteCache(ctx, cacheQueueEntry);
                                             break;
                                         }
                                         case (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages:
@@ -114,22 +115,6 @@ namespace Foundation.HtmlCache.Agents
                                         ctxDeleteQueue.CacheQueues.Remove(cacheQueueEntry);
                                         ctxDeleteQueue.SaveChanges();
                                     }
-
-                                    if (cacheQueueEntry.CacheQueueMessageTypeId > (int)MessageTypeEnum.AddToCache)
-                                    {
-                                        var cacheQueueBlocker = ctx.CacheQueueBlockers.First();
-                                        if (cacheQueueBlocker.BlockingMode)
-                                        {
-                                            using (var ctxBlocking = new ItemTrackingProvider())
-                                            {
-                                                ctxBlocking.CacheQueueBlockers
-                                                        .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
-                                                        .BlockingMode =
-                                                    false;
-                                                ctxBlocking.SaveChanges();
-                                            }
-                                        }
-                                    }
                                 }
                                 catch (Exception e)
                                 {
@@ -161,9 +146,9 @@ namespace Foundation.HtmlCache.Agents
             }
         }
 
-        private void DeleteAllSiteCache(ItemTrackingProvider ctx)
+        private void DeleteAllSiteCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            ctx.CacheQueues.RemoveRange(ctx.CacheQueues);
+            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.Id != cacheQueueEntry.Id));
             ctx.Caches.RemoveRange(ctx.Caches);
             ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheAllSites:Remote", null, ClearCacheOperation.ClearCacheOperationEnum.AllSites);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
@@ -191,17 +176,11 @@ namespace Foundation.HtmlCache.Agents
             dic.Add(name, new Dictionary<string, HashSet<string>>());
             dic[name].Add(lang, null);
 
+            ctx.CacheQueues.RemoveRange(ctx.CacheQueues.Where(x => x.CacheTemps.Any(y => y.SiteName == name && y.SiteLang == lang && y.CacheQueueId != cacheQueueEntry.Id)));
+            ctx.Caches.RemoveRange(ctx.Caches.Where(x => x.SiteName == name && x.SiteLang == lang));
+
             ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheSite:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.Site);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
-
-
-            var result = ctx.CacheTemps
-                .Join(ctx.Caches, x => x.ItemId, y => y.ItemId, (left, right) => new {ct = left, c = right})
-                .Where(x => (x.c.SiteName == name && x.c.SiteLang == lang) || (x.ct.SiteName == name && x.ct.SiteLang == lang));
-
-
-            ctx.CacheQueues.RemoveRange(result.Select(x => x.ct.CacheQueue).Where(x => x.Id != cacheQueueEntry.Id));
-            ctx.Caches.RemoveRange(result.Select(x => x.c));
         }
 
         public void DeleteFromCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
@@ -228,36 +207,15 @@ namespace Foundation.HtmlCache.Agents
                 dic[cacheItem.SiteName][cacheItem.SiteLang].Add(cacheItem.HtmlCacheKey);
             }
 
+            ctx.CacheQueues.RemoveRange(result.Select(x => x.ct.CacheQueue).Where(x => x.Id != cacheQueueEntry.Id));
+            ctx.Caches.RemoveRange(result.Select(x => x.c));
+
             ClearCacheArgs remoteEvent = new ClearCacheArgs("cache:clearCacheHtml:Remote", dic, ClearCacheOperation.ClearCacheOperationEnum.Site);
             Factory.GetDatabase("web").RemoteEvents.Queue.QueueEvent(remoteEvent, true, true);
-
-            ctx.CacheQueues.RemoveRange(result.Select(x => x.ct.CacheQueue)).Where(x => x.Id != cacheQueueEntry.Id);
-            ctx.Caches.RemoveRange(result.Select(x => x.c));
         }
 
         private void AddToCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            //            foreach (var cacheTemp in cacheQueueEntry.CacheTemps)
-            //            {
-            //                var cache = new Cache
-            //                {
-            //                    SiteName = cacheTemp.SiteName,
-            //                    SiteLang = cacheTemp.SiteLang,
-            //                    ItemId = cacheTemp.ItemId,
-            //                    HtmlCacheKey = cacheTemp.HtmlCacheKey,
-            //                    HtmlCacheResult = cacheTemp.HtmlCacheResult
-            //                };
-            //
-            //                ctx.Upsert(cache)
-            //                    .Key(x => x.SiteName)
-            //                    .Key(x => x.SiteLang)
-            //                    .Key(x => x.HtmlCacheKeyHash)
-            //                    .Key(x => x.ItemId)
-            //                    .ExcludeField(x => x.Id)
-            //                    .ExcludeField(x => x.HtmlCacheKeyHash)
-            //                    .OutputKey(x => x.Id).Execute();
-            //            }
-
             var sql = string.Format(@"
                 WITH CTE (SiteName, SiteLang, HtmlCacheKey, HtmlCacheKeyHash, HtmlCacheResult, ItemId) AS 
                 (

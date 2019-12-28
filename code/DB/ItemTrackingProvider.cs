@@ -50,7 +50,6 @@ namespace Foundation.HtmlCache.DB
     {
         public DbSet<Cache> Caches { get; set; } // Cache
         public DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
-        public DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         public DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
         public DbSet<CacheTemp> CacheTemps { get; set; } // CacheTemp
 
@@ -115,7 +114,6 @@ namespace Foundation.HtmlCache.DB
 
             modelBuilder.Configurations.Add(new CacheConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueConfiguration());
-            modelBuilder.Configurations.Add(new CacheQueueBlockerConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueMessageTypeConfiguration());
             modelBuilder.Configurations.Add(new CacheTempConfiguration());
 
@@ -177,14 +175,6 @@ namespace Foundation.HtmlCache.DB
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("PK_CacheQueue", 1) { IsUnique = true, IsClustered = true })
-                );
-
-
-            modelBuilder.Entity<CacheQueueBlocker>()
-                .Property(e => e.Id)
-                .HasColumnAnnotation(
-                    IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("PK_CacheQueueBlocker", 1) { IsUnique = true, IsClustered = true })
                 );
 
 
@@ -253,7 +243,6 @@ namespace Foundation.HtmlCache.DB
         {
             modelBuilder.Configurations.Add(new CacheConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueConfiguration(schema));
-            modelBuilder.Configurations.Add(new CacheQueueBlockerConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueMessageTypeConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheTempConfiguration(schema));
 

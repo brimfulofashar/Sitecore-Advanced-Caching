@@ -42,7 +42,6 @@ namespace Foundation.HtmlCache.DB
     {
         DbSet<Cache> Caches { get; set; } // Cache
         DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
-        DbSet<CacheQueueBlocker> CacheQueueBlockers { get; set; } // CacheQueueBlocker
         DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
         DbSet<CacheTemp> CacheTemps { get; set; } // CacheTemp
 

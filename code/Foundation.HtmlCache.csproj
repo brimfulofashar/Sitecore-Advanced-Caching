@@ -153,8 +153,6 @@
     <Compile Include="DB\Cache.cs" />
     <Compile Include="DB\CacheConfiguration.cs" />
     <Compile Include="DB\CacheQueue.cs" />
-    <Compile Include="DB\CacheQueueBlocker.cs" />
-    <Compile Include="DB\CacheQueueBlockerConfiguration.cs" />
     <Compile Include="DB\CacheQueueConfiguration.cs" />
     <Compile Include="DB\CacheQueueMessageType.cs" />
     <Compile Include="DB\CacheQueueMessageTypeConfiguration.cs" />

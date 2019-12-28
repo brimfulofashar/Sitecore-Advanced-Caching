@@ -14,7 +14,7 @@ namespace Foundation.HtmlCache.Events
             {
                 var sourceDb = publisher.Options.SourceDatabase.Name;
                 var destinationDb = publisher.Options.TargetDatabase.Name;
-                if (Sitecore.Context.Items.Contains(PublishItemTracking.Name))
+                if (!Sitecore.Context.Items.Contains(PublishItemTracking.Name))
                 {
                     Sitecore.Context.Items.Add(PublishItemTracking.Name,
                         new PublishItemTracking(sourceDb, destinationDb));
