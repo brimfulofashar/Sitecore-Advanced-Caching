@@ -210,7 +210,7 @@ namespace Foundation.HtmlCache.DB
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new[]
                     {
-                        new IndexAttribute("IX_CacheTemp", 1) { IsUnique = true },
+                        new IndexAttribute("IX_CacheTemp", 1),
                         new IndexAttribute("IX_CacheTemp_SiteNameSiteLang", 1)
                     }));
 
@@ -221,7 +221,7 @@ namespace Foundation.HtmlCache.DB
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new[]
                     {
-                        new IndexAttribute("IX_CacheTemp", 2) { IsUnique = true },
+                        new IndexAttribute("IX_CacheTemp", 2),
                         new IndexAttribute("IX_CacheTemp_SiteNameSiteLang", 2)
                     }));
 
@@ -232,7 +232,7 @@ namespace Foundation.HtmlCache.DB
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new[]
                     {
-                        new IndexAttribute("IX_CacheTemp", 3) { IsUnique = true },
+                        new IndexAttribute("IX_CacheTemp", 3),
                         new IndexAttribute("IX_CacheTemp_HtmlCacheKeyHash", 1)
                     }));
 
@@ -243,7 +243,7 @@ namespace Foundation.HtmlCache.DB
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new[]
                     {
-                        new IndexAttribute("IX_CacheTemp", 4) { IsUnique = true },
+                        new IndexAttribute("IX_CacheTemp", 4),
                         new IndexAttribute("IX_CacheTemp_ItemId", 1)
                     }));
 

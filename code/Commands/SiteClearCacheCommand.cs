@@ -25,34 +25,40 @@ namespace Foundation.HtmlCache.Commands
 
         protected void Run(ClientPipelineArgs args)
         {
-            using (var ctx = new ItemTrackingProvider())
+            if (item != null && language != null)
             {
-                var siteInfo = SiteInfoExtensions.GetSites(this.item).FirstOrDefault();
-                if (siteInfo != null)
+                using (var ctx = new ItemTrackingProvider())
                 {
-                    var cacheQueue = new CacheQueue
+                    var siteInfo = SiteInfoExtensions.GetSites(this.item, item.Language).FirstOrDefault();
+                    if (siteInfo != null)
                     {
-
-                        CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
-                        CacheTemps = new List<CacheTemp>()
+                        var cacheQueue = new CacheQueue
                         {
-                            new CacheTemp()
+
+                            CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCache,
+                            CacheTemps = new List<CacheTemp>()
                             {
-                                SiteName = siteInfo.Name,
-                                SiteLang = language.Name
+                                new CacheTemp()
+                                {
+                                    SiteName = siteInfo.Name,
+                                    SiteLang = language.Name
+                                }
                             }
-                        }
-                    };
-                    ctx.CacheQueues.Add(cacheQueue);
-                    ctx.SaveChanges();
-                    SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
-                }
-                else
-                {
-                    SheerResponse.Alert("Site could not be determined by the item in context", true);
+                        };
+                        ctx.CacheQueues.Add(cacheQueue);
+                        ctx.SaveChanges();
+                        SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
+                    }
+                    else
+                    {
+                        SheerResponse.Alert("Site could not be determined by the item in context", true);
+                    }
                 }
             }
-
+            else
+            {
+                SheerResponse.Alert("Site could not be determined by the item in context", true);
+            }
             args.WaitForPostBack(false);
         }
     }

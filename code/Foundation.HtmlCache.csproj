@@ -183,7 +183,6 @@
     <Compile Include="Events\ItemPublishedArgs.cs" />
     <Compile Include="Events\PublishJobBegin.cs" />
     <Compile Include="Events\PublishJobEnd.cs" />
-    <Compile Include="Extensions\EFExtensions.cs" />
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
     <Compile Include="Arguments\ItemMetaData.cs" />
     <Compile Include="Arguments\RenderingProcessorArgs.cs" />

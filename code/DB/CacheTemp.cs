@@ -46,7 +46,7 @@ namespace Foundation.HtmlCache.DB
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
         public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
-        public Guid ItemId { get; set; } // ItemId
+        public Guid? ItemId { get; set; } // ItemId
 
         // Foreign keys
 

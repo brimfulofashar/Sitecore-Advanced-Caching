@@ -16,7 +16,7 @@ namespace Foundation.HtmlCache.Extensions
                 foreach (SiteInfo siteInfo in siteInfoList)
                 {
                     if (item.Paths.FullPath.ToLower().Trim().StartsWith(siteInfo.RootPath.ToLower().Trim()) &&
-                        siteInfo.Domain != "sitecore" && siteInfo.Domain != "extranet" &&
+                        !string.IsNullOrEmpty(siteInfo.HostName) && siteInfo.CacheHtml &&
                         (language == null || siteInfo.Language == language.Name))
                     {
                         siteInfos.Add(siteInfo);

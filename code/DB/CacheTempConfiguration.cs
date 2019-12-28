@@ -49,10 +49,10 @@ namespace Foundation.HtmlCache.DB
             Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
             Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
             Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
+            Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(5000);
             Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("varbinary").IsOptional().HasMaxLength(8000).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
-            Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
-            Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsOptional().IsUnicode(false);
+            Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsOptional();
 
             // Foreign keys
             HasRequired(a => a.CacheQueue).WithMany(b => b.CacheTemps).HasForeignKey(c => c.CacheQueueId); // FK_CacheTemp_CacheQueue

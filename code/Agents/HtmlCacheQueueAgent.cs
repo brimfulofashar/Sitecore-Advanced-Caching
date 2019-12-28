@@ -114,6 +114,22 @@ namespace Foundation.HtmlCache.Agents
                                         ctxDeleteQueue.CacheQueues.Remove(cacheQueueEntry);
                                         ctxDeleteQueue.SaveChanges();
                                     }
+
+                                    if (cacheQueueEntry.CacheQueueMessageTypeId > (int)MessageTypeEnum.AddToCache)
+                                    {
+                                        var cacheQueueBlocker = ctx.CacheQueueBlockers.First();
+                                        if (cacheQueueBlocker.BlockingMode)
+                                        {
+                                            using (var ctxBlocking = new ItemTrackingProvider())
+                                            {
+                                                ctxBlocking.CacheQueueBlockers
+                                                        .First(x => x.UpdateVersion == cacheQueueBlocker.UpdateVersion)
+                                                        .BlockingMode =
+                                                    false;
+                                                ctxBlocking.SaveChanges();
+                                            }
+                                        }
+                                    }
                                 }
                                 catch (Exception e)
                                 {
@@ -123,17 +139,12 @@ namespace Foundation.HtmlCache.Agents
                                     {
                                         try
                                         {
-                                            var cacheQueueEntryToLock = ctxProcessing.CacheQueues.AsNoTracking().FirstOrDefault(x =>
-                                                x.Id == cacheQueueEntry.Id && x.UpdateVersion == cacheQueueEntry.UpdateVersion);
+                                            var cacheQueueEntryToLock = ctxProcessing.CacheQueues.AsNoTracking().FirstOrDefault(x => x.Id == cacheQueueEntry.Id);
                                             if (cacheQueueEntryToLock != null)
                                             {
-                                                cacheQueueEntryToLock.Processing = true;
+                                                cacheQueueEntryToLock.Processing = false;
                                                 ctxProcessing.CacheQueues.AddOrUpdate(cacheQueueEntryToLock);
-                                                var saved = ctxProcessing.SaveChanges() > 0;
-                                                if (!saved)
-                                                {
-                                                    processQueue = false;
-                                                }
+                                                ctxProcessing.SaveChanges();
                                             }
                                         }
                                         catch (Exception ex)
@@ -248,22 +259,26 @@ namespace Foundation.HtmlCache.Agents
             //            }
 
             var sql = string.Format(@"
+                WITH CTE (SiteName, SiteLang, HtmlCacheKey, HtmlCacheKeyHash, HtmlCacheResult, ItemId) AS 
+                (
+                   SELECT SiteName, SiteLang, HtmlCacheKey, HtmlCacheKeyHash, HtmlCacheResult, ItemId 
+                   FROM CacheTemp 
+                   WHERE CacheQueueId = {0} 
+                )
                 MERGE [Cache] WITH (HOLDLOCK) AS t 
-                USING [CacheTemp] AS s
-            ON (s.SiteName = t.SiteName AND s.SiteLang = t.SiteLang AND s.HtmlCacheKeyHash = t.HtmlCacheKeyHash AND s.ItemId = t.ItemId AND s.CacheQueueId = {0})
-            WHEN MATCHED
-                THEN UPDATE SET 
-                    t.SiteName = s.SiteName,
-                    t.SiteLang = s.SiteLang,
-                    t.HtmlCacheKey = s.HtmlCacheKey,
-                    t.HtmlCacheResult = s.HtmlCacheResult
-            WHEN NOT MATCHED BY TARGET 
-                THEN INSERT ([SiteName]
-                           ,[SiteLang]
-                           ,[HtmlCacheKey]
-                           ,[HtmlCacheResult]
-                           ,[ItemId])
-                     VALUES (s.SiteName, s.SiteLang, s.HtmlCacheKey, s.HtmlCacheResult, s.ItemId);",
+                USING CTE AS s 
+                ON 
+                (
+                    s.SiteName = t.SiteName 
+                    AND s.SiteLang = t.SiteLang 
+                    AND s.HtmlCacheKeyHash = t.HtmlCacheKeyHash 
+                    AND s.ItemId = t.ItemId
+                ) 
+                WHEN MATCHED THEN UPDATE
+                   SET t.SiteName = s.SiteName, t.SiteLang = s.SiteLang, t.HtmlCacheKey = s.HtmlCacheKey, t.HtmlCacheResult = s.HtmlCacheResult, t.ItemId = s.ItemId 
+                WHEN NOT MATCHED THEN
+                   INSERT ([SiteName] , [SiteLang] , [HtmlCacheKey] , [HtmlCacheResult] , [ItemId]) 
+                   VALUES (s.SiteName, s.SiteLang, s.HtmlCacheKey, s.HtmlCacheResult, s.ItemId);",
                 cacheQueueEntry.Id);
             ctx.Database.ExecuteSqlCommand(sql);
         }
