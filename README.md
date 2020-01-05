@@ -6,3 +6,4 @@ This module clears a component's html cache entry based on the item which was pu
 Step 1 - Run sql script located in Scripts folder  
 Step 2 - Compile and deploy config and dll to both CM and CD  
 Step 3 - Add HtmlCache ConnectionString  
+Step 4 - Under cache settings for component, set the cacheable templates field to enable item tracking. 
