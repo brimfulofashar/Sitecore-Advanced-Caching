@@ -57,6 +57,11 @@ namespace Foundation.HtmlCache.DB
         DbSet Set(Type entityType);
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         string ToString();
+
+        // Stored Procedures
+        int UspSyncCacheData(int? cacheQueueId);
+        // UspSyncCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
     }
 }
 // </auto-generated>

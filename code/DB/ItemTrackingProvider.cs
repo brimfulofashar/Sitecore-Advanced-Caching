@@ -130,22 +130,16 @@ namespace Foundation.HtmlCache.DB
                 .Property(e => e.SiteName)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new[]
-                    {
-                        new IndexAttribute("IX_Cache", 1) { IsUnique = true },
-                        new IndexAttribute("IX_Cache_SiteNameSiteLang", 1)
-                    }));
+                    new IndexAnnotation(new IndexAttribute("IX_Cache", 1) { IsUnique = true })
+                );
 
 
             modelBuilder.Entity<Cache>()
                 .Property(e => e.SiteLang)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new[]
-                    {
-                        new IndexAttribute("IX_Cache", 2) { IsUnique = true },
-                        new IndexAttribute("IX_Cache_SiteNameSiteLang", 2)
-                    }));
+                    new IndexAnnotation(new IndexAttribute("IX_Cache", 2) { IsUnique = true })
+                );
 
 
             modelBuilder.Entity<Cache>()
@@ -178,6 +172,14 @@ namespace Foundation.HtmlCache.DB
                 );
 
 
+            modelBuilder.Entity<CacheQueue>()
+                .Property(e => e.CacheQueueMessageTypeId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheQueue_CacheQueueMessageTypeId", 1))
+                );
+
+
             modelBuilder.Entity<CacheQueueMessageType>()
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
@@ -195,25 +197,27 @@ namespace Foundation.HtmlCache.DB
 
 
             modelBuilder.Entity<CacheTemp>()
+                .Property(e => e.CacheQueueId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheTemp_CacheQueueId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheTemp>()
                 .Property(e => e.SiteName)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new[]
-                    {
-                        new IndexAttribute("IX_CacheTemp", 1),
-                        new IndexAttribute("IX_CacheTemp_SiteNameSiteLang", 1)
-                    }));
+                    new IndexAnnotation(new IndexAttribute("IX_CacheTemp", 1))
+                );
 
 
             modelBuilder.Entity<CacheTemp>()
                 .Property(e => e.SiteLang)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new[]
-                    {
-                        new IndexAttribute("IX_CacheTemp", 2),
-                        new IndexAttribute("IX_CacheTemp_SiteNameSiteLang", 2)
-                    }));
+                    new IndexAnnotation(new IndexAttribute("IX_CacheTemp", 2))
+                );
 
 
             modelBuilder.Entity<CacheTemp>()
@@ -248,6 +252,23 @@ namespace Foundation.HtmlCache.DB
 
             return modelBuilder;
         }
+
+        // Stored Procedures
+        public int UspSyncCacheData(int? cacheQueueId)
+        {
+            var cacheQueueIdParam = new SqlParameter { ParameterName = "@CacheQueueId", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input, Value = cacheQueueId.GetValueOrDefault(), Precision = 10, Scale = 0 };
+            if (!cacheQueueId.HasValue)
+                cacheQueueIdParam.Value = DBNull.Value;
+
+            var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
+
+            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[usp_SyncCacheData] @CacheQueueId", cacheQueueIdParam, procResultParam);
+
+            return (int)procResultParam.Value;
+        }
+
+        // UspSyncCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
     }
 }
 // </auto-generated>

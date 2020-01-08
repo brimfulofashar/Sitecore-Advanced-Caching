@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity.Migrations;
+using System.Data.SqlClient;
 using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Events;
@@ -224,29 +226,7 @@ namespace Foundation.HtmlCache.Agents
 
         private void AddToCache(ItemTrackingProvider ctx, CacheQueue cacheQueueEntry)
         {
-            var sql = string.Format(@"
-                WITH CTE (SiteName, SiteLang, HtmlCacheKey, HtmlCacheKeyHash, HtmlCacheResult, ItemId) AS 
-                (
-                   SELECT SiteName, SiteLang, HtmlCacheKey, HtmlCacheKeyHash, HtmlCacheResult, ItemId 
-                   FROM CacheTemp 
-                   WHERE CacheQueueId = {0} 
-                )
-                MERGE [Cache] WITH (HOLDLOCK) AS t 
-                USING CTE AS s 
-                ON 
-                (
-                    s.SiteName = t.SiteName 
-                    AND s.SiteLang = t.SiteLang 
-                    AND s.HtmlCacheKeyHash = t.HtmlCacheKeyHash 
-                    AND s.ItemId = t.ItemId
-                ) 
-                WHEN MATCHED THEN UPDATE
-                   SET t.SiteName = s.SiteName, t.SiteLang = s.SiteLang, t.HtmlCacheKey = s.HtmlCacheKey, t.HtmlCacheResult = s.HtmlCacheResult, t.ItemId = s.ItemId 
-                WHEN NOT MATCHED THEN
-                   INSERT ([SiteName] , [SiteLang] , [HtmlCacheKey] , [HtmlCacheResult] , [ItemId]) 
-                   VALUES (s.SiteName, s.SiteLang, s.HtmlCacheKey, s.HtmlCacheResult, s.ItemId);",
-                cacheQueueEntry.Id);
-            ctx.Database.ExecuteSqlCommand(sql);
+            ctx.Database.ExecuteSqlCommand("usp_SyncCacheData @CacheQueueId", new SqlParameter("@CacheQueueId", cacheQueueEntry.Id));
         }
     }
 }
