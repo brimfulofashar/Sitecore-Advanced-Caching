@@ -29,31 +29,33 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheTemp
-    [Table("CacheTemp")]
-    public class CacheTemp
+    // CacheSite
+    [Table("CacheSite")]
+    public class CacheSite
     {
-        public long Id { get; set; } // Id (Primary key)
-        public long CacheQueueId { get; set; } // CacheQueueId
+        public Guid Id { get; set; } // Id (Primary key)
         public string SiteName { get; set; } // SiteName (length: 250)
         public string SiteLang { get; set; } // SiteLang (length: 250)
-        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
-        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
-        public string HtmlCacheResult { get; set; } // HtmlCacheResult
-        public Guid? ItemId { get; set; } // ItemId
 
-        // Foreign keys
+        // Reverse navigation
 
         /// <summary>
-        /// Parent CacheQueue pointed by [CacheTemp].([CacheQueueId]) (FK_CacheTemp_CacheQueue)
+        /// Child CacheHtmls where [CacheHtml].[CacheSiteId] point to this entity (FK_CacheHtml_CacheSite)
         /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheTemp_CacheQueue
+        public virtual ICollection<CacheHtml> CacheHtmls { get; set; } // CacheHtml.FK_CacheHtml_CacheSite
+
+        public CacheSite()
+        {
+            Id = Guid.NewGuid();
+            CacheHtmls = new List<CacheHtml>();
+        }
     }
 
 }

@@ -29,6 +29,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,17 +42,26 @@ namespace Foundation.HtmlCache.DB
     {
         public long Id { get; set; } // Id (Primary key)
         public int CacheQueueMessageTypeId { get; set; } // CacheQueueMessageTypeId
-        public string Site { get; set; } // Site (length: 250)
-        public string Language { get; set; } // Language (length: 250)
         public bool Processing { get; set; } // Processing
+        public string ProcessingBy { get; set; } // ProcessingBy (length: 250)
         public byte[] UpdateVersion { get; set; } // UpdateVersion (length: 8)
 
         // Reverse navigation
 
         /// <summary>
-        /// Child CacheTemps where [CacheTemp].[CacheQueueId] point to this entity (FK_CacheTemp_CacheQueue)
+        /// Child CacheHtmlTemps where [CacheHtmlTemp].[CacheQueueId] point to this entity (FK_CacheHtmlTemp_CacheQueue)
         /// </summary>
-        public virtual ICollection<CacheTemp> CacheTemps { get; set; } // CacheTemp.FK_CacheTemp_CacheQueue
+        public virtual ICollection<CacheHtmlTemp> CacheHtmlTemps { get; set; } // CacheHtmlTemp.FK_CacheHtmlTemp_CacheQueue
+
+        /// <summary>
+        /// Child CacheItemTemps where [CacheItemTemp].[CacheQueueId] point to this entity (FK_CacheItemTemp_CacheQueue)
+        /// </summary>
+        public virtual ICollection<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp.FK_CacheItemTemp_CacheQueue
+
+        /// <summary>
+        /// Child CacheSiteTemps where [CacheSiteTemp].[CacheQueueId] point to this entity (FK_CacheSiteTemp_CacheQueue)
+        /// </summary>
+        public virtual ICollection<CacheSiteTemp> CacheSiteTemps { get; set; } // CacheSiteTemp.FK_CacheSiteTemp_CacheQueue
 
         // Foreign keys
 
@@ -62,7 +72,9 @@ namespace Foundation.HtmlCache.DB
 
         public CacheQueue()
         {
-            CacheTemps = new List<CacheTemp>();
+            CacheHtmlTemps = new List<CacheHtmlTemp>();
+            CacheItemTemps = new List<CacheItemTemp>();
+            CacheSiteTemps = new List<CacheSiteTemp>();
         }
     }
 

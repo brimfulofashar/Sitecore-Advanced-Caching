@@ -110,7 +110,7 @@ namespace ConsoleTest
                                                 DeleteSiteCache(ctx, cacheQueueEntry);
                                                 break;
                                             }
-                                        case (int)MessageTypeEnum.DeleteFromCache:
+                                        case (int)MessageTypeEnum.DeleteHtmlFromCache:
                                             {
                                                 DeleteFromCache(ctx, cacheQueueEntry);
                                                 break;

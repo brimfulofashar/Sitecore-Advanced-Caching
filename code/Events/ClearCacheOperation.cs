@@ -10,9 +10,7 @@ namespace Foundation.HtmlCache.Models
         public enum ClearCacheOperationEnum
         {
             Html,
-            Site,
-            SiteAllLanguages,
-            AllSites
+            Site
         }
     }
 }

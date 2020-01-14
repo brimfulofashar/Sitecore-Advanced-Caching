@@ -12,10 +12,13 @@ namespace Foundation.HtmlCache.Pipelines
         {
             using (var ctx = new ItemTrackingProvider())
             {
-                foreach (var cacheSiteLang in ctx.Caches)
+                foreach (var cacheSiteLang in ctx.CacheSites)
                 {
                     SiteContext siteContext = Factory.GetSite(cacheSiteLang.SiteName);
-                    CacheManager.GetHtmlCache(siteContext).SetHtml(cacheSiteLang.HtmlCacheKey, cacheSiteLang.HtmlCacheResult);
+                    foreach (var cacheHtml in cacheSiteLang.CacheHtmls)
+                    {
+                        CacheManager.GetHtmlCache(siteContext).SetHtml(cacheHtml.HtmlCacheKey, cacheHtml.HtmlCacheResult);
+                    }
                 }
             }
 

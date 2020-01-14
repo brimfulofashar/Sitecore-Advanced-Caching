@@ -6,7 +6,7 @@ namespace Foundation.HtmlCache.Extensions
 {
     public static class SiteInfoExtensions
     {
-        public static List<SiteInfo> GetSites(Sitecore.Data.Items.Item item, Language language = null)
+        public static List<SiteInfo> GetSites(Sitecore.Data.Items.Item item, Language language)
         {
             List<SiteInfo> siteInfos = new List<SiteInfo>();
             if (item != null)
@@ -22,8 +22,10 @@ namespace Foundation.HtmlCache.Extensions
                         siteInfos.Add(siteInfo);
                     }
                 }
-
-                
+            }
+            else
+            {
+                siteInfos = Sitecore.Configuration.Factory.GetSiteInfoList();
             }
 
             return siteInfos;

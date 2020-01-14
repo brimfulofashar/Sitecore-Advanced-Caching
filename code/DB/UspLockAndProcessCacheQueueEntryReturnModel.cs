@@ -27,34 +27,18 @@
 // ReSharper disable UsePatternMatching
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheQueue
-    public class CacheQueueConfiguration : EntityTypeConfiguration<CacheQueue>
+    public class UspLockAndProcessCacheQueueEntryReturnModel
     {
-        public CacheQueueConfiguration()
-            : this("dbo")
-        {
-        }
-
-        public CacheQueueConfiguration(string schema)
-        {
-            ToTable("CacheQueue", schema);
-            HasKey(x => x.Id);
-
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
-            Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
-            Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
-        }
+        public int CacheQueueMessageTypeId { get; set; }
+        public string SiteName { get; set; }
+        public string SiteLang { get; set; }
+        public string HtmlCacheKey { get; set; }
     }
 
 }

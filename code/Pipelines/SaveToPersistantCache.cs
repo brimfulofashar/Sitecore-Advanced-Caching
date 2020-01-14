@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.DB;
+using Foundation.HtmlCache.Helpers;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Diagnostics;
@@ -22,31 +25,10 @@ namespace Foundation.HtmlCache.Pipelines
                 {
                     try
                     {
-                        var cacheQueue = new CacheQueue
-                        {
-                            CacheQueueMessageTypeId = (int)MessageTypeEnum.AddToCache
-                        };
+                        var ids = GuidTVPHelper.GetTVPParameter(renderingProcessorArgs.ItemAccessList.Select(x => x.Id).ToList());
 
-                        var cacheTemps = new List<CacheTemp>();
-
-                        foreach (var trackedItem in renderingProcessorArgs.ItemAccessList)
-                        {
-                            cacheTemps.Add(new CacheTemp
-                            {
-                                SiteName = Context.Site.SiteInfo.Name,
-                                SiteLang = Context.Site.SiteInfo.Language,
-                                CacheQueue = cacheQueue,
-                                HtmlCacheKey = args.CacheKey,
-                                HtmlCacheResult = renderingProcessorArgs.CacheResult,
-                                ItemId = trackedItem.Id
-                            });
-                        }
-
-                        cacheQueue.CacheTemps = cacheTemps;
-
-                        ctx.CacheQueues.Add(cacheQueue);
-
-                        ctx.SaveChanges();
+                        ctx.UspQueueCacheData(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language,
+                            renderingProcessorArgs.CacheKey, renderingProcessorArgs.CacheResult, ids);
                     }
                     catch (Exception e)
                     {

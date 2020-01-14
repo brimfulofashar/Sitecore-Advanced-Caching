@@ -31,10 +31,8 @@ namespace Foundation.HtmlCache.DB
     public enum MessageTypeEnum
     {
         AddToCache = 1,
-        DeleteFromCache = 2,
+        DeleteHtmlFromCache = 2,
         DeleteSiteFromCache = 3,
-        DeleteSiteFromCacheAllLanguages = 4,
-        DeleteSiteFromCacheAllSites = 5,
     }
 
 }

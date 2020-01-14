@@ -29,6 +29,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
@@ -40,10 +41,15 @@ namespace Foundation.HtmlCache.DB
 {
     public interface IItemTrackingProvider : IDisposable
     {
-        DbSet<Cache> Caches { get; set; } // Cache
+        DbSet<CacheHtml> CacheHtmls { get; set; } // CacheHtml
+        DbSet<CacheHtmlCacheItem> CacheHtmlCacheItems { get; set; } // CacheHtml_CacheItem
+        DbSet<CacheHtmlTemp> CacheHtmlTemps { get; set; } // CacheHtmlTemp
+        DbSet<CacheItem> CacheItems { get; set; } // CacheItem
+        DbSet<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp
         DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
         DbSet<CacheQueueMessageType> CacheQueueMessageTypes { get; set; } // CacheQueueMessageType
-        DbSet<CacheTemp> CacheTemps { get; set; } // CacheTemp
+        DbSet<CacheSite> CacheSites { get; set; } // CacheSite
+        DbSet<CacheSiteTemp> CacheSiteTemps { get; set; } // CacheSiteTemp
 
         int SaveChanges();
         Task<int> SaveChangesAsync();
@@ -59,8 +65,27 @@ namespace Foundation.HtmlCache.DB
         string ToString();
 
         // Stored Procedures
-        int UspSyncCacheData(int? cacheQueueId);
-        // UspSyncCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+        List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount);
+        List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount, out int procResult);
+        // UspLockAndProcessCacheQueueEntryAsync() cannot be created due to having out parameters, or is relying on the procedure result (List<UspLockAndProcessCacheQueueEntryReturnModel>)
+
+        int UspProcessCacheData(long? cacheQueueId);
+        // UspProcessCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        int UspProcessDeleteHtmlFromCache(long? cacheQueueId, int? cacheQueueMessageTypeId);
+        // UspProcessDeleteHtmlFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        int UspProcessDeleteSiteFromCache(long? cacheQueueId, int? cacheQueueMessageTypeId);
+        // UspProcessDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        int UspQueueCacheData(string siteName, string siteLang, string htmlCacheKey, string htmlCacheResult, DataTable ids);
+        // UspQueueCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        int UspQueueDeleteSiteFromCache(string siteName, string siteLang);
+        // UspQueueDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        int UspQueuePublishData(string siteLang, DataTable ids);
+        // UspQueuePublishDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
     }
 }

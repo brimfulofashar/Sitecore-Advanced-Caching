@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
@@ -32,16 +34,8 @@ namespace Foundation.HtmlCache.Commands
                     var siteInfo = SiteInfoExtensions.GetSites(this.item, item.Language).FirstOrDefault();
                     if (siteInfo != null)
                     {
-                        var cacheQueue = new CacheQueue
-                        {
+                        ctx.UspQueueDeleteSiteFromCache(siteInfo.Name, siteInfo.Language);
 
-                            CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCache,
-                            Site = siteInfo.Name,
-                            Language = language.Name
-
-                        };
-                        ctx.CacheQueues.Add(cacheQueue);
-                        ctx.SaveChanges();
                         SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
                     }
                     else

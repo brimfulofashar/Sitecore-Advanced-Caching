@@ -14,7 +14,7 @@ namespace Foundation.HtmlCache.Events
             RemoteEventArgs<ClearCacheArgs> clearCacheArgs = args as RemoteEventArgs<ClearCacheArgs>;
             if (clearCacheArgs != null)
             {
-                var siteInfo = Factory.GetSiteInfo(clearCacheArgs.Event.NameLangKeys.FirstOrDefault().Key);
+                var siteInfo = Factory.GetSiteInfo(clearCacheArgs.Event.CacheSiteLangKeys.FirstOrDefault().Key);
                 SiteContext siteContext = Factory.GetSite(siteInfo.Name);
                 CacheManager.GetHtmlCache(siteContext)?.Clear();
             }

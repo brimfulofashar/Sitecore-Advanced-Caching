@@ -27,33 +27,43 @@
 // ReSharper disable UsePatternMatching
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.ModelConfiguration;
+using System.Data.Entity.Infrastructure;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheQueue
-    public class CacheQueueConfiguration : EntityTypeConfiguration<CacheQueue>
+    // CacheHtml
+    [Table("CacheHtml")]
+    public class CacheHtml
     {
-        public CacheQueueConfiguration()
-            : this("dbo")
+        public Guid Id { get; set; } // Id (Primary key)
+        public Guid? CacheSiteId { get; set; } // CacheSiteId
+        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
+        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
+        public string HtmlCacheResult { get; set; } // HtmlCacheResult
+
+        // Reverse navigation
+
+        /// <summary>
+        /// Child CacheHtmlCacheItems where [CacheHtml_CacheItem].[CacheHtmlId] point to this entity (FK_CacheHtml_CacheItem_CacheHtml)
+        /// </summary>
+        public virtual ICollection<CacheHtmlCacheItem> CacheHtmlCacheItems { get; set; } // CacheHtml_CacheItem.FK_CacheHtml_CacheItem_CacheHtml
+
+        // Foreign keys
+
+        /// <summary>
+        /// Parent CacheSite pointed by [CacheHtml].([CacheSiteId]) (FK_CacheHtml_CacheSite)
+        /// </summary>
+        public virtual CacheSite CacheSite { get; set; } // FK_CacheHtml_CacheSite
+
+        public CacheHtml()
         {
-        }
-
-        public CacheQueueConfiguration(string schema)
-        {
-            ToTable("CacheQueue", schema);
-            HasKey(x => x.Id);
-
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
-            Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
-            Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
+            Id = Guid.NewGuid();
+            CacheHtmlCacheItems = new List<CacheHtmlCacheItem>();
         }
     }
 
