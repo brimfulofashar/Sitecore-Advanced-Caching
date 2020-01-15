@@ -380,6 +380,34 @@ namespace Foundation.HtmlCache.DB
 
         // PurgeDatabaseAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
+        public List<UspGetCacheForSiteReturnModel> UspGetCacheForSite(string siteName)
+        {
+            int procResult;
+            return UspGetCacheForSite(siteName, out procResult);
+        }
+
+        public List<UspGetCacheForSiteReturnModel> UspGetCacheForSite(string siteName, out int procResult)
+        {
+            var siteNameParam = new SqlParameter { ParameterName = "@SiteName", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = siteName, Size = 250 };
+            if (siteNameParam.Value == null)
+                siteNameParam.Value = DBNull.Value;
+
+            var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
+            var procResultData = Database.SqlQuery<UspGetCacheForSiteReturnModel>("EXEC @procResult = [dbo].[usp_GetCacheForSite] @SiteName", siteNameParam, procResultParam).ToList();
+            procResult = (int) procResultParam.Value;
+            return procResultData;
+        }
+
+        public async Task<List<UspGetCacheForSiteReturnModel>> UspGetCacheForSiteAsync(string siteName)
+        {
+            var siteNameParam = new SqlParameter { ParameterName = "@SiteName", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = siteName, Size = 250 };
+            if (siteNameParam.Value == null)
+                siteNameParam.Value = DBNull.Value;
+
+            var procResultData = await Database.SqlQuery<UspGetCacheForSiteReturnModel>("EXEC [dbo].[usp_GetCacheForSite] @SiteName", siteNameParam).ToListAsync();
+            return procResultData;
+        }
+
         public List<UspGetStatsReturnModel> UspGetStats()
         {
             int procResult;

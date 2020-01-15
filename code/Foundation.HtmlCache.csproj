@@ -178,6 +178,7 @@
     <Compile Include="DB\IItemTrackingProvider.cs" />
     <Compile Include="DB\ItemTrackingProvider.cs" />
     <Compile Include="DB\MessageTypeEnum.cs" />
+    <Compile Include="DB\UspGetCacheForSiteReturnModel.cs" />
     <Compile Include="DB\UspGetStatsReturnModel.cs" />
     <Compile Include="DB\UspLockAndProcessCacheQueueEntryReturnModel.cs" />
     <Compile Include="Events\ClearCacheArgs.cs" />

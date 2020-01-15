@@ -50,7 +50,7 @@ namespace Foundation.HtmlCache.DB
             Property(x => x.CacheSiteId).HasColumnName(@"CacheSiteId").HasColumnType("bigint").IsOptional();
             Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
             Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
-            Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("varbinary").IsOptional().HasMaxLength(8000).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
+            Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("binary").IsRequired().HasMaxLength(64);
 
             // Foreign keys
             HasOptional(a => a.CacheSite).WithMany(b => b.CacheHtmls).HasForeignKey(c => c.CacheSiteId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheSite

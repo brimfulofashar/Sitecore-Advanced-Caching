@@ -1,4 +1,5 @@
-﻿using Foundation.HtmlCache.DB;
+﻿using System.Linq;
+using Foundation.HtmlCache.DB;
 using Sitecore.Caching;
 using Sitecore.Configuration;
 using Sitecore.Pipelines;
@@ -10,18 +11,23 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public void Initialize(PipelineArgs args)
         {
-            using (var ctx = new ItemTrackingProvider())
+            var siteNames = Factory.GetSiteInfoList().Select(x => x.Name);
+
+            foreach (var siteName in siteNames)
             {
-                foreach (var cacheSiteLang in ctx.CacheSites)
+                using (var ctx = new ItemTrackingProvider())
                 {
-                    SiteContext siteContext = Factory.GetSite(cacheSiteLang.SiteName);
-                    foreach (var cacheHtml in cacheSiteLang.CacheHtmls)
+                    var htmlResults = ctx.UspGetCacheForSite(siteName);
+
+                    SiteContext siteContext = Factory.GetSite(siteName);
+
+                    foreach (var htmlResult in htmlResults)
                     {
-                        CacheManager.GetHtmlCache(siteContext).SetHtml(cacheHtml.HtmlCacheKey, cacheHtml.HtmlCacheResult);
+                        CacheManager.GetHtmlCache(siteContext)
+                            .SetHtml(htmlResult.HtmlCacheKey, htmlResult.HtmlCacheResult);
                     }
                 }
             }
-
         }
     }
 }

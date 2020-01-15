@@ -30,28 +30,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.Infrastructure;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheHtmlTemp
-    [Table("CacheHtmlTemp")]
-    public class CacheHtmlTemp
+    public class UspGetCacheForSiteReturnModel
     {
-        public long Id { get; set; } // Id (Primary key)
-        public long CacheQueueId { get; set; } // CacheQueueId
-        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
-        public string HtmlCacheResult { get; set; } // HtmlCacheResult
-        public byte[] HtmlCacheKeyHash { get; set; } // HtmlCacheKeyHash (length: 64)
-
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheQueue pointed by [CacheHtmlTemp].([CacheQueueId]) (FK_CacheHtmlTemp_CacheQueue)
-        /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheHtmlTemp_CacheQueue
+        public string SiteName { get; set; }
+        public string HtmlCacheKey { get; set; }
+        public string HtmlCacheResult { get; set; }
     }
 
 }

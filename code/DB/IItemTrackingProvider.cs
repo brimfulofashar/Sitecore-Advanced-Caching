@@ -68,6 +68,10 @@ namespace Foundation.HtmlCache.DB
         int PurgeDatabase();
         // PurgeDatabaseAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
+        List<UspGetCacheForSiteReturnModel> UspGetCacheForSite(string siteName);
+        List<UspGetCacheForSiteReturnModel> UspGetCacheForSite(string siteName, out int procResult);
+        Task<List<UspGetCacheForSiteReturnModel>> UspGetCacheForSiteAsync(string siteName);
+
         List<UspGetStatsReturnModel> UspGetStats();
         List<UspGetStatsReturnModel> UspGetStats(out int procResult);
         Task<List<UspGetStatsReturnModel>> UspGetStatsAsync();
