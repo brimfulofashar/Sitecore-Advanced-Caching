@@ -9,15 +9,26 @@ namespace Foundation.HtmlCache.Arguments
         public ItemMetaData(Guid id, string language)
         {
             Id = id;
-            //TempalteId = templateId;
             Language = language;
         }
 
         [JsonProperty("Id")]
         public readonly Guid Id;
-        //[JsonProperty("TempalteId")]
-        //public readonly Guid TempalteId;
+        
         [JsonProperty("Language")]
         public readonly string Language;
+
+        public override bool Equals(object obj)
+        {
+            var itemMetaData = obj as ItemMetaData;
+            if (itemMetaData == null)
+                return false;
+            return itemMetaData.Id == Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

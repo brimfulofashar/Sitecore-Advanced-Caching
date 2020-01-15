@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Foundation.HtmlCache.Arguments;
 
@@ -10,12 +11,12 @@ namespace Foundation.HtmlCache.Helpers
         public static DataTable GetTVPParameter(List<ItemMetaData> itemAccessList)
         {
             var dt = new DataTable();
-            dt.Columns.Add("Id");
-            dt.Columns.Add("Lang");
+            dt.Columns.Add("Id", typeof(Guid));
+            dt.Columns.Add("Lang", typeof(string));
 
             foreach (var trackedItem in itemAccessList)
             {
-                dt.Rows.Add(new {trackedItem.Id, trackedItem.Language});
+                dt.Rows.Add(trackedItem.Id, trackedItem.Language);
             }
 
             return dt;

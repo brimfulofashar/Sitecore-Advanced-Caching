@@ -137,6 +137,14 @@ namespace Foundation.HtmlCache.DB
 
 
             modelBuilder.Entity<CacheHtml>()
+                .Property(e => e.CacheSiteId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_CacheSiteId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheHtml>()
                 .Property(e => e.HtmlCacheKeyHash)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
@@ -156,7 +164,7 @@ namespace Foundation.HtmlCache.DB
                 .Property(e => e.CacheHtmlId)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_CacheItem_CacheHtmlId_CacheItemId", 1))
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_CacheItem_CacheHtmlId", 1))
                 );
 
 
@@ -164,7 +172,7 @@ namespace Foundation.HtmlCache.DB
                 .Property(e => e.CacheItemId)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_CacheItem_CacheHtmlId_CacheItemId", 2))
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_CacheItem_CacheItemId", 1))
                 );
 
 
@@ -379,13 +387,13 @@ namespace Foundation.HtmlCache.DB
             if (IsSqlParameterNull(cacheQueueCountParam))
                 cacheQueueCount = null;
             else
-                cacheQueueCount = (long) cacheQueueCountParam.Value;
+                cacheQueueCount = (long)cacheQueueCountParam.Value;
 
-            procResult = (int) procResultParam.Value;
+            procResult = (int)procResultParam.Value;
             return procResultData;
         }
 
-        // UspLockAndProcessCacheQueueEntryAsync() cannot be created due to having out parameters, or is relying on the procedure result (List<UspLockAndProcessCacheQueueEntryReturnModel>)
+        // UspLockAndProcessCacheQueueEntryAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
         public int UspProcessCacheData(long? cacheQueueId)
         {
