@@ -25,7 +25,7 @@ namespace Foundation.HtmlCache.Pipelines
                 {
                     try
                     {
-                        var ids = GuidTVPHelper.GetTVPParameter(renderingProcessorArgs.ItemAccessList.ToList());
+                        var ids = TVPHelper.GetTVPParameter(renderingProcessorArgs.ItemAccessList.ToList());
 
                         ctx.UspQueueCacheData(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language,
                             renderingProcessorArgs.CacheKey, renderingProcessorArgs.CacheResult, ids);

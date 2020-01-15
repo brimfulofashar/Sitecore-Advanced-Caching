@@ -44,6 +44,7 @@ namespace Foundation.HtmlCache.DB
         public long CacheQueueId { get; set; } // CacheQueueId
         public Guid ItemId { get; set; } // ItemId
         public string ItemLang { get; set; } // ItemLang (length: 250)
+        public bool IsDeleted { get; set; } // IsDeleted
 
         // Foreign keys
 

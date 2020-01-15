@@ -43,8 +43,8 @@ namespace Foundation.HtmlCache.DB
         public long Id { get; set; } // Id (Primary key)
         public long CacheQueueId { get; set; } // CacheQueueId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
-        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
+        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
 
         // Foreign keys
 

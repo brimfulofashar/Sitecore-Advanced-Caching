@@ -148,7 +148,7 @@ namespace Foundation.HtmlCache.DB
                 .Property(e => e.HtmlCacheKeyHash)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
-                    new IndexAnnotation(new IndexAttribute("IX_Cache_HtmlCacheKeyHash", 1))
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_HtmlCacheKeyHash", 1))
                 );
 
 

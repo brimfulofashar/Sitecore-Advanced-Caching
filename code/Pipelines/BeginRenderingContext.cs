@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Foundation.HtmlCache.Arguments;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Models;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
@@ -16,8 +17,7 @@ namespace Foundation.HtmlCache.Pipelines
                     args.Rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value + "|" + Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs"), 
                     args.Rendering.Caching.Cacheable, 
                     TrackOperation.TrackOperationEnum.Track);
-                dic.ItemAccessList.Add(new ItemMetaData(args.PageContext.Item.ID.Guid,
-                    args.PageContext.Item.Language.Name));
+                dic.ItemAccessList.Add(new ItemMetaData(args.PageContext.Item.ID.Guid, args.PageContext.Item.Language.Name, false));
             }
             else
             {

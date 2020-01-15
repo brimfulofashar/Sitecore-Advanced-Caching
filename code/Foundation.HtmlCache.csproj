@@ -157,6 +157,8 @@
     <Compile Include="DB\CacheHtmlTemp.cs" />
     <Compile Include="DB\CacheHtmlTempConfiguration.cs" />
     <Compile Include="DB\CacheItem.cs" />
+    <Compile Include="DB\CacheItemActionType.cs" />
+    <Compile Include="DB\CacheItemActionTypeConfiguration.cs" />
     <Compile Include="DB\CacheItemConfiguration.cs" />
     <Compile Include="DB\CacheItemTemp.cs" />
     <Compile Include="DB\CacheItemTempConfiguration.cs" />
@@ -194,7 +196,7 @@
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
     <Compile Include="Arguments\ItemMetaData.cs" />
     <Compile Include="Arguments\RenderingProcessorArgs.cs" />
-    <Compile Include="Helpers\GuidTVPHelper.cs" />
+    <Compile Include="Helpers\TVPHelper.cs" />
     <Compile Include="Models\CacheSiteLangKeys.cs" />
     <Compile Include="Models\ProcessCacheQueueResult.cs" />
     <Compile Include="Models\PublishItemTracking.cs" />

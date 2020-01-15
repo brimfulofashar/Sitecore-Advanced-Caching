@@ -5,7 +5,7 @@ using Foundation.HtmlCache.Arguments;
 
 namespace Foundation.HtmlCache.Helpers
 {
-    public class GuidTVPHelper
+    public class TVPHelper
     {
 
         public static DataTable GetTVPParameter(List<ItemMetaData> itemAccessList)
@@ -13,10 +13,11 @@ namespace Foundation.HtmlCache.Helpers
             var dt = new DataTable();
             dt.Columns.Add("Id", typeof(Guid));
             dt.Columns.Add("Lang", typeof(string));
+            dt.Columns.Add("IsDeleted", typeof(bool));
 
             foreach (var trackedItem in itemAccessList)
             {
-                dt.Rows.Add(trackedItem.Id, trackedItem.Language);
+                dt.Rows.Add(trackedItem.Id, trackedItem.Language, trackedItem.IsDeleted);
             }
 
             return dt;

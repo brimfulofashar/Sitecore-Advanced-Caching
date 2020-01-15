@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Foundation.HtmlCache.Arguments;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Data.Items;
@@ -23,7 +24,7 @@ namespace Foundation.HtmlCache.Providers
                         !item.Paths.FullPath.Contains("/sitecore/templates") &&
                         ((item.Language.Name == Context.Language.Name || item.IsFallback) && item.Language != null && !string.IsNullOrEmpty(item.Language.Name)))
                     {
-                        renderingProcessorArgs.ItemAccessList.Add(new ItemMetaData(item.ID.Guid, item.Language.Name));
+                        renderingProcessorArgs.ItemAccessList.Add(new ItemMetaData(item.ID.Guid, item.Language.Name, false));
                         HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
                     }
                 }
