@@ -42,6 +42,7 @@ namespace Foundation.HtmlCache.DB
     {
         public Guid Id { get; set; } // Id (Primary key)
         public Guid ItemId { get; set; } // ItemId
+        public string ItemLang { get; set; } // ItemLang (length: 250)
 
         // Reverse navigation
 

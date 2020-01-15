@@ -21,7 +21,7 @@ namespace Foundation.HtmlCache.Providers
                         renderingProcessorArgs.CacheableTemplates.Contains(item.TemplateID.ToString()) &&
                         !item.Paths.FullPath.Contains("/sitecore/templates"))
                     {
-                        renderingProcessorArgs.ItemAccessList.Add(new ItemMetaData(item.ID.Guid, item.TemplateID.Guid));
+                        renderingProcessorArgs.ItemAccessList.Add(new ItemMetaData(item.ID.Guid, item.Language.Name));
                         HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
                     }
                 }

@@ -208,6 +208,14 @@ namespace Foundation.HtmlCache.DB
                 );
 
 
+            modelBuilder.Entity<CacheItem>()
+                .Property(e => e.ItemLang)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheItem_ItemLang", 1))
+                );
+
+
             modelBuilder.Entity<CacheItemTemp>()
                 .Property(e => e.Id)
                 .HasColumnAnnotation(
@@ -229,6 +237,14 @@ namespace Foundation.HtmlCache.DB
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("IX_CacheItemTemp_ItemId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheItemTemp>()
+                .Property(e => e.ItemLang)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheItemTemp_ItemLang", 1))
                 );
 
 
@@ -442,7 +458,7 @@ namespace Foundation.HtmlCache.DB
             if (htmlCacheResultParam.Value == null)
                 htmlCacheResultParam.Value = DBNull.Value;
 
-            var idsParam = new SqlParameter { ParameterName = "@Ids", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = ids, TypeName = "dbo.GuidList" };
+            var idsParam = new SqlParameter { ParameterName = "@Ids", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = ids, TypeName = "dbo.ItemMetaData" };
             if (idsParam.Value == null)
                 idsParam.Value = DBNull.Value;
 
@@ -480,7 +496,7 @@ namespace Foundation.HtmlCache.DB
             if (siteLangParam.Value == null)
                 siteLangParam.Value = DBNull.Value;
 
-            var idsParam = new SqlParameter { ParameterName = "@Ids", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = ids, TypeName = "dbo.GuidList" };
+            var idsParam = new SqlParameter { ParameterName = "@Ids", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = ids, TypeName = "dbo.ItemMetaData" };
             if (idsParam.Value == null)
                 idsParam.Value = DBNull.Value;
 

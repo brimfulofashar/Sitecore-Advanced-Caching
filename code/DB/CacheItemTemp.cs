@@ -43,6 +43,7 @@ namespace Foundation.HtmlCache.DB
         public Guid Id { get; set; } // Id (Primary key)
         public long CacheQueueId { get; set; } // CacheQueueId
         public Guid ItemId { get; set; } // ItemId
+        public string ItemLang { get; set; } // ItemLang (length: 250)
 
         // Foreign keys
 

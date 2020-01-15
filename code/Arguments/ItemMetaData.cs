@@ -6,28 +6,18 @@ namespace Foundation.HtmlCache.Arguments
     [Serializable]
     public class ItemMetaData
     {
-        public ItemMetaData(Guid id, Guid templateId)
+        public ItemMetaData(Guid id, string language)
         {
             Id = id;
-            TempalteId = templateId;
+            //TempalteId = templateId;
+            Language = language;
         }
 
         [JsonProperty("Id")]
         public readonly Guid Id;
-        [JsonProperty("TempalteId")]
-        public readonly Guid TempalteId;
-
-        public override bool Equals(object obj)
-        {
-            var itemMetaData = obj as ItemMetaData;
-            if (itemMetaData == null)
-                return false;
-            return itemMetaData.Id == Id && itemMetaData.TempalteId == TempalteId;
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode() ^ TempalteId.GetHashCode();
-        }
+        //[JsonProperty("TempalteId")]
+        //public readonly Guid TempalteId;
+        [JsonProperty("Language")]
+        public readonly string Language;
     }
 }

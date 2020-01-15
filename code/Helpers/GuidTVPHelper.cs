@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using Foundation.HtmlCache.Arguments;
 
 namespace Foundation.HtmlCache.Helpers
@@ -11,14 +7,15 @@ namespace Foundation.HtmlCache.Helpers
     public class GuidTVPHelper
     {
 
-        public static DataTable GetTVPParameter(List<Guid> itemAccessList)
+        public static DataTable GetTVPParameter(List<ItemMetaData> itemAccessList)
         {
             var dt = new DataTable();
             dt.Columns.Add("Id");
+            dt.Columns.Add("Lang");
 
             foreach (var trackedItem in itemAccessList)
             {
-                dt.Rows.Add(trackedItem);
+                dt.Rows.Add(new {trackedItem.Id, trackedItem.Language});
             }
 
             return dt;
