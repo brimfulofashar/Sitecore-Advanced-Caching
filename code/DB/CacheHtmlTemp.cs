@@ -40,7 +40,7 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheHtmlTemp")]
     public class CacheHtmlTemp
     {
-        public Guid Id { get; set; } // Id (Primary key)
+        public long Id { get; set; } // Id (Primary key)
         public long CacheQueueId { get; set; } // CacheQueueId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
         public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
@@ -52,11 +52,6 @@ namespace Foundation.HtmlCache.DB
         /// Parent CacheQueue pointed by [CacheHtmlTemp].([CacheQueueId]) (FK_CacheHtmlTemp_CacheQueue)
         /// </summary>
         public virtual CacheQueue CacheQueue { get; set; } // FK_CacheHtmlTemp_CacheQueue
-
-        public CacheHtmlTemp()
-        {
-            Id = Guid.NewGuid();
-        }
     }
 
 }

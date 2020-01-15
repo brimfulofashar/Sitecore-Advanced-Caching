@@ -27,33 +27,23 @@
 // ReSharper disable UsePatternMatching
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheHtml_CacheItem
-    public class CacheHtmlCacheItemConfiguration : EntityTypeConfiguration<CacheHtmlCacheItem>
+    public class UspGetStatsReturnModel
     {
-        public CacheHtmlCacheItemConfiguration()
-            : this("dbo")
-        {
-        }
-
-        public CacheHtmlCacheItemConfiguration(string schema)
-        {
-            ToTable("CacheHtml_CacheItem", schema);
-            HasKey(x => x.Id);
-
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheHtmlId).HasColumnName(@"CacheHtmlId").HasColumnType("bigint").IsRequired();
-            Property(x => x.CacheItemId).HasColumnName(@"CacheItemId").HasColumnType("bigint").IsRequired();
-
-            // Foreign keys
-            HasRequired(a => a.CacheHtml).WithMany(b => b.CacheHtmlCacheItems).HasForeignKey(c => c.CacheHtmlId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheItem_CacheHtml
-            HasRequired(a => a.CacheItem).WithMany(b => b.CacheHtmlCacheItems).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheItem_CacheItem
-        }
+        public string TableName { get; set; }
+        public string SchemaName { get; set; }
+        public long? RowCounts { get; set; }
+        public long? TotalSpaceKB { get; set; }
+        public decimal? TotalSpaceMB { get; set; }
+        public long? UsedSpaceKB { get; set; }
+        public decimal? UsedSpaceMB { get; set; }
+        public long? UnusedSpaceKB { get; set; }
+        public decimal? UnusedSpaceMB { get; set; }
     }
 
 }

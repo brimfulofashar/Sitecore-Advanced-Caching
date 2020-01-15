@@ -369,6 +369,37 @@ namespace Foundation.HtmlCache.DB
         }
 
         // Stored Procedures
+        public int PurgeDatabase()
+        {
+            var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
+
+            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[PurgeDatabase] ", procResultParam);
+
+            return (int)procResultParam.Value;
+        }
+
+        // PurgeDatabaseAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        public List<UspGetStatsReturnModel> UspGetStats()
+        {
+            int procResult;
+            return UspGetStats(out procResult);
+        }
+
+        public List<UspGetStatsReturnModel> UspGetStats(out int procResult)
+        {
+            var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
+            var procResultData = Database.SqlQuery<UspGetStatsReturnModel>("EXEC @procResult = [dbo].[usp_GetStats]", procResultParam).ToList();
+            procResult = (int) procResultParam.Value;
+            return procResultData;
+        }
+
+        public async Task<List<UspGetStatsReturnModel>> UspGetStatsAsync()
+        {
+            var procResultData = await Database.SqlQuery<UspGetStatsReturnModel>("EXEC [dbo].[usp_GetStats]").ToListAsync();
+            return procResultData;
+        }
+
         public List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount)
         {
             int procResult;

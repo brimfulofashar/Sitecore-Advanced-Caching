@@ -65,9 +65,16 @@ namespace Foundation.HtmlCache.DB
         string ToString();
 
         // Stored Procedures
+        int PurgeDatabase();
+        // PurgeDatabaseAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        List<UspGetStatsReturnModel> UspGetStats();
+        List<UspGetStatsReturnModel> UspGetStats(out int procResult);
+        Task<List<UspGetStatsReturnModel>> UspGetStatsAsync();
+
         List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount);
         List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount, out int procResult);
-        // UspLockAndProcessCacheQueueEntryAsync() cannot be created due to having out parameters, or is relying on the procedure result (List<UspLockAndProcessCacheQueueEntryReturnModel>)
+        // UspLockAndProcessCacheQueueEntryAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
         int UspProcessCacheData(long? cacheQueueId);
         // UspProcessCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)

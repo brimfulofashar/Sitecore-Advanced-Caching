@@ -40,8 +40,8 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheHtml")]
     public class CacheHtml
     {
-        public Guid Id { get; set; } // Id (Primary key)
-        public Guid? CacheSiteId { get; set; } // CacheSiteId
+        public long Id { get; set; } // Id (Primary key)
+        public long? CacheSiteId { get; set; } // CacheSiteId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
         public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
@@ -62,7 +62,6 @@ namespace Foundation.HtmlCache.DB
 
         public CacheHtml()
         {
-            Id = Guid.NewGuid();
             CacheHtmlCacheItems = new List<CacheHtmlCacheItem>();
         }
     }

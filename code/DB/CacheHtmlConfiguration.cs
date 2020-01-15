@@ -46,8 +46,8 @@ namespace Foundation.HtmlCache.DB
             ToTable("CacheHtml", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheSiteId).HasColumnName(@"CacheSiteId").HasColumnType("uniqueidentifier").IsOptional();
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.CacheSiteId).HasColumnName(@"CacheSiteId").HasColumnType("bigint").IsOptional();
             Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
             Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("varbinary").IsOptional().HasMaxLength(8000).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
