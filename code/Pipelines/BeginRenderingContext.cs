@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Foundation.HtmlCache.Arguments;
+using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Models;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
@@ -10,14 +11,13 @@ namespace Foundation.HtmlCache.Pipelines
         public override void Process(RenderRenderingArgs args)
         {
             RenderingProcessorArgs dic;
-            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey) && !args.Rendering.Caching.VaryByUser)
+            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey))
             {
                 dic = new RenderingProcessorArgs(args.CacheKey, 
                     args.Rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value + "|" + Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs"), 
                     args.Rendering.Caching.Cacheable, 
                     TrackOperation.TrackOperationEnum.Track);
-                dic.ItemAccessList.Add(new ItemMetaData(args.PageContext.Item.ID.Guid,
-                    args.PageContext.Item.TemplateID.Guid));
+                dic.ItemAccessList.Add(new ItemMetaData(args.PageContext.Item.ID.Guid, args.PageContext.Item.Language.Name, false));
             }
             else
             {

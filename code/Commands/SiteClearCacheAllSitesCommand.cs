@@ -1,4 +1,7 @@
-﻿using Foundation.HtmlCache.DB;
+﻿using System.Data;
+using System.Data.SqlClient;
+using Foundation.HtmlCache.DB;
+using Foundation.HtmlCache.Extensions;
 using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Shell.Framework.Commands;
@@ -18,12 +21,16 @@ namespace Foundation.HtmlCache.Commands
         {
             using (var ctx = new ItemTrackingProvider())
             {
-                var cacheQueue = new CacheQueue
+                var siteInfos = SiteInfoExtensions.GetSites(null, null);
+                if (siteInfos != null)
                 {
-                    CacheQueueMessageTypeId = (int)MessageTypeEnum.DeleteSiteFromCacheAllSites,
-                };
-                ctx.CacheQueues.Add(cacheQueue);
-                ctx.SaveChanges();
+                    foreach (var siteInfo in siteInfos)
+                    {
+                        ctx.UspQueueDeleteSiteFromCache(siteInfo.Name, siteInfo.Language);
+                    }
+
+                    SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);
+                }
             }
 
             SheerResponse.Alert("Caches for the all sites in all languages have been queue to be cleared", true);

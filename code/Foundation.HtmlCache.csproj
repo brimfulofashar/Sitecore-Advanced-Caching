@@ -150,14 +150,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agents\HtmlCacheQueueAgent.cs" />
-    <Compile Include="DB\Cache.cs" />
-    <Compile Include="DB\CacheConfiguration.cs" />
+    <Compile Include="DB\CacheHtml.cs" />
+    <Compile Include="DB\CacheHtmlCacheItem.cs" />
+    <Compile Include="DB\CacheHtmlCacheItemConfiguration.cs" />
+    <Compile Include="DB\CacheHtmlConfiguration.cs" />
+    <Compile Include="DB\CacheHtmlTemp.cs" />
+    <Compile Include="DB\CacheHtmlTempConfiguration.cs" />
+    <Compile Include="DB\CacheItem.cs" />
+    <Compile Include="DB\CacheItemConfiguration.cs" />
+    <Compile Include="DB\CacheItemTemp.cs" />
+    <Compile Include="DB\CacheItemTempConfiguration.cs" />
     <Compile Include="DB\CacheQueue.cs" />
     <Compile Include="DB\CacheQueueConfiguration.cs" />
     <Compile Include="DB\CacheQueueMessageType.cs" />
     <Compile Include="DB\CacheQueueMessageTypeConfiguration.cs" />
-    <Compile Include="DB\CacheTemp.cs" />
-    <Compile Include="DB\CacheTempConfiguration.cs" />
+    <Compile Include="DB\CacheSite.cs" />
+    <Compile Include="DB\CacheSiteConfiguration.cs" />
+    <Compile Include="DB\CacheSiteTemp.cs" />
+    <Compile Include="DB\CacheSiteTempConfiguration.cs" />
     <Compile Include="DB\Database.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -166,12 +176,13 @@
     <Compile Include="DB\IItemTrackingProvider.cs" />
     <Compile Include="DB\ItemTrackingProvider.cs" />
     <Compile Include="DB\MessageTypeEnum.cs" />
-    <Compile Include="Events\ClearCacheAllSites.cs" />
+    <Compile Include="DB\UspGetCacheForSiteReturnModel.cs" />
+    <Compile Include="DB\UspGetStatsReturnModel.cs" />
+    <Compile Include="DB\UspLockAndProcessCacheQueueEntryReturnModel.cs" />
     <Compile Include="Events\ClearCacheArgs.cs" />
     <Compile Include="Events\ClearCacheHtml.cs" />
     <Compile Include="Events\ClearCacheOperation.cs" />
     <Compile Include="Events\ClearCacheSite.cs" />
-    <Compile Include="Events\ClearCacheSiteAllLanguages.cs" />
     <Compile Include="Events\ItemPrePublish.cs" />
     <Compile Include="Commands\SiteClearCacheAllSitesCommand.cs" />
     <Compile Include="Commands\SiteClearCacheAllLanguagesCommand.cs" />
@@ -184,6 +195,8 @@
     <Compile Include="Extensions\SiteInfoExtensions.cs" />
     <Compile Include="Arguments\ItemMetaData.cs" />
     <Compile Include="Arguments\RenderingProcessorArgs.cs" />
+    <Compile Include="Helpers\TVPHelper.cs" />
+    <Compile Include="Models\CacheSiteLangKeys.cs" />
     <Compile Include="Models\ProcessCacheQueueResult.cs" />
     <Compile Include="Models\PublishItemTracking.cs" />
     <Compile Include="Models\TrackOperation.cs" />
@@ -207,7 +220,6 @@
     <Content Include="App_Config\Include\zFoundation\zFoundation.HtmlCache.config" />
     <Content Include="DB\EF.Reverse.POCO.v3.ttinclude" />
     <None Include="packages.config" />
-    <Content Include="Views\HtmlCache\HtmlCacheLayout.cshtml" />
     <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>

@@ -29,27 +29,31 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // Cache
-    [Table("Cache")]
-    public class Cache
+    // CacheSite
+    [Table("CacheSite")]
+    public class CacheSite
     {
-        public Guid Id { get; set; } // Id (Primary key)
+        public long Id { get; set; } // Id (Primary key)
         public string SiteName { get; set; } // SiteName (length: 250)
         public string SiteLang { get; set; } // SiteLang (length: 250)
-        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
-        public byte[] HtmlCacheKeyHash { get; private set; } // HtmlCacheKeyHash (length: 8000)
-        public string HtmlCacheResult { get; set; } // HtmlCacheResult
-        public Guid ItemId { get; set; } // ItemId
 
-        public Cache()
+        // Reverse navigation
+
+        /// <summary>
+        /// Child CacheHtmls where [CacheHtml].[CacheSiteId] point to this entity (FK_CacheHtml_CacheSite)
+        /// </summary>
+        public virtual ICollection<CacheHtml> CacheHtmls { get; set; } // CacheHtml.FK_CacheHtml_CacheSite
+
+        public CacheSite()
         {
-            Id = Guid.NewGuid();
+            CacheHtmls = new List<CacheHtml>();
         }
     }
 

@@ -28,30 +28,31 @@
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // Cache
-    public class CacheConfiguration : EntityTypeConfiguration<Cache>
+    // CacheHtml_CacheItem
+    public class CacheHtmlCacheItemConfiguration : EntityTypeConfiguration<CacheHtmlCacheItem>
     {
-        public CacheConfiguration()
+        public CacheHtmlCacheItemConfiguration()
             : this("dbo")
         {
         }
 
-        public CacheConfiguration(string schema)
+        public CacheHtmlCacheItemConfiguration(string schema)
         {
-            ToTable("Cache", schema);
+            ToTable("CacheHtml_CacheItem", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
-            Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
-            Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("varbinary").IsOptional().HasMaxLength(8000).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
-            Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
-            Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.CacheHtmlId).HasColumnName(@"CacheHtmlId").HasColumnType("bigint").IsRequired();
+            Property(x => x.CacheItemId).HasColumnName(@"CacheItemId").HasColumnType("bigint").IsRequired();
+
+            // Foreign keys
+            HasRequired(a => a.CacheHtml).WithMany(b => b.CacheHtmlCacheItems).HasForeignKey(c => c.CacheHtmlId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheItem_CacheHtml
+            HasRequired(a => a.CacheItem).WithMany(b => b.CacheHtmlCacheItems).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheItem_CacheItem
         }
     }
 

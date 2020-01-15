@@ -33,27 +33,27 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheQueue
-    public class CacheQueueConfiguration : EntityTypeConfiguration<CacheQueue>
+    // CacheItemTemp
+    public class CacheItemTempConfiguration : EntityTypeConfiguration<CacheItemTemp>
     {
-        public CacheQueueConfiguration()
+        public CacheItemTempConfiguration()
             : this("dbo")
         {
         }
 
-        public CacheQueueConfiguration(string schema)
+        public CacheItemTempConfiguration(string schema)
         {
-            ToTable("CacheQueue", schema);
+            ToTable("CacheItemTemp", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
-            Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
-            Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
+            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
+            Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.ItemLang).HasColumnName(@"ItemLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
+            Property(x => x.IsDeleted).HasColumnName(@"IsDeleted").HasColumnType("bit").IsRequired();
 
             // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
+            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheItemTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheItemTemp_CacheQueue
         }
     }
 

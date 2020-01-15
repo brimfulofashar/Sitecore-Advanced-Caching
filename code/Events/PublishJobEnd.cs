@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.DB;
+using Foundation.HtmlCache.Helpers;
 using Foundation.HtmlCache.Models;
 
 namespace Foundation.HtmlCache.Events
@@ -14,18 +16,16 @@ namespace Foundation.HtmlCache.Events
             {
                 foreach (var langugage in publishItemTracking.Languages)
                 {
-                    var cacheQueue = new CacheQueue()
-                        {CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteFromCache, Language = langugage};
-
-                    var publishedItems = publishItemTracking.PublishedItems.Select(x => new CacheTemp()
-                        {CacheQueue = cacheQueue, ItemId = x.Key}).ToList();
-
-                    cacheQueue.CacheTemps = publishedItems;
-
                     using (var ctx = new ItemTrackingProvider())
                     {
-                        ctx.CacheQueues.Add(cacheQueue);
-                        ctx.SaveChanges();
+                        foreach (var language in publishItemTracking.Languages)
+                        {
+                            var ids = TVPHelper.GetTVPParameter(publishItemTracking.PublishedItems .Select(x => new ItemMetaData(x.Key, language, x.Value == PublishOperation.PublishOperationEnum.Delete)).ToList());
+
+                            ctx.UspQueuePublishData(langugage, ids);
+                        }
+
+                        
                     }
                 }
             }

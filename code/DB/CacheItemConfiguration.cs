@@ -33,27 +33,22 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheQueue
-    public class CacheQueueConfiguration : EntityTypeConfiguration<CacheQueue>
+    // CacheItem
+    public class CacheItemConfiguration : EntityTypeConfiguration<CacheItem>
     {
-        public CacheQueueConfiguration()
+        public CacheItemConfiguration()
             : this("dbo")
         {
         }
 
-        public CacheQueueConfiguration(string schema)
+        public CacheItemConfiguration(string schema)
         {
-            ToTable("CacheQueue", schema);
+            ToTable("CacheItem", schema);
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
-            Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
-            Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
+            Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
+            Property(x => x.ItemLang).HasColumnName(@"ItemLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
         }
     }
 

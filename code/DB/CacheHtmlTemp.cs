@@ -27,34 +27,31 @@
 // ReSharper disable UsePatternMatching
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.ModelConfiguration;
+using System.Data.Entity.Infrastructure;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheQueue
-    public class CacheQueueConfiguration : EntityTypeConfiguration<CacheQueue>
+    // CacheHtmlTemp
+    [Table("CacheHtmlTemp")]
+    public class CacheHtmlTemp
     {
-        public CacheQueueConfiguration()
-            : this("dbo")
-        {
-        }
+        public long Id { get; set; } // Id (Primary key)
+        public long CacheQueueId { get; set; } // CacheQueueId
+        public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
+        public string HtmlCacheResult { get; set; } // HtmlCacheResult
+        public byte[] HtmlCacheKeyHash { get; set; } // HtmlCacheKeyHash (length: 64)
 
-        public CacheQueueConfiguration(string schema)
-        {
-            ToTable("CacheQueue", schema);
-            HasKey(x => x.Id);
+        // Foreign keys
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
-            Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
-            Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
-        }
+        /// <summary>
+        /// Parent CacheQueue pointed by [CacheHtmlTemp].([CacheQueueId]) (FK_CacheHtmlTemp_CacheQueue)
+        /// </summary>
+        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheHtmlTemp_CacheQueue
     }
 
 }

@@ -27,34 +27,23 @@
 // ReSharper disable UsePatternMatching
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheQueue
-    public class CacheQueueConfiguration : EntityTypeConfiguration<CacheQueue>
+    public class UspGetStatsReturnModel
     {
-        public CacheQueueConfiguration()
-            : this("dbo")
-        {
-        }
-
-        public CacheQueueConfiguration(string schema)
-        {
-            ToTable("CacheQueue", schema);
-            HasKey(x => x.Id);
-
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
-            Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
-            Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
-        }
+        public string TableName { get; set; }
+        public string SchemaName { get; set; }
+        public long? RowCounts { get; set; }
+        public long? TotalSpaceKB { get; set; }
+        public decimal? TotalSpaceMB { get; set; }
+        public long? UsedSpaceKB { get; set; }
+        public decimal? UsedSpaceMB { get; set; }
+        public long? UnusedSpaceKB { get; set; }
+        public decimal? UnusedSpaceMB { get; set; }
     }
 
 }

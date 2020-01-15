@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Events;
@@ -29,22 +31,13 @@ namespace Foundation.HtmlCache.Commands
         {
             using (var ctx = new ItemTrackingProvider())
             {
-                var siteInfos = SiteInfoExtensions.GetSites(this.Item);
+                var siteInfos = SiteInfoExtensions.GetSites(this.Item, null);
                 if (siteInfos != null)
                 {
                     foreach (var siteInfo in siteInfos)
                     {
-                        var cacheQueue = new CacheQueue
-                        {
-                            CacheQueueMessageTypeId = (int) MessageTypeEnum.DeleteSiteFromCacheAllLanguages,
-                            Site = siteInfo.Name,
-                            Language = siteInfo.Language
-
-                        };
-                        ctx.CacheQueues.Add(cacheQueue);
+                        ctx.UspQueueDeleteSiteFromCache(siteInfo.Name, siteInfo.Language);
                     }
-
-                    ctx.SaveChanges();
 
                     SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);
                 }
