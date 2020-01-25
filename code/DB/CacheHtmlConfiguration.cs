@@ -34,7 +34,7 @@ using System.Data.Entity.ModelConfiguration;
 namespace Foundation.HtmlCache.DB
 {
     // CacheHtml
-    public class CacheHtmlConfiguration : EntityTypeConfiguration<CacheHtml>
+    public partial class CacheHtmlConfiguration : EntityTypeConfiguration<CacheHtml>
     {
         public CacheHtmlConfiguration()
             : this("dbo")

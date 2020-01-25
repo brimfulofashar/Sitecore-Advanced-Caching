@@ -44,6 +44,7 @@ namespace Foundation.HtmlCache.DB
         DbSet<CacheHtml> CacheHtmls { get; set; } // CacheHtml
         DbSet<CacheHtmlCacheItem> CacheHtmlCacheItems { get; set; } // CacheHtml_CacheItem
         DbSet<CacheHtmlTemp> CacheHtmlTemps { get; set; } // CacheHtmlTemp
+        DbSet<CacheHtmlTempCacheItemTemp> CacheHtmlTempCacheItemTemps { get; set; } // CacheHtmlTemp_CacheItemTemp
         DbSet<CacheItem> CacheItems { get; set; } // CacheItem
         DbSet<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp
         DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
@@ -89,7 +90,7 @@ namespace Foundation.HtmlCache.DB
         int UspProcessDeleteSiteFromCache(long? cacheQueueId, int? cacheQueueMessageTypeId);
         // UspProcessDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
-        int UspQueueCacheData(string siteName, string siteLang, string htmlCacheKey, string htmlCacheResult, DataTable ids);
+        int UspQueueCacheData(DataTable cacheSiteTvp, DataTable cacheHtmlTvp, DataTable cacheHtmlCacheItemTvp, DataTable cacheItemTvp);
         // UspQueueCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
         int UspQueueDeleteSiteFromCache(string siteName, string siteLang);

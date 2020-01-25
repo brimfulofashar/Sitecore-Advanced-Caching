@@ -34,7 +34,7 @@ using System.Data.Entity.ModelConfiguration;
 namespace Foundation.HtmlCache.DB
 {
     // CacheSiteTemp
-    public class CacheSiteTempConfiguration : EntityTypeConfiguration<CacheSiteTemp>
+    public partial class CacheSiteTempConfiguration : EntityTypeConfiguration<CacheSiteTemp>
     {
         public CacheSiteTempConfiguration()
             : this("dbo")
@@ -46,7 +46,7 @@ namespace Foundation.HtmlCache.DB
             ToTable("CacheSiteTemp", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
             Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
             Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
             Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);

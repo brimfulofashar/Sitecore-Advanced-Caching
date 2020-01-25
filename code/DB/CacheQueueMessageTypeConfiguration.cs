@@ -34,7 +34,7 @@ using System.Data.Entity.ModelConfiguration;
 namespace Foundation.HtmlCache.DB
 {
     // CacheQueueMessageType
-    public class CacheQueueMessageTypeConfiguration : EntityTypeConfiguration<CacheQueueMessageType>
+    public partial class CacheQueueMessageTypeConfiguration : EntityTypeConfiguration<CacheQueueMessageType>
     {
         public CacheQueueMessageTypeConfiguration()
             : this("dbo")

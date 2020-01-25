@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Foundation.HtmlCache</RootNamespace>
     <AssemblyName>Foundation.HtmlCache</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -81,26 +81,14 @@
       <HintPath>packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Extensions.DependencyInjection.2.1.1\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.1.1\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Sitecore.Kernel, Version=11.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Sitecore.Kernel.NoReferences.9.0.180604\lib\NET462\Sitecore.Kernel.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Sitecore.Kernel, Version=13.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Sitecore.Kernel.9.2.0\lib\net471\Sitecore.Kernel.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Mvc, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Sitecore.Mvc.9.2.0\lib\net471\Sitecore.Mvc.dll</HintPath>
+    <Reference Include="Sitecore.Mvc, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Sitecore.Mvc.NoReferences.9.0.180604\lib\NET462\Sitecore.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="sysglobl" />
     <Reference Include="System" />
@@ -125,25 +113,7 @@
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.Mvc.5.2.4\lib\net45\System.Web.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.Razor.3.2.4\lib\net45\System.Web.Razor.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -155,7 +125,11 @@
     <Compile Include="DB\CacheHtmlCacheItemConfiguration.cs" />
     <Compile Include="DB\CacheHtmlConfiguration.cs" />
     <Compile Include="DB\CacheHtmlTemp.cs" />
+    <Compile Include="DB\CacheHtmlTempCacheItemTemp.cs" />
+    <Compile Include="DB\CacheHtmlTempCacheItemTempConfiguration.cs" />
     <Compile Include="DB\CacheHtmlTempConfiguration.cs" />
+    <Compile Include="DB\CacheHtmlTempCacheItemTempEquality.cs" />
+    <Compile Include="DB\CacheItemTempEquality.cs" />
     <Compile Include="DB\CacheItem.cs" />
     <Compile Include="DB\CacheItemConfiguration.cs" />
     <Compile Include="DB\CacheItemTemp.cs" />
@@ -166,6 +140,8 @@
     <Compile Include="DB\CacheQueueMessageTypeConfiguration.cs" />
     <Compile Include="DB\CacheSite.cs" />
     <Compile Include="DB\CacheSiteConfiguration.cs" />
+    <Compile Include="DB\CacheHtmlTempEquality.cs" />
+    <Compile Include="DB\CacheSiteTempEquality.cs" />
     <Compile Include="DB\CacheSiteTemp.cs" />
     <Compile Include="DB\CacheSiteTempConfiguration.cs" />
     <Compile Include="DB\Database.cs">
@@ -201,6 +177,8 @@
     <Compile Include="Models\PublishItemTracking.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
+    <Compile Include="Pipelines\BeginTrackingContext.cs" />
+    <Compile Include="Pipelines\EndTrackingContext.cs" />
     <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\InitializeRemoteEventSubscriptions.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />

@@ -20,9 +20,9 @@ namespace Foundation.HtmlCache.Events
                     {
                         foreach (var language in publishItemTracking.Languages)
                         {
-                            var ids = TVPHelper.GetTVPParameter(publishItemTracking.PublishedItems .Select(x => new ItemMetaData(x.Key, language, x.Value == PublishOperation.PublishOperationEnum.Delete)).ToList());
-
-                            ctx.UspQueuePublishData(langugage, ids);
+//                            var ids = TVPHelper.GetTVPParameter(publishItemTracking.PublishedItems .Select(x => new ItemMetaData(x.Key, language, x.Value == PublishOperation.PublishOperationEnum.Delete)).ToList());
+//
+//                            ctx.UspQueuePublishData(langugage, ids);
                         }
 
                         

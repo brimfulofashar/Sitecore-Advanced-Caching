@@ -51,6 +51,7 @@ namespace Foundation.HtmlCache.DB
         public DbSet<CacheHtml> CacheHtmls { get; set; } // CacheHtml
         public DbSet<CacheHtmlCacheItem> CacheHtmlCacheItems { get; set; } // CacheHtml_CacheItem
         public DbSet<CacheHtmlTemp> CacheHtmlTemps { get; set; } // CacheHtmlTemp
+        public DbSet<CacheHtmlTempCacheItemTemp> CacheHtmlTempCacheItemTemps { get; set; } // CacheHtmlTemp_CacheItemTemp
         public DbSet<CacheItem> CacheItems { get; set; } // CacheItem
         public DbSet<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp
         public DbSet<CacheQueue> CacheQueues { get; set; } // CacheQueue
@@ -120,6 +121,7 @@ namespace Foundation.HtmlCache.DB
             modelBuilder.Configurations.Add(new CacheHtmlConfiguration());
             modelBuilder.Configurations.Add(new CacheHtmlCacheItemConfiguration());
             modelBuilder.Configurations.Add(new CacheHtmlTempConfiguration());
+            modelBuilder.Configurations.Add(new CacheHtmlTempCacheItemTempConfiguration());
             modelBuilder.Configurations.Add(new CacheItemConfiguration());
             modelBuilder.Configurations.Add(new CacheItemTempConfiguration());
             modelBuilder.Configurations.Add(new CacheQueueConfiguration());
@@ -193,10 +195,50 @@ namespace Foundation.HtmlCache.DB
 
 
             modelBuilder.Entity<CacheHtmlTemp>()
+                .Property(e => e.CacheSiteTempId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtmlTemp_CacheSiteTempId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheHtmlTemp>()
                 .Property(e => e.HtmlCacheKeyHash)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("IX_CacheHtmlTemp_HtmlCacheKeyHash", 1))
+                );
+
+
+            modelBuilder.Entity<CacheHtmlTempCacheItemTemp>()
+                .Property(e => e.Id)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("PK_CacheHtmlTemp_CacheItemTemp", 1) { IsUnique = true, IsClustered = true })
+                );
+
+
+            modelBuilder.Entity<CacheHtmlTempCacheItemTemp>()
+                .Property(e => e.CacheQueueId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtmlTemp_CacheItemTemp_CacheQueueId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheHtmlTempCacheItemTemp>()
+                .Property(e => e.CacheHtmlTempId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtmlTemp_CacheItemTemp_CacheHtmlTempId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheHtmlTempCacheItemTemp>()
+                .Property(e => e.CacheItemTempId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtmlTemp_CacheItemTemp_CacheItemTempId", 1))
                 );
 
 
@@ -358,6 +400,7 @@ namespace Foundation.HtmlCache.DB
             modelBuilder.Configurations.Add(new CacheHtmlConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheHtmlCacheItemConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheHtmlTempConfiguration(schema));
+            modelBuilder.Configurations.Add(new CacheHtmlTempCacheItemTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheItemConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheItemTempConfiguration(schema));
             modelBuilder.Configurations.Add(new CacheQueueConfiguration(schema));
@@ -507,31 +550,27 @@ namespace Foundation.HtmlCache.DB
 
         // UspProcessDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
-        public int UspQueueCacheData(string siteName, string siteLang, string htmlCacheKey, string htmlCacheResult, DataTable ids)
+        public int UspQueueCacheData(DataTable cacheSiteTvp, DataTable cacheHtmlTvp, DataTable cacheHtmlCacheItemTvp, DataTable cacheItemTvp)
         {
-            var siteNameParam = new SqlParameter { ParameterName = "@SiteName", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = siteName, Size = 250 };
-            if (siteNameParam.Value == null)
-                siteNameParam.Value = DBNull.Value;
+            var cacheSiteTvpParam = new SqlParameter { ParameterName = "@CacheSite_TVP", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = cacheSiteTvp, TypeName = "dbo.CacheSite_TVP" };
+            if (cacheSiteTvpParam.Value == null)
+                cacheSiteTvpParam.Value = DBNull.Value;
 
-            var siteLangParam = new SqlParameter { ParameterName = "@SiteLang", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = siteLang, Size = 250 };
-            if (siteLangParam.Value == null)
-                siteLangParam.Value = DBNull.Value;
+            var cacheHtmlTvpParam = new SqlParameter { ParameterName = "@CacheHtml_TVP", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = cacheHtmlTvp, TypeName = "dbo.CacheHtml_TVP" };
+            if (cacheHtmlTvpParam.Value == null)
+                cacheHtmlTvpParam.Value = DBNull.Value;
 
-            var htmlCacheKeyParam = new SqlParameter { ParameterName = "@HtmlCacheKey", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = htmlCacheKey, Size = 5000 };
-            if (htmlCacheKeyParam.Value == null)
-                htmlCacheKeyParam.Value = DBNull.Value;
+            var cacheHtmlCacheItemTvpParam = new SqlParameter { ParameterName = "@CacheHtml_CacheItem_TVP", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = cacheHtmlCacheItemTvp, TypeName = "dbo.CacheHtml_CacheItem_TVP" };
+            if (cacheHtmlCacheItemTvpParam.Value == null)
+                cacheHtmlCacheItemTvpParam.Value = DBNull.Value;
 
-            var htmlCacheResultParam = new SqlParameter { ParameterName = "@HtmlCacheResult", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = htmlCacheResult, Size = -1 };
-            if (htmlCacheResultParam.Value == null)
-                htmlCacheResultParam.Value = DBNull.Value;
-
-            var idsParam = new SqlParameter { ParameterName = "@Ids", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = ids, TypeName = "dbo.ItemMetaData" };
-            if (idsParam.Value == null)
-                idsParam.Value = DBNull.Value;
+            var cacheItemTvpParam = new SqlParameter { ParameterName = "@CacheItem_TVP", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = cacheItemTvp, TypeName = "dbo.CacheItem_TVP" };
+            if (cacheItemTvpParam.Value == null)
+                cacheItemTvpParam.Value = DBNull.Value;
 
             var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
 
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[usp_QueueCacheData] @SiteName, @SiteLang, @HtmlCacheKey, @HtmlCacheResult, @Ids", siteNameParam, siteLangParam, htmlCacheKeyParam, htmlCacheResultParam, idsParam, procResultParam);
+            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[usp_QueueCacheData] @CacheSite_TVP, @CacheHtml_TVP, @CacheHtml_CacheItem_TVP, @CacheItem_TVP", cacheSiteTvpParam, cacheHtmlTvpParam, cacheHtmlCacheItemTvpParam, cacheItemTvpParam, procResultParam);
 
             return (int)procResultParam.Value;
         }

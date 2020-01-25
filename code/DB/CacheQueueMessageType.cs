@@ -38,7 +38,7 @@ namespace Foundation.HtmlCache.DB
 {
     // CacheQueueMessageType
     [Table("CacheQueueMessageType")]
-    public class CacheQueueMessageType
+    public partial class CacheQueueMessageType
     {
         public int Id { get; set; } // Id (Primary key)
         public string MessageType { get; set; } // MessageType (length: 100)
@@ -53,7 +53,10 @@ namespace Foundation.HtmlCache.DB
         public CacheQueueMessageType()
         {
             CacheQueues = new List<CacheQueue>();
+            InitializePartial();
         }
+
+        partial void InitializePartial();
     }
 
 }

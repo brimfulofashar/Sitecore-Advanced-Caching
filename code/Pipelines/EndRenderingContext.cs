@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Foundation.HtmlCache.Arguments;
+using Foundation.HtmlCache.Helpers;
 using Foundation.HtmlCache.Models;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
@@ -14,7 +15,13 @@ namespace Foundation.HtmlCache.Pipelines
             if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track)
             {
                 renderingProcessorArgs.CacheResult = ((RecordingTextWriter) args.Writer).GetRecording();
+
+                var tvpHelper = HttpContext.Current.Items[TVPHelper.HttpContextKey] as TVPHelper;
+                tvpHelper?.Tracker.Add(args.CacheKey, renderingProcessorArgs);
             }
+
+            renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;
+            HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
         }
     }
 }

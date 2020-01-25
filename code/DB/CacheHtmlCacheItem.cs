@@ -38,7 +38,7 @@ namespace Foundation.HtmlCache.DB
 {
     // CacheHtml_CacheItem
     [Table("CacheHtml_CacheItem")]
-    public class CacheHtmlCacheItem
+    public partial class CacheHtmlCacheItem
     {
         public long Id { get; set; } // Id (Primary key)
         public long CacheHtmlId { get; set; } // CacheHtmlId
@@ -55,6 +55,13 @@ namespace Foundation.HtmlCache.DB
         /// Parent CacheItem pointed by [CacheHtml_CacheItem].([CacheItemId]) (FK_CacheHtml_CacheItem_CacheItem)
         /// </summary>
         public virtual CacheItem CacheItem { get; set; } // FK_CacheHtml_CacheItem_CacheItem
+
+        public CacheHtmlCacheItem()
+        {
+            InitializePartial();
+        }
+
+        partial void InitializePartial();
     }
 
 }

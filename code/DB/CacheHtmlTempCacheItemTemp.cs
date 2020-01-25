@@ -36,24 +36,35 @@ using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheSite
-    [Table("CacheSite")]
-    public partial class CacheSite
+    // CacheHtmlTemp_CacheItemTemp
+    [Table("CacheHtmlTemp_CacheItemTemp")]
+    public partial class CacheHtmlTempCacheItemTemp
     {
-        public long Id { get; set; } // Id (Primary key)
-        public string SiteName { get; set; } // SiteName (length: 250)
-        public string SiteLang { get; set; } // SiteLang (length: 250)
+        public Guid Id { get; set; } // Id (Primary key)
+        public long CacheQueueId { get; set; } // CacheQueueId
+        public Guid CacheHtmlTempId { get; set; } // CacheHtmlTempId
+        public Guid CacheItemTempId { get; set; } // CacheItemTempId
 
-        // Reverse navigation
+        // Foreign keys
 
         /// <summary>
-        /// Child CacheHtmls where [CacheHtml].[CacheSiteId] point to this entity (FK_CacheHtml_CacheSite)
+        /// Parent CacheHtmlTemp pointed by [CacheHtmlTemp_CacheItemTemp].([CacheHtmlTempId]) (FK_CacheHtmlTemp_CacheItemTemp_CacheHtmlTemp)
         /// </summary>
-        public virtual ICollection<CacheHtml> CacheHtmls { get; set; } // CacheHtml.FK_CacheHtml_CacheSite
+        public virtual CacheHtmlTemp CacheHtmlTemp { get; set; } // FK_CacheHtmlTemp_CacheItemTemp_CacheHtmlTemp
 
-        public CacheSite()
+        /// <summary>
+        /// Parent CacheItemTemp pointed by [CacheHtmlTemp_CacheItemTemp].([CacheItemTempId]) (FK_CacheHtmlTemp_CacheItemTemp_CacheItemTemp)
+        /// </summary>
+        public virtual CacheItemTemp CacheItemTemp { get; set; } // FK_CacheHtmlTemp_CacheItemTemp_CacheItemTemp
+
+        /// <summary>
+        /// Parent CacheQueue pointed by [CacheHtmlTemp_CacheItemTemp].([CacheQueueId]) (FK_CacheHtmlTemp_CacheItemTemp_CacheQueue)
+        /// </summary>
+        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheHtmlTemp_CacheItemTemp_CacheQueue
+
+        public CacheHtmlTempCacheItemTemp()
         {
-            CacheHtmls = new List<CacheHtml>();
+            Id = Guid.NewGuid();
             InitializePartial();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Data.Entity;
+using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Models;

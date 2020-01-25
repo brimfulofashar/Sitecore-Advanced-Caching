@@ -38,7 +38,7 @@ namespace Foundation.HtmlCache.DB
 {
     // CacheHtml
     [Table("CacheHtml")]
-    public class CacheHtml
+    public partial class CacheHtml
     {
         public long Id { get; set; } // Id (Primary key)
         public long? CacheSiteId { get; set; } // CacheSiteId
@@ -63,7 +63,10 @@ namespace Foundation.HtmlCache.DB
         public CacheHtml()
         {
             CacheHtmlCacheItems = new List<CacheHtmlCacheItem>();
+            InitializePartial();
         }
+
+        partial void InitializePartial();
     }
 
 }

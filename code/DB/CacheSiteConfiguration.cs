@@ -34,7 +34,7 @@ using System.Data.Entity.ModelConfiguration;
 namespace Foundation.HtmlCache.DB
 {
     // CacheSite
-    public class CacheSiteConfiguration : EntityTypeConfiguration<CacheSite>
+    public partial class CacheSiteConfiguration : EntityTypeConfiguration<CacheSite>
     {
         public CacheSiteConfiguration()
             : this("dbo")

@@ -68,7 +68,7 @@
     Settings.ConfigurationClassName                 = "Configuration"; // Configuration, Mapping, Map, etc. This is appended to the Poco class name to configure the mappings.
     Settings.DatabaseReaderPlugin                   = ""; // Eg, "c:\\Path\\YourDatabaseReader.dll,Full.Name.Of.Class.Including.Namespace". See #501. This will allow you to specify a pluggable provider for reading your database.
 
-    Settings.EntityClassesModifiers        = "public"; // "public partial";
+    Settings.EntityClassesModifiers        = "public partial"; // "public partial";
     Settings.ConfigurationClassesModifiers = "public"; // "public partial";
     Settings.DbContextClassModifiers       = "public"; // "public partial";
     Settings.DbContextInterfaceModifiers   = "public"; // "public partial";
