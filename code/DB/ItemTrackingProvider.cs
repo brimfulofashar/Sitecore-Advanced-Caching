@@ -139,6 +139,14 @@ namespace Foundation.HtmlCache.DB
 
 
             modelBuilder.Entity<CacheHtml>()
+                .Property(e => e.MergeId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_MergeId", 1))
+                );
+
+
+            modelBuilder.Entity<CacheHtml>()
                 .Property(e => e.CacheSiteId)
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
@@ -159,6 +167,14 @@ namespace Foundation.HtmlCache.DB
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("PK_CacheHtml_CacheItem", 1) { IsUnique = true, IsClustered = true })
+                );
+
+
+            modelBuilder.Entity<CacheHtmlCacheItem>()
+                .Property(e => e.MergeId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheHtml_CacheItem_MergeId", 1))
                 );
 
 
@@ -247,6 +263,14 @@ namespace Foundation.HtmlCache.DB
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("PK_CacheItem", 1) { IsUnique = true, IsClustered = true })
+                );
+
+
+            modelBuilder.Entity<CacheItem>()
+                .Property(e => e.MergeId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheItem_MergeId", 1))
                 );
 
 
@@ -343,6 +367,14 @@ namespace Foundation.HtmlCache.DB
                 .HasColumnAnnotation(
                     IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("PK_CacheSite", 1) { IsUnique = true, IsClustered = true })
+                );
+
+
+            modelBuilder.Entity<CacheSite>()
+                .Property(e => e.MergeId)
+                .HasColumnAnnotation(
+                    IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_CacheSite_MergeId", 1))
                 );
 
 

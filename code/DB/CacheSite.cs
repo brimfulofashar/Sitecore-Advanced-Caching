@@ -41,6 +41,7 @@ namespace Foundation.HtmlCache.DB
     public partial class CacheSite
     {
         public long Id { get; set; } // Id (Primary key)
+        public long MergeId { get; set; } // MergeId
         public string SiteName { get; set; } // SiteName (length: 250)
         public string SiteLang { get; set; } // SiteLang (length: 250)
 

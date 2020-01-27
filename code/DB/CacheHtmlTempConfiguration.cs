@@ -54,8 +54,8 @@ namespace Foundation.HtmlCache.DB
             Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("binary").IsRequired().HasMaxLength(64);
 
             // Foreign keys
-            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheHtmlTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheQueue
-            HasRequired(a => a.CacheSiteTemp).WithMany(b => b.CacheHtmlTemps).HasForeignKey(c => c.CacheSiteTempId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheSiteTemp
+            HasOptional(a => a.CacheQueue).WithMany(b => b.CacheHtmlTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheQueue
+            HasOptional(a => a.CacheSiteTemp).WithMany(b => b.CacheHtmlTemps).HasForeignKey(c => c.CacheSiteTempId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheSiteTemp
         }
     }
 

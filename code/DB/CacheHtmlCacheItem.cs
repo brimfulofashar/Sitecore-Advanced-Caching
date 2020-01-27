@@ -41,6 +41,7 @@ namespace Foundation.HtmlCache.DB
     public partial class CacheHtmlCacheItem
     {
         public long Id { get; set; } // Id (Primary key)
+        public long MergeId { get; set; } // MergeId
         public long CacheHtmlId { get; set; } // CacheHtmlId
         public long CacheItemId { get; set; } // CacheItemId
 

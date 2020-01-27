@@ -47,6 +47,7 @@ namespace Foundation.HtmlCache.DB
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.MergeId).HasColumnName(@"MergeId").HasColumnType("bigint").IsRequired();
             Property(x => x.CacheHtmlId).HasColumnName(@"CacheHtmlId").HasColumnType("bigint").IsRequired();
             Property(x => x.CacheItemId).HasColumnName(@"CacheItemId").HasColumnType("bigint").IsRequired();
 

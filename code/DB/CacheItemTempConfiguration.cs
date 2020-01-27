@@ -53,7 +53,7 @@ namespace Foundation.HtmlCache.DB
             Property(x => x.IsDeleted).HasColumnName(@"IsDeleted").HasColumnType("bit").IsRequired();
 
             // Foreign keys
-            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheItemTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheItemTemp_CacheQueue
+            HasOptional(a => a.CacheQueue).WithMany(b => b.CacheItemTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheItemTemp_CacheQueue
         }
     }
 

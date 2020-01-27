@@ -47,6 +47,7 @@ namespace Foundation.HtmlCache.DB
             HasKey(x => x.Id);
 
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.MergeId).HasColumnName(@"MergeId").HasColumnType("bigint").IsRequired();
             Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
             Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
         }
