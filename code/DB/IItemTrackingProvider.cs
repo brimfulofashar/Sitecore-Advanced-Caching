@@ -96,7 +96,7 @@ namespace Foundation.HtmlCache.DB
         int UspQueueDeleteSiteFromCache(string siteName, string siteLang);
         // UspQueueDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
-        int UspQueuePublishData(string siteLang, DataTable ids);
+        int UspQueuePublishData(string siteLang, DataTable cacheItemTvp);
         // UspQueuePublishDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
     }

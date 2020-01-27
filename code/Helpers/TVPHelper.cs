@@ -73,6 +73,20 @@ namespace Foundation.HtmlCache.Helpers
         public string CacheHtml_CacheItem_TVP = "CacheHtml_CacheItem_TVP";
         public string CacheItem_TVP = "CacheItem_TVP";
 
+        public void ProcessPublishData(Guid itemId, string itemLang, bool isDeleted)
+        {
+            CacheItemTemp cacheItemTemp = new CacheItemTemp
+            {
+                ItemId = itemId,
+                ItemLang = itemLang,
+                IsDeleted = isDeleted
+            };
+
+            TVP.Tables[CacheItem_TVP].Rows.Add(cacheItemTemp.Id, cacheItemTemp.ItemId,
+                cacheItemTemp.ItemLang,
+                cacheItemTemp.IsDeleted);
+        }
+
         public void ProcessTrackingData(string siteName, string siteLang, string htmlCacheKey,
             string htmlCacheResult, Guid itemId, string itemLang, bool isDeleted)
         {

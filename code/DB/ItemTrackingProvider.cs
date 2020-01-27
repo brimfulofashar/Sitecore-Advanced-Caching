@@ -596,19 +596,19 @@ namespace Foundation.HtmlCache.DB
 
         // UspQueueDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
-        public int UspQueuePublishData(string siteLang, DataTable ids)
+        public int UspQueuePublishData(string siteLang, DataTable cacheItemTvp)
         {
             var siteLangParam = new SqlParameter { ParameterName = "@SiteLang", SqlDbType = SqlDbType.VarChar, Direction = ParameterDirection.Input, Value = siteLang, Size = 250 };
             if (siteLangParam.Value == null)
                 siteLangParam.Value = DBNull.Value;
 
-            var idsParam = new SqlParameter { ParameterName = "@Ids", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = ids, TypeName = "dbo.ItemMetaData" };
-            if (idsParam.Value == null)
-                idsParam.Value = DBNull.Value;
+            var cacheItemTvpParam = new SqlParameter { ParameterName = "@CacheItem_TVP", SqlDbType = SqlDbType.Structured, Direction = ParameterDirection.Input, Value = cacheItemTvp, TypeName = "dbo.CacheItem_TVP" };
+            if (cacheItemTvpParam.Value == null)
+                cacheItemTvpParam.Value = DBNull.Value;
 
             var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
 
-            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[usp_QueuePublishData] @SiteLang, @Ids", siteLangParam, idsParam, procResultParam);
+            Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "EXEC @procResult = [dbo].[usp_QueuePublishData] @SiteLang, @CacheItem_TVP", siteLangParam, cacheItemTvpParam, procResultParam);
 
             return (int)procResultParam.Value;
         }
