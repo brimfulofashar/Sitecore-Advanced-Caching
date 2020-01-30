@@ -14,23 +14,17 @@ namespace Foundation.HtmlCache.Events
             var publishItemTracking = Sitecore.Context.Items[PublishItemTracking.Name] as PublishItemTracking;
             if (publishItemTracking != null)
             {
-                foreach (var langugage in publishItemTracking.Languages)
+                foreach (var language in publishItemTracking.Languages)
                 {
                     using (var ctx = new ItemTrackingProvider())
                     {
-                        foreach (var language in publishItemTracking.Languages)
+                        var tvpHelper = new TVPHelper();
+                        foreach (var publishedItem in publishItemTracking.PublishedItems)
                         {
-                            var tvpHelper = new TVPHelper();
-                            foreach (var publishedItem in publishItemTracking.PublishedItems)
-                            {
-                                tvpHelper.ProcessPublishData(publishedItem.Key, language, publishedItem.Value == PublishOperation.PublishOperationEnum.Delete);
-                                var tvp = tvpHelper.TVP.Tables[tvpHelper.CacheItem_TVP];
-
-                                ctx.UspQueuePublishData(langugage, tvp);
-                            }
+                            tvpHelper.ProcessPublishData(publishedItem.Key, language, publishedItem.Value == PublishOperation.PublishOperationEnum.Delete);
                         }
-
-                        
+                        var tvp = tvpHelper.TVP.Tables[tvpHelper.CacheItem_TVP];
+                        ctx.UspQueuePublishData(language, tvp);
                     }
                 }
             }

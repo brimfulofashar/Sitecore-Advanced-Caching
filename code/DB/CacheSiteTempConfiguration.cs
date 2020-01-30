@@ -52,7 +52,7 @@ namespace Foundation.HtmlCache.DB
             Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
 
             // Foreign keys
-            HasOptional(a => a.CacheQueue).WithMany(b => b.CacheSiteTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheSiteTemp_CacheQueue
+            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheSiteTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheSiteTemp_CacheQueue
         }
     }
 
