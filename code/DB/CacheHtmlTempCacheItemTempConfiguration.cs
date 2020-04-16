@@ -44,17 +44,13 @@ namespace Foundation.HtmlCache.DB
         public CacheHtmlTempCacheItemTempConfiguration(string schema)
         {
             ToTable("CacheHtmlTemp_CacheItemTemp", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.HashId, x.Id });
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+            Property(x => x.HashId).HasColumnName(@"HashId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
-            Property(x => x.CacheHtmlTempId).HasColumnName(@"CacheHtmlTempId").HasColumnType("uniqueidentifier").IsRequired();
-            Property(x => x.CacheItemTempId).HasColumnName(@"CacheItemTempId").HasColumnType("uniqueidentifier").IsRequired();
-
-            // Foreign keys
-            HasRequired(a => a.CacheHtmlTemp).WithMany(b => b.CacheHtmlTempCacheItemTemps).HasForeignKey(c => c.CacheHtmlTempId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheItemTemp_CacheHtmlTemp
-            HasRequired(a => a.CacheItemTemp).WithMany(b => b.CacheHtmlTempCacheItemTemps).HasForeignKey(c => c.CacheItemTempId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheItemTemp_CacheItemTemp
-            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheHtmlTempCacheItemTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheHtmlTemp_CacheItemTemp_CacheQueue
+            Property(x => x.CacheHtmlTempId).HasColumnName(@"CacheHtmlTempId").HasColumnType("bigint").IsRequired();
+            Property(x => x.CacheItemTempId).HasColumnName(@"CacheItemTempId").HasColumnType("bigint").IsRequired();
         }
     }
 

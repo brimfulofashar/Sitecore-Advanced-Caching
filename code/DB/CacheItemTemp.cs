@@ -40,30 +40,16 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheItemTemp")]
     public partial class CacheItemTemp
     {
-        public Guid Id { get; set; } // Id (Primary key)
+        public byte HashId { get; private set; } // HashId (Primary key)
+        public long Id { get; set; } // Id (Primary key)
         public long CacheQueueId { get; set; } // CacheQueueId
         public Guid ItemId { get; set; } // ItemId
         public string ItemLang { get; set; } // ItemLang (length: 250)
         public bool IsDeleted { get; set; } // IsDeleted
 
-        // Reverse navigation
-
-        /// <summary>
-        /// Child CacheHtmlTempCacheItemTemps where [CacheHtmlTemp_CacheItemTemp].[CacheItemTempId] point to this entity (FK_CacheHtmlTemp_CacheItemTemp_CacheItemTemp)
-        /// </summary>
-        public virtual ICollection<CacheHtmlTempCacheItemTemp> CacheHtmlTempCacheItemTemps { get; set; } // CacheHtmlTemp_CacheItemTemp.FK_CacheHtmlTemp_CacheItemTemp_CacheItemTemp
-
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheQueue pointed by [CacheItemTemp].([CacheQueueId]) (FK_CacheItemTemp_CacheQueue)
-        /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheItemTemp_CacheQueue
 
         public CacheItemTemp()
         {
-            Id = Guid.NewGuid();
-            CacheHtmlTempCacheItemTemps = new List<CacheHtmlTempCacheItemTemp>();
             InitializePartial();
         }
 

@@ -44,16 +44,14 @@ namespace Foundation.HtmlCache.DB
         public CacheItemTempConfiguration(string schema)
         {
             ToTable("CacheItemTemp", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.HashId, x.Id });
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+            Property(x => x.HashId).HasColumnName(@"HashId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
             Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
             Property(x => x.ItemLang).HasColumnName(@"ItemLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
             Property(x => x.IsDeleted).HasColumnName(@"IsDeleted").HasColumnType("bit").IsRequired();
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheItemTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheItemTemp_CacheQueue
         }
     }
 

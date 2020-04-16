@@ -40,33 +40,12 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheQueue")]
     public partial class CacheQueue
     {
+        public byte HashId { get; private set; } // HashId (Primary key)
         public long Id { get; set; } // Id (Primary key)
-        public int CacheQueueMessageTypeId { get; set; } // CacheQueueMessageTypeId
+        public byte CacheQueueMessageTypeId { get; set; } // CacheQueueMessageTypeId
         public bool Processing { get; set; } // Processing
         public string ProcessingBy { get; set; } // ProcessingBy (length: 250)
         public byte[] UpdateVersion { get; set; } // UpdateVersion (length: 8)
-
-        // Reverse navigation
-
-        /// <summary>
-        /// Child CacheHtmlTemps where [CacheHtmlTemp].[CacheQueueId] point to this entity (FK_CacheHtmlTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheHtmlTemp> CacheHtmlTemps { get; set; } // CacheHtmlTemp.FK_CacheHtmlTemp_CacheQueue
-
-        /// <summary>
-        /// Child CacheHtmlTempCacheItemTemps where [CacheHtmlTemp_CacheItemTemp].[CacheQueueId] point to this entity (FK_CacheHtmlTemp_CacheItemTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheHtmlTempCacheItemTemp> CacheHtmlTempCacheItemTemps { get; set; } // CacheHtmlTemp_CacheItemTemp.FK_CacheHtmlTemp_CacheItemTemp_CacheQueue
-
-        /// <summary>
-        /// Child CacheItemTemps where [CacheItemTemp].[CacheQueueId] point to this entity (FK_CacheItemTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheItemTemp> CacheItemTemps { get; set; } // CacheItemTemp.FK_CacheItemTemp_CacheQueue
-
-        /// <summary>
-        /// Child CacheSiteTemps where [CacheSiteTemp].[CacheQueueId] point to this entity (FK_CacheSiteTemp_CacheQueue)
-        /// </summary>
-        public virtual ICollection<CacheSiteTemp> CacheSiteTemps { get; set; } // CacheSiteTemp.FK_CacheSiteTemp_CacheQueue
 
         // Foreign keys
 
@@ -77,10 +56,6 @@ namespace Foundation.HtmlCache.DB
 
         public CacheQueue()
         {
-            CacheHtmlTemps = new List<CacheHtmlTemp>();
-            CacheHtmlTempCacheItemTemps = new List<CacheHtmlTempCacheItemTemp>();
-            CacheItemTemps = new List<CacheItemTemp>();
-            CacheSiteTemps = new List<CacheSiteTemp>();
             InitializePartial();
         }
 

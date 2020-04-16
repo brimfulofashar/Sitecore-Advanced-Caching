@@ -44,15 +44,13 @@ namespace Foundation.HtmlCache.DB
         public CacheSiteTempConfiguration(string schema)
         {
             ToTable("CacheSiteTemp", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.HashId, x.Id });
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
+            Property(x => x.HashId).HasColumnName(@"HashId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
             Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
             Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-
-            // Foreign keys
-            HasRequired(a => a.CacheQueue).WithMany(b => b.CacheSiteTemps).HasForeignKey(c => c.CacheQueueId).WillCascadeOnDelete(false); // FK_CacheSiteTemp_CacheQueue
         }
     }
 

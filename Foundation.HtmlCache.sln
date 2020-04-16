@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foundation.HtmlCache", "Foundation.HtmlCache.csproj", "{469B024A-6107-4706-A0E8-B4F2E5A2E958}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foundation.HtmlCache", "HtmlCache\code\Foundation.HtmlCache.csproj", "{469B024A-6107-4706-A0E8-B4F2E5A2E958}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBLoadTest", "DBLoadTest\DBLoadTest.csproj", "{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +20,12 @@ Global
 		{469B024A-6107-4706-A0E8-B4F2E5A2E958}.Int|Any CPU.Build.0 = Int|Any CPU
 		{469B024A-6107-4706-A0E8-B4F2E5A2E958}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{469B024A-6107-4706-A0E8-B4F2E5A2E958}.Release|Any CPU.Build.0 = Release|Any CPU
+		{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}.Int|Any CPU.ActiveCfg = Release|Any CPU
+		{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}.Int|Any CPU.Build.0 = Release|Any CPU
+		{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{125B48F4-7091-4B3A-AAFF-F0E0EAACE929}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

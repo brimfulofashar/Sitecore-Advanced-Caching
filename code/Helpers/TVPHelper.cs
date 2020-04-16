@@ -32,27 +32,39 @@ namespace Foundation.HtmlCache.Helpers
         {
             TVP = new DataSet("TVP");
             var cacheSiteDt = new DataTable(CacheSite_TVP);
-            cacheSiteDt.Columns.Add("Id", typeof(Guid));
+            cacheSiteDt.Columns.Add("Id", typeof(long));
             cacheSiteDt.Columns.Add("SiteName", typeof(string));
             cacheSiteDt.Columns.Add("SiteLang", typeof(string));
+            cacheSiteDt.Columns["Id"].AutoIncrement = true;
+            cacheSiteDt.Columns["Id"].AutoIncrementSeed = 1;
+            cacheSiteDt.Columns["Id"].AutoIncrementStep = 1;
 
             var cacheHtmlDt = new DataTable(CacheHtml_TVP);
-            cacheHtmlDt.Columns.Add("Id", typeof(Guid));
-            cacheHtmlDt.Columns.Add("CacheSideId", typeof(Guid));
+            cacheHtmlDt.Columns.Add("Id", typeof(long));
+            cacheHtmlDt.Columns.Add("CacheSideId", typeof(long));
             cacheHtmlDt.Columns.Add("HtmlCacheKey", typeof(string));
             cacheHtmlDt.Columns.Add("HtmlCacheResult", typeof(string));
             cacheHtmlDt.Columns.Add("HtmlCacheKeyHash", typeof(byte[]));
+            cacheHtmlDt.Columns["Id"].AutoIncrement = true;
+            cacheHtmlDt.Columns["Id"].AutoIncrementSeed = 1;
+            cacheHtmlDt.Columns["Id"].AutoIncrementStep = 1;
 
             var cacheHtmlCacheItemDt = new DataTable(CacheHtml_CacheItem_TVP);
-            cacheHtmlCacheItemDt.Columns.Add("Id", typeof(Guid));
-            cacheHtmlCacheItemDt.Columns.Add("CacheHtmlId", typeof(Guid));
-            cacheHtmlCacheItemDt.Columns.Add("CacheItemId", typeof(Guid));
+            cacheHtmlCacheItemDt.Columns.Add("Id", typeof(long));
+            cacheHtmlCacheItemDt.Columns.Add("CacheHtmlId", typeof(long));
+            cacheHtmlCacheItemDt.Columns.Add("CacheItemId", typeof(long));
+            cacheHtmlCacheItemDt.Columns["Id"].AutoIncrement = true;
+            cacheHtmlCacheItemDt.Columns["Id"].AutoIncrementSeed = 1;
+            cacheHtmlCacheItemDt.Columns["Id"].AutoIncrementStep = 1;
 
             var cacheItemDt = new DataTable(CacheItem_TVP);
-            cacheItemDt.Columns.Add("Id", typeof(Guid));
+            cacheItemDt.Columns.Add("Id", typeof(long));
             cacheItemDt.Columns.Add("ItemId", typeof(Guid));
             cacheItemDt.Columns.Add("ItemLang", typeof(string));
             cacheItemDt.Columns.Add("IsDeleted", typeof(bool));
+            cacheItemDt.Columns["Id"].AutoIncrement = true;
+            cacheItemDt.Columns["Id"].AutoIncrementSeed = 1;
+            cacheItemDt.Columns["Id"].AutoIncrementStep = 1;
 
             TVP.Tables.Add(cacheSiteDt);
             TVP.Tables.Add(cacheHtmlDt);
@@ -87,7 +99,7 @@ namespace Foundation.HtmlCache.Helpers
                 cacheItemTemp.IsDeleted);
         }
 
-        public void ProcessTrackingData(string siteName, string siteLang, string htmlCacheKey,
+        public TVPHelper ProcessTrackingData(string siteName, string siteLang, string htmlCacheKey,
             string htmlCacheResult, Guid itemId, string itemLang, bool isDeleted)
         {
             if (TVP != null)
@@ -166,7 +178,9 @@ namespace Foundation.HtmlCache.Helpers
                 }
 
                 HttpContext.Current.Items["TVPHelper"] = this;
+                return this;
             }
+            return null;
         }
     }
 }

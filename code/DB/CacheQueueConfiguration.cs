@@ -44,16 +44,17 @@ namespace Foundation.HtmlCache.DB
         public CacheQueueConfiguration(string schema)
         {
             ToTable("CacheQueue", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.HashId, x.Id });
 
+            Property(x => x.HashId).HasColumnName(@"HashId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("int").IsRequired();
+            Property(x => x.CacheQueueMessageTypeId).HasColumnName(@"CacheQueueMessageTypeId").HasColumnType("tinyint").IsRequired();
             Property(x => x.Processing).HasColumnName(@"Processing").HasColumnType("bit").IsRequired();
             Property(x => x.ProcessingBy).HasColumnName(@"ProcessingBy").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
             Property(x => x.UpdateVersion).HasColumnName(@"UpdateVersion").HasColumnType("timestamp").IsRequired().IsFixedLength().HasMaxLength(8).IsRowVersion();
 
             // Foreign keys
-            HasRequired(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
+            HasOptional(a => a.CacheQueueMessageType).WithMany(b => b.CacheQueues).HasForeignKey(c => c.CacheQueueMessageTypeId).WillCascadeOnDelete(false); // FK_CacheQueue_CacheQueueMessageType
         }
     }
 

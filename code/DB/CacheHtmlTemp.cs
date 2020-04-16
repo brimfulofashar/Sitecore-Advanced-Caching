@@ -40,36 +40,17 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheHtmlTemp")]
     public partial class CacheHtmlTemp
     {
-        public Guid Id { get; set; } // Id (Primary key)
+        public byte HashId { get; private set; } // HashId (Primary key)
+        public long Id { get; set; } // Id (Primary key)
         public long CacheQueueId { get; set; } // CacheQueueId
-        public Guid CacheSiteTempId { get; set; } // CacheSiteTempId
+        public long CacheSiteTempId { get; set; } // CacheSiteTempId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
         public byte[] HtmlCacheKeyHash { get; set; } // HtmlCacheKeyHash (length: 64)
 
-        // Reverse navigation
-
-        /// <summary>
-        /// Child CacheHtmlTempCacheItemTemps where [CacheHtmlTemp_CacheItemTemp].[CacheHtmlTempId] point to this entity (FK_CacheHtmlTemp_CacheItemTemp_CacheHtmlTemp)
-        /// </summary>
-        public virtual ICollection<CacheHtmlTempCacheItemTemp> CacheHtmlTempCacheItemTemps { get; set; } // CacheHtmlTemp_CacheItemTemp.FK_CacheHtmlTemp_CacheItemTemp_CacheHtmlTemp
-
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheQueue pointed by [CacheHtmlTemp].([CacheQueueId]) (FK_CacheHtmlTemp_CacheQueue)
-        /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheHtmlTemp_CacheQueue
-
-        /// <summary>
-        /// Parent CacheSiteTemp pointed by [CacheHtmlTemp].([CacheSiteTempId]) (FK_CacheHtmlTemp_CacheSiteTemp)
-        /// </summary>
-        public virtual CacheSiteTemp CacheSiteTemp { get; set; } // FK_CacheHtmlTemp_CacheSiteTemp
 
         public CacheHtmlTemp()
         {
-            Id = Guid.NewGuid();
-            CacheHtmlTempCacheItemTemps = new List<CacheHtmlTempCacheItemTemp>();
             InitializePartial();
         }
 

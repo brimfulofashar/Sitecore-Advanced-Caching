@@ -46,7 +46,7 @@ namespace Foundation.HtmlCache.DB
             ToTable("CacheQueueMessageType", schema);
             HasKey(x => x.Id);
 
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("int").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.MessageType).HasColumnName(@"MessageType").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(100);
         }
     }

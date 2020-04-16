@@ -69,6 +69,9 @@ namespace Foundation.HtmlCache.DB
         int PurgeDatabase();
         // PurgeDatabaseAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
+        int UspDeleteCacheData(DataTable cacheItemTvp);
+        // UspDeleteCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
         List<UspGetCacheForSiteReturnModel> UspGetCacheForSite(string siteName);
         List<UspGetCacheForSiteReturnModel> UspGetCacheForSite(string siteName, out int procResult);
         Task<List<UspGetCacheForSiteReturnModel>> UspGetCacheForSiteAsync(string siteName);
@@ -77,17 +80,19 @@ namespace Foundation.HtmlCache.DB
         List<UspGetStatsReturnModel> UspGetStats(out int procResult);
         Task<List<UspGetStatsReturnModel>> UspGetStatsAsync();
 
-        List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount);
-        List<UspLockAndProcessCacheQueueEntryReturnModel> UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount, out int procResult);
+        int UspLockAndProcessCacheQueueEntry(string processingBy, out long? cacheQueueCount);
         // UspLockAndProcessCacheQueueEntryAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+
+        int UspMergeCacheData(DataTable cacheSiteTvp, DataTable cacheHtmlTvp, DataTable cacheHtmlCacheItemTvp, DataTable cacheItemTvp);
+        // UspMergeCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
         int UspProcessCacheData(long? cacheQueueId);
         // UspProcessCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
-        int UspProcessDeleteHtmlFromCache(long? cacheQueueId, int? cacheQueueMessageTypeId);
+        int UspProcessDeleteHtmlFromCache(long? cacheQueueId, byte? cacheQueueMessageTypeId);
         // UspProcessDeleteHtmlFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
-        int UspProcessDeleteSiteFromCache(long? cacheQueueId, int? cacheQueueMessageTypeId);
+        int UspProcessDeleteSiteFromCache(long? cacheQueueId, byte? cacheQueueMessageTypeId);
         // UspProcessDeleteSiteFromCacheAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
         int UspQueueCacheData(DataTable cacheSiteTvp, DataTable cacheHtmlTvp, DataTable cacheHtmlCacheItemTvp, DataTable cacheItemTvp);

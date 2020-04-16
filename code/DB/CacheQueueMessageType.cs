@@ -40,7 +40,7 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheQueueMessageType")]
     public partial class CacheQueueMessageType
     {
-        public int Id { get; set; } // Id (Primary key)
+        public byte Id { get; set; } // Id (Primary key)
         public string MessageType { get; set; } // MessageType (length: 100)
 
         // Reverse navigation
