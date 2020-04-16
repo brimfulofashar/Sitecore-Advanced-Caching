@@ -44,16 +44,12 @@ namespace Foundation.HtmlCache.DB
         public CacheHtmlCacheItemConfiguration(string schema)
         {
             ToTable("CacheHtml_CacheItem", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.ConcurrencyId, x.Id });
 
+            Property(x => x.ConcurrencyId).HasColumnName(@"ConcurrencyId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.MergeId).HasColumnName(@"MergeId").HasColumnType("bigint").IsRequired();
             Property(x => x.CacheHtmlId).HasColumnName(@"CacheHtmlId").HasColumnType("bigint").IsRequired();
             Property(x => x.CacheItemId).HasColumnName(@"CacheItemId").HasColumnType("bigint").IsRequired();
-
-            // Foreign keys
-            HasRequired(a => a.CacheHtml).WithMany(b => b.CacheHtmlCacheItems).HasForeignKey(c => c.CacheHtmlId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheItem_CacheHtml
-            HasRequired(a => a.CacheItem).WithMany(b => b.CacheHtmlCacheItems).HasForeignKey(c => c.CacheItemId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheItem_CacheItem
         }
     }
 

@@ -18,10 +18,11 @@ namespace Foundation.HtmlCache.Pipelines
                 {
                     tvpHelper.ProcessTrackingData(Sitecore.Context.Site.SiteInfo.Name,
                         Context.Site.SiteInfo.Language, renderingProcessorArgs.CacheKey,
-                        renderingProcessorArgs.CacheResult, itemMetaData.Id, itemMetaData.Language,
-                        itemMetaData.IsDeleted);
+                        renderingProcessorArgs.CacheResult, itemMetaData.Id, itemMetaData.Language);
                 }
             }
+
+            HttpContext.Current.Items["TVPHelper"] = tvpHelper;
         }
     }
 }

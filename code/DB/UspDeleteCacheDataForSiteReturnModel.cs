@@ -26,13 +26,17 @@
 // ReSharper disable UseNameofExpression
 // ReSharper disable UsePatternMatching
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+
 namespace Foundation.HtmlCache.DB
 {
-    public enum MessageTypeEnum
+    public class UspDeleteCacheDataForSiteReturnModel
     {
-        AddToCache = 1,
-        DeleteHtmlFromCache = 2,
-        DeleteSiteFromCache = 3,
+        public string SiteName { get; set; }
+        public string SiteLang { get; set; }
     }
 
 }

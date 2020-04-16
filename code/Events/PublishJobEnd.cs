@@ -24,7 +24,7 @@ namespace Foundation.HtmlCache.Events
                             tvpHelper.ProcessPublishData(publishedItem.Key, language, publishedItem.Value == PublishOperation.PublishOperationEnum.Delete);
                         }
                         var tvp = tvpHelper.TVP.Tables[tvpHelper.CacheItem_TVP];
-                        ctx.UspQueuePublishData(language, tvp);
+                        var cacheEntriesToClear = ctx.UspDeleteCacheData(tvp);
                     }
                 }
             }

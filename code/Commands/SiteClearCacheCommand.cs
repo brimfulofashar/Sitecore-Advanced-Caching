@@ -34,7 +34,7 @@ namespace Foundation.HtmlCache.Commands
                     var siteInfo = SiteInfoExtensions.GetSites(this.item, item.Language).FirstOrDefault();
                     if (siteInfo != null)
                     {
-                        ctx.UspQueueDeleteSiteFromCache(siteInfo.Name, siteInfo.Language);
+                        ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
 
                         SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
                     }

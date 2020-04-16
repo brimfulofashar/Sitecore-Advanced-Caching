@@ -1,17 +1,17 @@
 namespace Foundation.HtmlCache.DB
 {
-    public partial class CacheSiteTemp
+    public partial class CacheItem
     {
         public override bool Equals(object obj)
         {
-            var item = obj as CacheSiteTemp;
+            var item = obj as CacheItem;
 
             if (item == null)
             {
                 return false;
             }
 
-            return this.SiteName.Equals(item.SiteName) && this.SiteLang.Equals(item.SiteLang);
+            return this.ItemId.Equals(item.ItemId) && this.ItemLang.Equals(item.ItemLang);
         }
 
         public override int GetHashCode()
@@ -19,8 +19,8 @@ namespace Foundation.HtmlCache.DB
             unchecked // disable overflow, for the unlikely possibility that you
             {         // are compiling with overflow-checking enabled
                 int hash = 27;
-                hash = (13 * hash) + SiteName.GetHashCode();
-                hash = (13 * hash) + SiteLang.GetHashCode();
+                hash = (13 * hash) + ItemId.GetHashCode();
+                hash = (13 * hash) + ItemLang.GetHashCode();
                 return hash;
             }
         }

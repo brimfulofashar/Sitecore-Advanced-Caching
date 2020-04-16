@@ -27,31 +27,17 @@
 // ReSharper disable UsePatternMatching
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.ModelConfiguration;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheSiteTemp
-    public partial class CacheSiteTempConfiguration : EntityTypeConfiguration<CacheSiteTemp>
+    public class UspDeleteCacheDataReturnModel
     {
-        public CacheSiteTempConfiguration()
-            : this("dbo")
-        {
-        }
-
-        public CacheSiteTempConfiguration(string schema)
-        {
-            ToTable("CacheSiteTemp", schema);
-            HasKey(x => new { x.HashId, x.Id });
-
-            Property(x => x.HashId).HasColumnName(@"HashId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
-            Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheQueueId).HasColumnName(@"CacheQueueId").HasColumnType("bigint").IsRequired();
-            Property(x => x.SiteName).HasColumnName(@"SiteName").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-            Property(x => x.SiteLang).HasColumnName(@"SiteLang").HasColumnType("varchar").IsOptional().IsUnicode(false).HasMaxLength(250);
-        }
+        public string SiteName { get; set; }
+        public string SiteLang { get; set; }
+        public string HtmlCacheKey { get; set; }
     }
 
 }

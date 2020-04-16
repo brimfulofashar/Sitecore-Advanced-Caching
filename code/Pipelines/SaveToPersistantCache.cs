@@ -21,7 +21,7 @@ namespace Foundation.HtmlCache.Pipelines
                     dataset.Tables[tvpHelper.CacheHtml_TVP].Rows.Count > 0 && dataset.Tables[tvpHelper.CacheHtml_CacheItem_TVP].Rows.Count > 0 &&
                     dataset.Tables[tvpHelper.CacheItem_TVP].Rows.Count > 0)
                     {
-                        ctx.UspQueueCacheData(dataset.Tables[tvpHelper.CacheSite_TVP],
+                        ctx.UspMergeCacheData(dataset.Tables[tvpHelper.CacheSite_TVP],
                             dataset.Tables[tvpHelper.CacheHtml_TVP], dataset.Tables[tvpHelper.CacheHtml_CacheItem_TVP],
                             dataset.Tables[tvpHelper.CacheItem_TVP]);
                     }

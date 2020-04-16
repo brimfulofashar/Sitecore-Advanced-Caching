@@ -40,22 +40,11 @@ namespace Foundation.HtmlCache.DB
     [Table("CacheHtml_CacheItem")]
     public partial class CacheHtmlCacheItem
     {
+        public byte ConcurrencyId { get; private set; } // ConcurrencyId (Primary key)
         public long Id { get; set; } // Id (Primary key)
-        public long MergeId { get; set; } // MergeId
         public long CacheHtmlId { get; set; } // CacheHtmlId
         public long CacheItemId { get; set; } // CacheItemId
 
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheHtml pointed by [CacheHtml_CacheItem].([CacheHtmlId]) (FK_CacheHtml_CacheItem_CacheHtml)
-        /// </summary>
-        public virtual CacheHtml CacheHtml { get; set; } // FK_CacheHtml_CacheItem_CacheHtml
-
-        /// <summary>
-        /// Parent CacheItem pointed by [CacheHtml_CacheItem].([CacheItemId]) (FK_CacheHtml_CacheItem_CacheItem)
-        /// </summary>
-        public virtual CacheItem CacheItem { get; set; } // FK_CacheHtml_CacheItem_CacheItem
 
         public CacheHtmlCacheItem()
         {

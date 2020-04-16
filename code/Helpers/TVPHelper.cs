@@ -12,10 +12,10 @@ namespace Foundation.HtmlCache.Helpers
     {
         public static string HttpContextKey = "TVPHelper";
 
-        private HashSet<CacheSiteTemp> CacheSiteTempSet { get; set; }
-        private HashSet<CacheHtmlTemp> CacheHtmlTempSet { get; set; }
-        private HashSet<CacheHtmlTempCacheItemTemp> CacheHtmlTempCacheItemTempSet { get; set; }
-        private HashSet<CacheItemTemp> CacheItemTempSet { get; set; }
+        private HashSet<CacheSite> CacheSiteSet { get; set; }
+        private HashSet<CacheHtml> CacheHtmlSet { get; set; }
+        private HashSet<CacheHtmlCacheItem> CacheHtmlCacheItemSet { get; set; }
+        private HashSet<CacheItem> CacheItemSet { get; set; }
 
         public Dictionary<string, RenderingProcessorArgs> Tracker { get; set; }
 
@@ -72,10 +72,10 @@ namespace Foundation.HtmlCache.Helpers
             TVP.Tables.Add(cacheHtmlCacheItemDt);
 
             Tracker = new Dictionary<string, RenderingProcessorArgs>();
-            CacheSiteTempSet = new HashSet<CacheSiteTemp>();
-            CacheHtmlTempSet = new HashSet<CacheHtmlTemp>();
-            CacheHtmlTempCacheItemTempSet = new HashSet<CacheHtmlTempCacheItemTemp>();
-            CacheItemTempSet = new HashSet<CacheItemTemp>();
+            CacheSiteSet = new HashSet<CacheSite>();
+            CacheHtmlSet = new HashSet<CacheHtml>();
+            CacheHtmlCacheItemSet = new HashSet<CacheHtmlCacheItem>();
+            CacheItemSet = new HashSet<CacheItem>();
         }
 
         public DataSet TVP { get; set; }
@@ -87,97 +87,93 @@ namespace Foundation.HtmlCache.Helpers
 
         public void ProcessPublishData(Guid itemId, string itemLang, bool isDeleted)
         {
-            CacheItemTemp cacheItemTemp = new CacheItemTemp
+            CacheItem cacheItem = new CacheItem
             {
                 ItemId = itemId,
-                ItemLang = itemLang,
-                IsDeleted = isDeleted
+                ItemLang = itemLang
             };
 
-            TVP.Tables[CacheItem_TVP].Rows.Add(cacheItemTemp.Id, cacheItemTemp.ItemId,
-                cacheItemTemp.ItemLang,
-                cacheItemTemp.IsDeleted);
+            TVP.Tables[CacheItem_TVP].Rows.Add(cacheItem.Id, cacheItem.ItemId,
+                cacheItem.ItemLang,
+                isDeleted);
         }
 
         public TVPHelper ProcessTrackingData(string siteName, string siteLang, string htmlCacheKey,
-            string htmlCacheResult, Guid itemId, string itemLang, bool isDeleted)
+            string htmlCacheResult, Guid itemId, string itemLang)
         {
             if (TVP != null)
             {
-                CacheSiteTemp cacheSiteTemp = new CacheSiteTemp
+                CacheSite cacheSite = new CacheSite
                 {
                     SiteName = siteName,
                     SiteLang = siteLang
                 };
 
-                var cacheSiteTempExists = !CacheSiteTempSet.Add(cacheSiteTemp);
+                var cacheSiteExists = !CacheSiteSet.Add(cacheSite);
 
-                if (cacheSiteTempExists)
+                if (cacheSiteExists)
                 {
-                    cacheSiteTemp = CacheSiteTempSet.First(x => Equals(x, cacheSiteTemp));
+                    cacheSite = CacheSiteSet.First(x => Equals(x, cacheSite));
                 }
                 else
                 {
                     TVP.Tables[CacheSite_TVP].Rows
-                        .Add(cacheSiteTemp.Id, cacheSiteTemp.SiteName, cacheSiteTemp.SiteLang);
+                        .Add(cacheSite.Id, cacheSite.SiteName, cacheSite.SiteLang);
                 }
 
-                CacheHtmlTemp cacheHtmlTemp = new CacheHtmlTemp
+                CacheHtml cacheHtml = new CacheHtml
                 {
-                    CacheSiteTempId = cacheSiteTemp.Id,
+                    CacheSiteId = cacheSite.Id,
                     HtmlCacheKey = htmlCacheKey,
                     HtmlCacheResult = htmlCacheResult,
                     HtmlCacheKeyHash = SHA512(htmlCacheKey)
                 };
 
-                var cacheHtmlTempExists = !CacheHtmlTempSet.Add(cacheHtmlTemp);
+                var cacheHtmlExists = !CacheHtmlSet.Add(cacheHtml);
 
-                if (cacheHtmlTempExists)
+                if (cacheHtmlExists)
                 {
-                    cacheHtmlTemp = CacheHtmlTempSet.First(x => x.Equals(cacheHtmlTemp));
+                    cacheHtml = CacheHtmlSet.First(x => x.Equals(cacheHtml));
                 }
                 else
                 {
-                    TVP.Tables[CacheHtml_TVP].Rows.Add(cacheHtmlTemp.Id, cacheSiteTemp.Id,
-                        cacheHtmlTemp.HtmlCacheKey,
-                        cacheHtmlTemp.HtmlCacheResult, cacheHtmlTemp.HtmlCacheKeyHash);
+                    TVP.Tables[CacheHtml_TVP].Rows.Add(cacheHtml.Id, cacheSite.Id,
+                        cacheHtml.HtmlCacheKey,
+                        cacheHtml.HtmlCacheResult, cacheHtml.HtmlCacheKeyHash);
                 }
 
-                CacheItemTemp cacheItemTemp = new CacheItemTemp
+                CacheItem cacheItem = new CacheItem
                 {
                     ItemId = itemId,
-                    ItemLang = itemLang,
-                    IsDeleted = isDeleted
+                    ItemLang = itemLang
                 };
 
-                var cacheItemExists = !CacheItemTempSet.Add(cacheItemTemp);
+                var cacheItemExists = !CacheItemSet.Add(cacheItem);
 
                 if (cacheItemExists)
                 {
-                    cacheItemTemp = CacheItemTempSet.First(x => x.Equals(cacheItemTemp));
+                    cacheItem = CacheItemSet.First(x => x.Equals(cacheItem));
                 }
                 else
                 {
-                    TVP.Tables[CacheItem_TVP].Rows.Add(cacheItemTemp.Id, cacheItemTemp.ItemId,
-                        cacheItemTemp.ItemLang,
-                        cacheItemTemp.IsDeleted);
+                    TVP.Tables[CacheItem_TVP].Rows.Add(cacheItem.Id, cacheItem.ItemId,
+                        cacheItem.ItemLang, false);
                 }
 
-                CacheHtmlTempCacheItemTemp cacheHtmlTempCacheItemTemp = new CacheHtmlTempCacheItemTemp
+                CacheHtmlCacheItem cacheHtmlCacheItem = new CacheHtmlCacheItem
                 {
-                    CacheHtmlTempId = cacheHtmlTemp.Id,
-                    CacheItemTempId = cacheItemTemp.Id
+                    CacheHtmlId = cacheHtml.Id,
+                    CacheItemId = cacheItem.Id
                 };
 
-                var cacheHtmlTempCacheItemTempExists = !CacheHtmlTempCacheItemTempSet.Add(cacheHtmlTempCacheItemTemp);
+                var cacheHtmlCacheItemExists = !CacheHtmlCacheItemSet.Add(cacheHtmlCacheItem);
 
-                if (!cacheHtmlTempCacheItemTempExists)
+                if (!cacheHtmlCacheItemExists)
                 {
-                    TVP.Tables[CacheHtml_CacheItem_TVP].Rows.Add(cacheHtmlTempCacheItemTemp.Id,
-                        cacheHtmlTempCacheItemTemp.CacheHtmlTempId, cacheHtmlTempCacheItemTemp.CacheItemTempId);
+                    TVP.Tables[CacheHtml_CacheItem_TVP].Rows.Add(cacheHtmlCacheItem.Id,
+                        cacheHtmlCacheItem.CacheHtmlId, cacheHtmlCacheItem.CacheItemId);
                 }
 
-                HttpContext.Current.Items["TVPHelper"] = this;
                 return this;
             }
             return null;

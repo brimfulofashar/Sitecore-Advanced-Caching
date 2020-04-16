@@ -26,7 +26,7 @@ namespace Foundation.HtmlCache.Commands
                 {
                     foreach (var siteInfo in siteInfos)
                     {
-                        ctx.UspQueueDeleteSiteFromCache(siteInfo.Name, siteInfo.Language);
+                        ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
                     }
 
                     SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);

@@ -1,10 +1,10 @@
 namespace Foundation.HtmlCache.DB
 {
-    public partial class CacheHtmlTemp
+    public partial class CacheHtml
     {
         public override bool Equals(object obj)
         {
-            var item = obj as CacheHtmlTemp;
+            var item = obj as CacheHtml;
 
             if (item == null)
             {

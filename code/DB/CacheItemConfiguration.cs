@@ -44,10 +44,10 @@ namespace Foundation.HtmlCache.DB
         public CacheItemConfiguration(string schema)
         {
             ToTable("CacheItem", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.ConcurrencyId, x.Id });
 
+            Property(x => x.ConcurrencyId).HasColumnName(@"ConcurrencyId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.MergeId).HasColumnName(@"MergeId").HasColumnType("bigint").IsRequired();
             Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
             Property(x => x.ItemLang).HasColumnName(@"ItemLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);
         }
