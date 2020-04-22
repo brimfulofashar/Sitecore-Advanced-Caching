@@ -295,7 +295,7 @@ namespace Foundation.HtmlCache.DB
 
             var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
             var procResultData = Database.SqlQuery<UspDeleteCacheDataReturnModel>("EXEC @procResult = [dbo].[usp_DeleteCacheData] @CacheItem_TVP", cacheItemTvpParam, procResultParam).ToList();
-            procResult = (int)procResultParam.Value;
+            procResult = (int) procResultParam.Value;
             return procResultData;
         }
 
@@ -327,7 +327,7 @@ namespace Foundation.HtmlCache.DB
 
             var procResultParam = new SqlParameter { ParameterName = "@procResult", SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Output };
             var procResultData = Database.SqlQuery<UspDeleteCacheDataForSiteReturnModel>("EXEC @procResult = [dbo].[usp_DeleteCacheDataForSite] @SiteName, @SiteLang", siteNameParam, siteLangParam, procResultParam).ToList();
-            procResult = (int)procResultParam.Value;
+            procResult = (int) procResultParam.Value;
             return procResultData;
         }
 

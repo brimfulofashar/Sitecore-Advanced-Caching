@@ -134,6 +134,7 @@
     <Compile Include="DB\CacheItemConfiguration.cs" />
     <Compile Include="DB\CacheItemEquality.cs" />
     <Compile Include="DB\CacheHtmlEquality.cs" />
+    <Compile Include="DB\CacheLock.cs" />
     <Compile Include="DB\CacheSite.cs" />
     <Compile Include="DB\CacheSiteConfiguration.cs" />
     <Compile Include="DB\CacheSiteEquality.cs" />
@@ -165,15 +166,21 @@
     <Compile Include="Arguments\ItemMetaData.cs" />
     <Compile Include="Arguments\RenderingProcessorArgs.cs" />
     <Compile Include="Helpers\TVPHelper.cs" />
+    <Compile Include="Messaging\Bus\BroadcastHtmlCacheBus.cs" />
+    <Compile Include="Messaging\Handlers\BroadcastHtmlCacheHandler.cs" />
+    <Compile Include="Messaging\Message\BroadcastHtmlCacheMessage.cs" />
+    <Compile Include="Messaging\Repository\BroadcastHtmlCacheRepository.cs" />
     <Compile Include="Models\CacheSiteLangKeys.cs" />
     <Compile Include="Models\ProcessCacheQueueResult.cs" />
     <Compile Include="Models\PublishItemTracking.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
     <Compile Include="Pipelines\BeginTrackingContext.cs" />
+    <Compile Include="Pipelines\BroadcastHtmlCache.cs" />
     <Compile Include="Pipelines\EndTrackingContext.cs" />
     <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\InitializeRemoteEventSubscriptions.cs" />
+    <Compile Include="Pipelines\InitializeServiceBus.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />
     <Compile Include="Pipelines\EndRenderingContext.cs" />
     <Compile Include="Pipelines\BeginRenderingContext.cs" />
@@ -203,7 +210,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Agents\" />
-    <Folder Include="Messaging\Mappings\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

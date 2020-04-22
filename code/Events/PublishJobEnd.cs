@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Helpers;
+using Foundation.HtmlCache.Messaging.Message;
+using Foundation.HtmlCache.Messaging.Repository;
 using Foundation.HtmlCache.Models;
 
 namespace Foundation.HtmlCache.Events
@@ -25,10 +25,22 @@ namespace Foundation.HtmlCache.Events
                         }
                         var tvp = tvpHelper.TVP.Tables[tvpHelper.CacheItem_TVP];
                         var cacheEntriesToClear = ctx.UspDeleteCacheData(tvp);
+
+                        BroadcastHtmlCacheRepository broadcastHtmlCacheRepository = new BroadcastHtmlCacheRepository();
+
+                        foreach (var cacheEntryToClear in cacheEntriesToClear)
+                        {
+                            broadcastHtmlCacheRepository.BroadcastMessage(new BroadcastHtmlCacheMessage
+                            {
+                                SiteName = cacheEntryToClear.SiteName,
+                                SiteLang = cacheEntryToClear.SiteLang,
+                                HtmlCacheKey = cacheEntryToClear.HtmlCacheKey,
+                                ToRemove = true
+                            });
+                        }
                     }
                 }
             }
-
         }
     }
 }

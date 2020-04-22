@@ -64,7 +64,8 @@ namespace Foundation.HtmlCache.DB
         // PurgeDatabaseAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
 
         List<UspDeleteCacheDataReturnModel> UspDeleteCacheData(DataTable cacheItemTvp);
-        // UspDeleteCacheDataAsync() cannot be created due to having out parameters, or is relying on the procedure result (int)
+        List<UspDeleteCacheDataReturnModel> UspDeleteCacheData(DataTable cacheItemTvp, out int procResult);
+        Task<List<UspDeleteCacheDataReturnModel>> UspDeleteCacheDataAsync(DataTable cacheItemTvp);
 
         List<UspDeleteCacheDataForSiteReturnModel> UspDeleteCacheDataForSite(string siteName, string siteLang);
         List<UspDeleteCacheDataForSiteReturnModel> UspDeleteCacheDataForSite(string siteName, string siteLang, out int procResult);

@@ -22,7 +22,7 @@ namespace Foundation.HtmlCache.Pipelines
                 }
             }
 
-            HttpContext.Current.Items["TVPHelper"] = tvpHelper;
+            HttpContext.Current.Items[TVPHelper.HttpContextKey] = tvpHelper;
         }
     }
 }
