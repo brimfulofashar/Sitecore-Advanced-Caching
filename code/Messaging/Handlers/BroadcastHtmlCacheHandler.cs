@@ -8,20 +8,22 @@ namespace Foundation.HtmlCache.Messaging.Handlers
 {
     public class BroadcastHtmlCacheHandler : IMessageHandler<BroadcastHtmlCacheMessage>
     {
-        public BroadcastHtmlCacheHandler()
-        {
-
-        }
-
         public Task Handle(BroadcastHtmlCacheMessage message, IMessageReceiveContext receiveContext,
             IMessageReplyContext replyContext)
         {
             SiteContext siteContext = SiteContext.GetSite(message.SiteName);
             if (message.ToRemove)
             {
-                foreach (var cacheKey in message.HtmlCacheKey.Split('|'))
+                if (!string.IsNullOrEmpty(message.HtmlCacheKey))
                 {
-                    CacheManager.GetHtmlCache(siteContext).RemoveKeysContaining(cacheKey);
+                    foreach (var cacheKey in message.HtmlCacheKey.Split('|'))
+                    {
+                        CacheManager.GetHtmlCache(siteContext).RemoveKeysContaining(cacheKey);
+                    }
+                }
+                else
+                {
+                    CacheManager.GetHtmlCache(siteContext).Clear();
                 }
             }
             else

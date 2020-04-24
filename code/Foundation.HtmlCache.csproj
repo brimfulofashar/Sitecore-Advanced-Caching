@@ -173,7 +173,6 @@
     <Compile Include="Messaging\Handlers\BroadcastHtmlCacheHandler.cs" />
     <Compile Include="Messaging\Message\BroadcastHtmlCacheMessage.cs" />
     <Compile Include="Messaging\Repository\BroadcastHtmlCacheRepository.cs" />
-    <Compile Include="Messaging\Subscription\ServicesConfigurator.cs" />
     <Compile Include="Models\CacheSiteLangKeys.cs" />
     <Compile Include="Models\ProcessCacheQueueResult.cs" />
     <Compile Include="Models\PublishItemTracking.cs" />
