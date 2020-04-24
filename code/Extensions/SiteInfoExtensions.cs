@@ -17,7 +17,7 @@ namespace Foundation.HtmlCache.Extensions
                 {
                     if (item.Paths.FullPath.ToLower().Trim().StartsWith(siteInfo.RootPath.ToLower().Trim()) &&
                         !string.IsNullOrEmpty(siteInfo.HostName) && siteInfo.CacheHtml &&
-                        (language == null || siteInfo.Language == language.Name))
+                        (language == null || siteInfo.Language == language.Name || string.IsNullOrEmpty(siteInfo.Language)))
                     {
                         siteInfos.Add(siteInfo);
                     }

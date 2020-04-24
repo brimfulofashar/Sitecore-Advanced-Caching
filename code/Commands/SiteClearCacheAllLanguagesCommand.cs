@@ -5,6 +5,8 @@ using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Messaging.Message;
+using Foundation.HtmlCache.Messaging.Repository;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Configuration;
@@ -34,9 +36,19 @@ namespace Foundation.HtmlCache.Commands
                 var siteInfos = SiteInfoExtensions.GetSites(this.Item, null);
                 if (siteInfos != null)
                 {
+                    BroadcastHtmlCacheRepository broadcastHtmlCacheRepository = new BroadcastHtmlCacheRepository();
                     foreach (var siteInfo in siteInfos)
                     {
-                        ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
+                        var results = ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
+                        foreach (var result in results)
+                        {
+                            broadcastHtmlCacheRepository.BroadcastMessage(new BroadcastHtmlCacheMessage
+                            {
+                                ToRemove = true,
+                                SiteName = result.SiteName,
+                                SiteLang = result.SiteLang
+                            });
+                        }
                     }
 
                     SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);

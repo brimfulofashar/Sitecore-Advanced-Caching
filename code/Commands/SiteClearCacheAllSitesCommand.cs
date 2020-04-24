@@ -2,6 +2,8 @@
 using System.Data.SqlClient;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Messaging.Message;
+using Foundation.HtmlCache.Messaging.Repository;
 using Sitecore;
 using Sitecore.Diagnostics;
 using Sitecore.Shell.Framework.Commands;
@@ -24,16 +26,24 @@ namespace Foundation.HtmlCache.Commands
                 var siteInfos = SiteInfoExtensions.GetSites(null, null);
                 if (siteInfos != null)
                 {
+                    BroadcastHtmlCacheRepository broadcastHtmlCacheRepository = new BroadcastHtmlCacheRepository();
                     foreach (var siteInfo in siteInfos)
                     {
-                        ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
+                        var results = ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
+                        foreach (var result in results)
+                        {
+                            broadcastHtmlCacheRepository.BroadcastMessage(new BroadcastHtmlCacheMessage
+                            {
+                                ToRemove = true,
+                                SiteName = result.SiteName,
+                                SiteLang = result.SiteLang
+                            });
+                        }
                     }
 
                     SheerResponse.Alert("Caches for the Site in all languages have been queue to be cleared", true);
                 }
             }
-
-            SheerResponse.Alert("Caches for the all sites in all languages have been queue to be cleared", true);
             args.WaitForPostBack(false);
         }
     }

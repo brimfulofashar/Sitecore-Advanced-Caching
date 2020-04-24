@@ -1,5 +1,7 @@
 ﻿using System;
 using Foundation.HtmlCache.Messaging.Bus;
+using Foundation.HtmlCache.Messaging.Message;
+using Sitecore.DependencyInjection;
 using Sitecore.Framework.Messaging;
 using Sitecore.Pipelines;
 

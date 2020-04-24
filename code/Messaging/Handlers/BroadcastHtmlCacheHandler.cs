@@ -6,7 +6,7 @@ using Sitecore.Sites;
 
 namespace Foundation.HtmlCache.Messaging.Handlers
 {
-    public class BroadcastHtmlCacheHandler : IMessageHandler
+    public class BroadcastHtmlCacheHandler : IMessageHandler<BroadcastHtmlCacheMessage>
     {
         public BroadcastHtmlCacheHandler()
         {

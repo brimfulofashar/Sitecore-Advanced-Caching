@@ -81,6 +81,9 @@
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.1.1\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -170,6 +173,7 @@
     <Compile Include="Messaging\Handlers\BroadcastHtmlCacheHandler.cs" />
     <Compile Include="Messaging\Message\BroadcastHtmlCacheMessage.cs" />
     <Compile Include="Messaging\Repository\BroadcastHtmlCacheRepository.cs" />
+    <Compile Include="Messaging\Subscription\ServicesConfigurator.cs" />
     <Compile Include="Models\CacheSiteLangKeys.cs" />
     <Compile Include="Models\ProcessCacheQueueResult.cs" />
     <Compile Include="Models\PublishItemTracking.cs" />
@@ -199,7 +203,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="DB\EF.Reverse.POCO.v3.ttinclude" />
-    <Content Include="App_Config\Include\Foundation\Foundation.HtmlCache.Messaging.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -208,9 +211,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Agents\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

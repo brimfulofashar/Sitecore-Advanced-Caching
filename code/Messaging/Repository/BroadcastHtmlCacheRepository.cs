@@ -17,7 +17,7 @@ namespace Foundation.HtmlCache.Messaging.Repository
 
         public void BroadcastMessage(BroadcastHtmlCacheMessage message)
         {
-            _messageBus.PublishAsync(message);
+            _messageBus.Publish(message, null);
         }
     }
 }

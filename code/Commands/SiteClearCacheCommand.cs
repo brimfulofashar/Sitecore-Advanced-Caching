@@ -4,6 +4,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Extensions;
+using Foundation.HtmlCache.Messaging.Message;
+using Foundation.HtmlCache.Messaging.Repository;
 using Sitecore;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
@@ -34,7 +36,17 @@ namespace Foundation.HtmlCache.Commands
                     var siteInfo = SiteInfoExtensions.GetSites(this.item, item.Language).FirstOrDefault();
                     if (siteInfo != null)
                     {
-                        ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
+                        BroadcastHtmlCacheRepository broadcastHtmlCacheRepository = new BroadcastHtmlCacheRepository();
+                        var results = ctx.UspDeleteCacheDataForSite(siteInfo.Name, siteInfo.Language);
+                        foreach (var result in results)
+                        {
+                            broadcastHtmlCacheRepository.BroadcastMessage(new BroadcastHtmlCacheMessage
+                            {
+                                ToRemove = true,
+                                SiteName = result.SiteName,
+                                SiteLang = result.SiteLang
+                            });
+                        }
 
                         SheerResponse.Alert("All caches for all sites have been queued for clearing", true);
                     }
