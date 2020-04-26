@@ -38,23 +38,19 @@ namespace Foundation.HtmlCache.DB
 {
     // CacheSite
     [Table("CacheSite")]
-    public class CacheSite
+    public partial class CacheSite
     {
+        public byte ConcurrencyId { get; private set; } // ConcurrencyId (Primary key)
         public long Id { get; set; } // Id (Primary key)
         public string SiteName { get; set; } // SiteName (length: 250)
         public string SiteLang { get; set; } // SiteLang (length: 250)
 
-        // Reverse navigation
-
-        /// <summary>
-        /// Child CacheHtmls where [CacheHtml].[CacheSiteId] point to this entity (FK_CacheHtml_CacheSite)
-        /// </summary>
-        public virtual ICollection<CacheHtml> CacheHtmls { get; set; } // CacheHtml.FK_CacheHtml_CacheSite
-
         public CacheSite()
         {
-            CacheHtmls = new List<CacheHtml>();
+            InitializePartial();
         }
+
+        partial void InitializePartial();
     }
 
 }

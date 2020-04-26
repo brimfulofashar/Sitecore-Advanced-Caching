@@ -26,13 +26,30 @@
 // ReSharper disable UseNameofExpression
 // ReSharper disable UsePatternMatching
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+using System.Data.Entity.Infrastructure;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Foundation.HtmlCache.DB
 {
-    public enum MessageTypeEnum
+    // The table 'CacheLock' is not usable by entity framework because it
+    // does not have a primary key. It is listed here for completeness.
+    // CacheLock
+    [Table("CacheLock")]
+    public partial class CacheLock
     {
-        AddToCache = 1,
-        DeleteHtmlFromCache = 2,
-        DeleteSiteFromCache = 3,
+        public bool? DummyLockColumn { get; set; } // DummyLockColumn
+
+        public CacheLock()
+        {
+            InitializePartial();
+        }
+
+        partial void InitializePartial();
     }
 
 }

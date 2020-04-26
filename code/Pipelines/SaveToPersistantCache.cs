@@ -1,43 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Web;
-using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Helpers;
-using Foundation.HtmlCache.Models;
-using Sitecore;
 using Sitecore.Diagnostics;
-using Sitecore.Mvc.Pipelines.Response.RenderRendering;
+using Sitecore.Mvc.Pipelines.Request.RequestEnd;
 
 namespace Foundation.HtmlCache.Pipelines
 {
-    public class SaveToPersistantCache : RenderRenderingProcessor
+    public class SaveToPersistantCache : RequestEndProcessor
     {
-        public override void Process(RenderRenderingArgs args)
+        public override void Process(RequestEndArgs args)
         {
-            var renderingProcessorArgs = (RenderingProcessorArgs) HttpContext.Current.Items["RenderingArgs"];
-            if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track && renderingProcessorArgs.ItemAccessList.Any())
+            using (var ctx = new ItemTrackingProvider())
             {
-                using (var ctx = new ItemTrackingProvider())
+                try
                 {
-                    try
+                    var tvpHelper = HttpContext.Current.Items[TVPHelper.HttpContextKey] as TVPHelper;
+                    var dataset = tvpHelper?.TVP;
+                    if (dataset != null && dataset.Tables[tvpHelper.CacheSite_TVP].Rows.Count > 0 &&
+                    dataset.Tables[tvpHelper.CacheHtml_TVP].Rows.Count > 0 && dataset.Tables[tvpHelper.CacheHtml_CacheItem_TVP].Rows.Count > 0 &&
+                    dataset.Tables[tvpHelper.CacheItem_TVP].Rows.Count > 0)
                     {
-                        var ids = TVPHelper.GetTVPParameter(renderingProcessorArgs.ItemAccessList.ToList());
-
-                        ctx.UspQueueCacheData(Context.Site.SiteInfo.Name, Context.Site.SiteInfo.Language,
-                            renderingProcessorArgs.CacheKey, renderingProcessorArgs.CacheResult, ids);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error("Failed to write to cache store", e, this);
+                        ctx.UspMergeCacheData(dataset.Tables[tvpHelper.CacheSite_TVP],
+                            dataset.Tables[tvpHelper.CacheHtml_TVP], dataset.Tables[tvpHelper.CacheHtml_CacheItem_TVP],
+                            dataset.Tables[tvpHelper.CacheItem_TVP]);
                     }
                 }
+                catch (Exception e)
+                {
+                    Log.Error("Failed to write to cache store", e, this);
+                }
             }
-            renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;
-            HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
         }
     }
 }

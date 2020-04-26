@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foundation.HtmlCache", "Foundation.HtmlCache.csproj", "{469B024A-6107-4706-A0E8-B4F2E5A2E958}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foundation.HtmlCache", "code\Foundation.HtmlCache.csproj", "{469B024A-6107-4706-A0E8-B4F2E5A2E958}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

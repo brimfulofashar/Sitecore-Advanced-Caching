@@ -34,7 +34,7 @@ using System.Data.Entity.ModelConfiguration;
 namespace Foundation.HtmlCache.DB
 {
     // CacheHtml
-    public class CacheHtmlConfiguration : EntityTypeConfiguration<CacheHtml>
+    public partial class CacheHtmlConfiguration : EntityTypeConfiguration<CacheHtml>
     {
         public CacheHtmlConfiguration()
             : this("dbo")
@@ -44,16 +44,14 @@ namespace Foundation.HtmlCache.DB
         public CacheHtmlConfiguration(string schema)
         {
             ToTable("CacheHtml", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.ConcurrencyId, x.Id });
 
+            Property(x => x.ConcurrencyId).HasColumnName(@"ConcurrencyId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-            Property(x => x.CacheSiteId).HasColumnName(@"CacheSiteId").HasColumnType("bigint").IsOptional();
+            Property(x => x.CacheSiteId).HasColumnName(@"CacheSiteId").HasColumnType("bigint").IsRequired();
             Property(x => x.HtmlCacheKey).HasColumnName(@"HtmlCacheKey").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(5000);
             Property(x => x.HtmlCacheResult).HasColumnName(@"HtmlCacheResult").HasColumnType("varchar(max)").IsRequired().IsUnicode(false);
             Property(x => x.HtmlCacheKeyHash).HasColumnName(@"HtmlCacheKeyHash").HasColumnType("binary").IsRequired().HasMaxLength(64);
-
-            // Foreign keys
-            HasOptional(a => a.CacheSite).WithMany(b => b.CacheHtmls).HasForeignKey(c => c.CacheSiteId).WillCascadeOnDelete(false); // FK_CacheHtml_CacheSite
         }
     }
 

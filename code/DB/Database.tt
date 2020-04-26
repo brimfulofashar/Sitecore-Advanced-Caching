@@ -16,7 +16,7 @@
     Settings.GeneratorType           = GeneratorType.Ef6; // Ef6, EfCore, Custom. Custom edit GeneratorCustom class to provide your own implementation
     Settings.UseMappingTables        = false; // Set to false for EfCore. EFCore will add support for this in v3 at some point, so please set this to false. If true, mapping will be used and no mapping tables will be generated. If false, all tables will be generated.
     Settings.FileManagerType         = FileManagerType.Custom; // .NET project = VisualStudio; .NET Core project = Custom; No output (testing only) = Null
-    Settings.ConnectionString        = "Data Source=192.168.50.4,1433;Initial Catalog=HtmlCache;Integrated security=False;MultipleActiveResultSets=True;User ID=htmlcacheuser;Password=Fj0h3A1zaeJHaLzhIdhq"; // This is used by the generator to reverse engineer your database
+    Settings.ConnectionString        = "Data Source=EPAEDUBW0023;Initial Catalog=HtmlCache;Integrated security=False;MultipleActiveResultSets=True;User ID=htmlcacheuser;Password=1Qa2Ws3Ed"; // This is used by the generator to reverse engineer your database
     Settings.ConnectionStringName    = "HtmlCache"; // ConnectionString key as specified in your app.config/web.config/appsettings.json. Not used by the generator, but is placed into the generated DbContext constructor.
     Settings.DbContextName           = "ItemTrackingProvider"; // Class name for the DbContext to be generated. Note: If generating separate files, please give the db context a different name from this tt filename.
     Settings.DbContextInterfaceName  = "IItemTrackingProvider"; // Defaults to "I" + DbContextName or set string empty to not implement any interface.
@@ -68,7 +68,7 @@
     Settings.ConfigurationClassName                 = "Configuration"; // Configuration, Mapping, Map, etc. This is appended to the Poco class name to configure the mappings.
     Settings.DatabaseReaderPlugin                   = ""; // Eg, "c:\\Path\\YourDatabaseReader.dll,Full.Name.Of.Class.Including.Namespace". See #501. This will allow you to specify a pluggable provider for reading your database.
 
-    Settings.EntityClassesModifiers        = "public"; // "public partial";
+    Settings.EntityClassesModifiers        = "public partial"; // "public partial";
     Settings.ConfigurationClassesModifiers = "public"; // "public partial";
     Settings.DbContextClassModifiers       = "public"; // "public partial";
     Settings.DbContextInterfaceModifiers   = "public"; // "public partial";

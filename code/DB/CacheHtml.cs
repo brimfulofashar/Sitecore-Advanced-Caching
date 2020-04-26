@@ -38,32 +38,22 @@ namespace Foundation.HtmlCache.DB
 {
     // CacheHtml
     [Table("CacheHtml")]
-    public class CacheHtml
+    public partial class CacheHtml
     {
+        public byte ConcurrencyId { get; private set; } // ConcurrencyId (Primary key)
         public long Id { get; set; } // Id (Primary key)
-        public long? CacheSiteId { get; set; } // CacheSiteId
+        public long CacheSiteId { get; set; } // CacheSiteId
         public string HtmlCacheKey { get; set; } // HtmlCacheKey (length: 5000)
         public string HtmlCacheResult { get; set; } // HtmlCacheResult
         public byte[] HtmlCacheKeyHash { get; set; } // HtmlCacheKeyHash (length: 64)
 
-        // Reverse navigation
-
-        /// <summary>
-        /// Child CacheHtmlCacheItems where [CacheHtml_CacheItem].[CacheHtmlId] point to this entity (FK_CacheHtml_CacheItem_CacheHtml)
-        /// </summary>
-        public virtual ICollection<CacheHtmlCacheItem> CacheHtmlCacheItems { get; set; } // CacheHtml_CacheItem.FK_CacheHtml_CacheItem_CacheHtml
-
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheSite pointed by [CacheHtml].([CacheSiteId]) (FK_CacheHtml_CacheSite)
-        /// </summary>
-        public virtual CacheSite CacheSite { get; set; } // FK_CacheHtml_CacheSite
 
         public CacheHtml()
         {
-            CacheHtmlCacheItems = new List<CacheHtmlCacheItem>();
+            InitializePartial();
         }
+
+        partial void InitializePartial();
     }
 
 }

@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Helpers;
+using Foundation.HtmlCache.Messaging.Message;
+using Foundation.HtmlCache.Messaging.Repository;
 using Foundation.HtmlCache.Models;
 
 namespace Foundation.HtmlCache.Events
@@ -14,22 +14,33 @@ namespace Foundation.HtmlCache.Events
             var publishItemTracking = Sitecore.Context.Items[PublishItemTracking.Name] as PublishItemTracking;
             if (publishItemTracking != null)
             {
-                foreach (var langugage in publishItemTracking.Languages)
+                foreach (var language in publishItemTracking.Languages)
                 {
                     using (var ctx = new ItemTrackingProvider())
                     {
-                        foreach (var language in publishItemTracking.Languages)
+                        var tvpHelper = new TVPHelper();
+                        foreach (var publishedItem in publishItemTracking.PublishedItems)
                         {
-                            var ids = TVPHelper.GetTVPParameter(publishItemTracking.PublishedItems .Select(x => new ItemMetaData(x.Key, language, x.Value == PublishOperation.PublishOperationEnum.Delete)).ToList());
-
-                            ctx.UspQueuePublishData(langugage, ids);
+                            tvpHelper.ProcessPublishData(publishedItem.Key, language, publishedItem.Value == PublishOperation.PublishOperationEnum.Delete);
                         }
+                        var tvp = tvpHelper.TVP.Tables[tvpHelper.CacheItem_TVP];
+                        var cacheEntriesToClear = ctx.UspDeleteCacheData(tvp);
 
-                        
+                        BroadcastHtmlCacheRepository broadcastHtmlCacheRepository = new BroadcastHtmlCacheRepository();
+
+                        foreach (var cacheEntryToClear in cacheEntriesToClear)
+                        {
+                            broadcastHtmlCacheRepository.BroadcastMessage(new BroadcastHtmlCacheMessage
+                            {
+                                SiteName = cacheEntryToClear.SiteName,
+                                SiteLang = cacheEntryToClear.SiteLang,
+                                HtmlCacheKey = cacheEntryToClear.HtmlCacheKey,
+                                ToRemove = true
+                            });
+                        }
                     }
                 }
             }
-
         }
     }
 }

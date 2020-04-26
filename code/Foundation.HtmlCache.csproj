@@ -75,39 +75,36 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Extensions.DependencyInjection.2.1.1\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.1.1\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.1.1\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Sitecore.Framework.Messaging.Abstractions, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Framework.Messaging.Abstractions.4.0.1\lib\netstandard2.0\Sitecore.Framework.Messaging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Framework.Messaging.Configuration, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Framework.Messaging.Configuration.4.0.1\lib\netstandard2.0\Sitecore.Framework.Messaging.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Kernel, Version=13.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Sitecore.Kernel.9.2.0\lib\net471\Sitecore.Kernel.dll</HintPath>
+      <HintPath>..\packages\Sitecore.Kernel.9.2.0\lib\net471\Sitecore.Kernel.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Mvc, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Sitecore.Mvc.9.2.0\lib\net471\Sitecore.Mvc.dll</HintPath>
+      <HintPath>..\packages\Sitecore.Mvc.9.2.0\lib\net471\Sitecore.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="sysglobl" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Configuration.ConfigurationManager.4.6.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.4.6.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -125,49 +122,25 @@
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.Mvc.5.2.4\lib\net45\System.Web.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.Razor.3.2.4\lib\net45\System.Web.Razor.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agents\HtmlCacheQueueAgent.cs" />
     <Compile Include="DB\CacheHtml.cs" />
     <Compile Include="DB\CacheHtmlCacheItem.cs" />
     <Compile Include="DB\CacheHtmlCacheItemConfiguration.cs" />
+    <Compile Include="DB\CacheHtmlCacheItemEquality.cs" />
     <Compile Include="DB\CacheHtmlConfiguration.cs" />
-    <Compile Include="DB\CacheHtmlTemp.cs" />
-    <Compile Include="DB\CacheHtmlTempConfiguration.cs" />
     <Compile Include="DB\CacheItem.cs" />
     <Compile Include="DB\CacheItemConfiguration.cs" />
-    <Compile Include="DB\CacheItemTemp.cs" />
-    <Compile Include="DB\CacheItemTempConfiguration.cs" />
-    <Compile Include="DB\CacheQueue.cs" />
-    <Compile Include="DB\CacheQueueConfiguration.cs" />
-    <Compile Include="DB\CacheQueueMessageType.cs" />
-    <Compile Include="DB\CacheQueueMessageTypeConfiguration.cs" />
+    <Compile Include="DB\CacheItemEquality.cs" />
+    <Compile Include="DB\CacheHtmlEquality.cs" />
+    <Compile Include="DB\CacheLock.cs" />
     <Compile Include="DB\CacheSite.cs" />
     <Compile Include="DB\CacheSiteConfiguration.cs" />
-    <Compile Include="DB\CacheSiteTemp.cs" />
-    <Compile Include="DB\CacheSiteTempConfiguration.cs" />
+    <Compile Include="DB\CacheSiteEquality.cs" />
     <Compile Include="DB\Database.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -175,10 +148,10 @@
     </Compile>
     <Compile Include="DB\IItemTrackingProvider.cs" />
     <Compile Include="DB\ItemTrackingProvider.cs" />
-    <Compile Include="DB\MessageTypeEnum.cs" />
+    <Compile Include="DB\UspDeleteCacheDataForSiteReturnModel.cs" />
+    <Compile Include="DB\UspDeleteCacheDataReturnModel.cs" />
     <Compile Include="DB\UspGetCacheForSiteReturnModel.cs" />
     <Compile Include="DB\UspGetStatsReturnModel.cs" />
-    <Compile Include="DB\UspLockAndProcessCacheQueueEntryReturnModel.cs" />
     <Compile Include="Events\ClearCacheArgs.cs" />
     <Compile Include="Events\ClearCacheHtml.cs" />
     <Compile Include="Events\ClearCacheOperation.cs" />
@@ -196,13 +169,21 @@
     <Compile Include="Arguments\ItemMetaData.cs" />
     <Compile Include="Arguments\RenderingProcessorArgs.cs" />
     <Compile Include="Helpers\TVPHelper.cs" />
+    <Compile Include="Messaging\Bus\BroadcastHtmlCacheBus.cs" />
+    <Compile Include="Messaging\Handlers\BroadcastHtmlCacheHandler.cs" />
+    <Compile Include="Messaging\Message\BroadcastHtmlCacheMessage.cs" />
+    <Compile Include="Messaging\Repository\BroadcastHtmlCacheRepository.cs" />
     <Compile Include="Models\CacheSiteLangKeys.cs" />
     <Compile Include="Models\ProcessCacheQueueResult.cs" />
     <Compile Include="Models\PublishItemTracking.cs" />
     <Compile Include="Models\TrackOperation.cs" />
     <Compile Include="Models\PublishOperation.cs" />
+    <Compile Include="Pipelines\BeginTrackingContext.cs" />
+    <Compile Include="Pipelines\BroadcastHtmlCache.cs" />
+    <Compile Include="Pipelines\EndTrackingContext.cs" />
     <Compile Include="Pipelines\InitializePersistedHtmlCache.cs" />
     <Compile Include="Pipelines\InitializeRemoteEventSubscriptions.cs" />
+    <Compile Include="Pipelines\InitializeServiceBus.cs" />
     <Compile Include="Pipelines\SaveToPersistantCache.cs" />
     <Compile Include="Pipelines\EndRenderingContext.cs" />
     <Compile Include="Pipelines\BeginRenderingContext.cs" />
@@ -217,9 +198,13 @@
     </Content>
     <Content Include="Scripts\SQL\schema.sql" />
     <Content Include="sitecore\admin\HtmlCacheViewer.aspx" />
-    <Content Include="App_Config\Include\zFoundation\zFoundation.HtmlCache.config" />
+    <Content Include="App_Config\Include\zFoundation\zFoundation.HtmlCache.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="DB\EF.Reverse.POCO.v3.ttinclude" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>

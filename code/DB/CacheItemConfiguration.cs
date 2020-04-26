@@ -34,7 +34,7 @@ using System.Data.Entity.ModelConfiguration;
 namespace Foundation.HtmlCache.DB
 {
     // CacheItem
-    public class CacheItemConfiguration : EntityTypeConfiguration<CacheItem>
+    public partial class CacheItemConfiguration : EntityTypeConfiguration<CacheItem>
     {
         public CacheItemConfiguration()
             : this("dbo")
@@ -44,8 +44,9 @@ namespace Foundation.HtmlCache.DB
         public CacheItemConfiguration(string schema)
         {
             ToTable("CacheItem", schema);
-            HasKey(x => x.Id);
+            HasKey(x => new { x.ConcurrencyId, x.Id });
 
+            Property(x => x.ConcurrencyId).HasColumnName(@"ConcurrencyId").HasColumnType("tinyint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Computed);
             Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.ItemId).HasColumnName(@"ItemId").HasColumnType("uniqueidentifier").IsRequired();
             Property(x => x.ItemLang).HasColumnName(@"ItemLang").HasColumnType("varchar").IsRequired().IsUnicode(false).HasMaxLength(250);

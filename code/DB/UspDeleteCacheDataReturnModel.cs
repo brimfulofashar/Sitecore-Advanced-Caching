@@ -30,28 +30,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Entity.Infrastructure;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Foundation.HtmlCache.DB
 {
-    // CacheItemTemp
-    [Table("CacheItemTemp")]
-    public class CacheItemTemp
+    public class UspDeleteCacheDataReturnModel
     {
-        public long Id { get; set; } // Id (Primary key)
-        public long CacheQueueId { get; set; } // CacheQueueId
-        public Guid ItemId { get; set; } // ItemId
-        public string ItemLang { get; set; } // ItemLang (length: 250)
-        public bool IsDeleted { get; set; } // IsDeleted
-
-        // Foreign keys
-
-        /// <summary>
-        /// Parent CacheQueue pointed by [CacheItemTemp].([CacheQueueId]) (FK_CacheItemTemp_CacheQueue)
-        /// </summary>
-        public virtual CacheQueue CacheQueue { get; set; } // FK_CacheItemTemp_CacheQueue
+        public string SiteName { get; set; }
+        public string SiteLang { get; set; }
+        public string HtmlCacheKey { get; set; }
     }
 
 }

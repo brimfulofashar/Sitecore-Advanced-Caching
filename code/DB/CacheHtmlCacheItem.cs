@@ -38,23 +38,20 @@ namespace Foundation.HtmlCache.DB
 {
     // CacheHtml_CacheItem
     [Table("CacheHtml_CacheItem")]
-    public class CacheHtmlCacheItem
+    public partial class CacheHtmlCacheItem
     {
+        public byte ConcurrencyId { get; private set; } // ConcurrencyId (Primary key)
         public long Id { get; set; } // Id (Primary key)
         public long CacheHtmlId { get; set; } // CacheHtmlId
         public long CacheItemId { get; set; } // CacheItemId
 
-        // Foreign keys
 
-        /// <summary>
-        /// Parent CacheHtml pointed by [CacheHtml_CacheItem].([CacheHtmlId]) (FK_CacheHtml_CacheItem_CacheHtml)
-        /// </summary>
-        public virtual CacheHtml CacheHtml { get; set; } // FK_CacheHtml_CacheItem_CacheHtml
+        public CacheHtmlCacheItem()
+        {
+            InitializePartial();
+        }
 
-        /// <summary>
-        /// Parent CacheItem pointed by [CacheHtml_CacheItem].([CacheItemId]) (FK_CacheHtml_CacheItem_CacheItem)
-        /// </summary>
-        public virtual CacheItem CacheItem { get; set; } // FK_CacheHtml_CacheItem_CacheItem
+        partial void InitializePartial();
     }
 
 }

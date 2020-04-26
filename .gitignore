@@ -4,3 +4,9 @@
 /code/packages
 obj
 bin
+packages
+/.vs/Foundation.HtmlCache/v15/.suo
+/.vs/Foundation.HtmlCache/v15/Server/sqlite3/db.lock
+/.vs/Foundation.HtmlCache/v15/Server/sqlite3/storage.ide
+/.vs/Foundation.HtmlCache/v15/Server/sqlite3/storage.ide-shm
+/.vs/Foundation.HtmlCache/v15/Server/sqlite3/storage.ide-wal
