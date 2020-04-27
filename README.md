@@ -13,4 +13,4 @@ Step 2 - Compile and deploy config and dll to both CM and CD
 Step 3 - Add HtmlCache ConnectionString  
 Step 4 - Set the HtmlCacheQueueSubscriberPostfix config setting per CD server.  
 Step 5 - Run Unicorn.  
-Step 6 - Under cache settings for component, set the cacheable templates field to enable item tracking.  
+Step 6 - Under cache settings for each component, set the cacheable templates field to enable item tracking. These cacheable templates should be set in accordance to the datasources for that component.  
