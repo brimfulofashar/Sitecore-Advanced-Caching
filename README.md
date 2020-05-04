@@ -1,5 +1,5 @@
 # Sitecore-Advanced-Caching
-Cache clearing module for Sitecore
+Cache clearing module for Sitecore - Currently tested against MVC only.
 
 FEATURES:  
 - Clears a component's html cache entry based on the item that was publish.   
