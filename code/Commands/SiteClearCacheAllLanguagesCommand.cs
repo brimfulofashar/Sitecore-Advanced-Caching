@@ -1,19 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
+﻿using System.Linq;
 using Foundation.HtmlCache.DB;
-using Foundation.HtmlCache.Events;
 using Foundation.HtmlCache.Extensions;
 using Foundation.HtmlCache.Messaging.Message;
 using Foundation.HtmlCache.Messaging.Repository;
-using Foundation.HtmlCache.Models;
 using Sitecore;
-using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Shell.Framework.Commands;
-using Sitecore.Web;
 using Sitecore.Web.UI.Sheer;
 
 namespace Foundation.HtmlCache.Commands

@@ -1,6 +1,5 @@
 ﻿using System.Web;
 using Foundation.HtmlCache.Arguments;
-using Foundation.HtmlCache.DB;
 using Foundation.HtmlCache.Models;
 using Sitecore;
 using Sitecore.Data.Items;
@@ -13,19 +12,21 @@ namespace Foundation.HtmlCache.Providers
         public override void Process(GetItemArgs args)
         {
             if (args.Result != null && HttpContext.Current != null &&
-                HttpContext.Current.Items.Contains("RenderingArgs"))
+                HttpContext.Current.Items.Contains(RenderingProcessorArgs.Key))
             {
                 Item item = args.Result;
                 if (item != null)
                 {
-                    var renderingProcessorArgs = (RenderingProcessorArgs) HttpContext.Current.Items["RenderingArgs"];
+                    var templateRootPath = Context.Database.GetItem(ItemIDs.TemplateRoot).Paths.FullPath;
+
+                    var renderingProcessorArgs = (RenderingProcessorArgs) HttpContext.Current.Items[RenderingProcessorArgs.Key];
                     if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track &&
                         renderingProcessorArgs.CacheableTemplates.Contains(item.TemplateID.ToString()) &&
-                        !item.Paths.FullPath.Contains("/sitecore/templates") &&
+                        !item.Paths.FullPath.Contains(templateRootPath) &&
                         ((item.Language.Name == Context.Language.Name || item.IsFallback) && item.Language != null && !string.IsNullOrEmpty(item.Language.Name)))
                     {
                         renderingProcessorArgs.ItemAccessList.Add(new ItemMetaData(item.ID.Guid, item.Language.Name, false));
-                        HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
+                        HttpContext.Current.Items[RenderingProcessorArgs.Key] = renderingProcessorArgs;
                     }
                 }
             }

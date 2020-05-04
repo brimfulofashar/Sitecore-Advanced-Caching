@@ -23,7 +23,7 @@ namespace Foundation.HtmlCache.Pipelines
             {
                 dic = new RenderingProcessorArgs(TrackOperation.TrackOperationEnum.DoNotTrack);
             }
-            HttpContext.Current.Items["RenderingArgs"] = dic;
+            HttpContext.Current.Items[RenderingProcessorArgs.Key] = dic;
         }
     }
 }

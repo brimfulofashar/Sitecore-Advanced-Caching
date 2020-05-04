@@ -21,7 +21,7 @@ namespace Foundation.HtmlCache.Pipelines
             }
 
             renderingProcessorArgs.TrackOperationEnum = TrackOperation.TrackOperationEnum.DoNotTrack;
-            HttpContext.Current.Items["RenderingArgs"] = renderingProcessorArgs;
+            HttpContext.Current.Items[RenderingProcessorArgs.Key] = renderingProcessorArgs;
         }
     }
 }
