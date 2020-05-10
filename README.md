@@ -9,7 +9,7 @@ FEATURES:
 - Works with both SQL and Azure Service Bus
 
 STEPS:  
-Step 1 - Run sql script located in Scripts folder  
+Step 1 - Run sql script located in Scripts folder. The ConcurrencyId columns have computed column with 12. Change this to the number of virtual CPU's assigned to the database or leave as is for Azure Database.  
 Step 2 - Compile and deploy config and dll to both CM and CD  
 Step 3 - Add HtmlCache ConnectionString  
 Step 4 - Set the HtmlCacheQueueSubscriberPostfix config setting (unique per CD server).  
