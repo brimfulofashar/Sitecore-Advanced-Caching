@@ -11,7 +11,10 @@ namespace Foundation.HtmlCache.Pipelines
         public override void Process(RenderRenderingArgs args)
         {
             RenderingProcessorArgs dic;
-            if (args.Rendering.RenderingType == "r" && !args.UsedCache && args.Cacheable && !string.IsNullOrEmpty(args.CacheKey))
+            if (args.Rendering.RenderingType == "r" 
+                && !args.UsedCache 
+                && args.Cacheable 
+                && !string.IsNullOrEmpty(args.CacheKey))
             {
                 dic = new RenderingProcessorArgs(args.CacheKey, 
                     args.Rendering.RenderingItem.InnerItem.Fields["CacheableTemplates"].Value + "|" + Sitecore.Configuration.Settings.GetSetting("GlobalCacheableTemplateIDs"), 

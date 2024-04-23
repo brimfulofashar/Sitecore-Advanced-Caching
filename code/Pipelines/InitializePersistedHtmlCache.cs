@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Foundation.HtmlCache.DB;
 using Sitecore.Caching;
 using Sitecore.Configuration;
+using Sitecore.Data;
+using Sitecore.Data.Items;
 using Sitecore.Pipelines;
 using Sitecore.Sites;
 

@@ -2,6 +2,7 @@
 using Foundation.HtmlCache.Arguments;
 using Foundation.HtmlCache.Helpers;
 using Foundation.HtmlCache.Models;
+using Sitecore.Caching;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.Pipelines.Response.RenderRendering;
 
@@ -11,7 +12,7 @@ namespace Foundation.HtmlCache.Pipelines
     {
         public override void Process(RenderRenderingArgs args)
         {
-            var renderingProcessorArgs = (RenderingProcessorArgs)HttpContext.Current.Items["RenderingArgs"];
+            var renderingProcessorArgs = (RenderingProcessorArgs)HttpContext.Current.Items[RenderingProcessorArgs.Key];
             if (renderingProcessorArgs.TrackOperationEnum == TrackOperation.TrackOperationEnum.Track)
             {
                 renderingProcessorArgs.CacheResult = ((RecordingTextWriter) args.Writer).GetRecording();
